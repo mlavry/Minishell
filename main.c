@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/03/26 20:21:21 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/03/26 21:05:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	signal_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
-		write(STDOUT_FILENO, "\n", 1);
+		ft_putstr_fd("\n", STDOUT_FILENO);
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
@@ -39,7 +39,10 @@ int main(int argc, char *argv[], char **envp)
 	{
 		line = readline("minishell$ ");
 		if (!line)
+		{
+			ft_putstr_fd("exit\n", 1);
 			break;
+		}
 		if (*line)
 			add_history(line);
 		free(line);

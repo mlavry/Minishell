@@ -3,7 +3,7 @@ NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -I$(SUBDIR)
 
-SRC = main.c
+SRC = main.c parsing_start.c
 
 OBJ = $(SRC:.c=.o)
 SUBDIR = Libft

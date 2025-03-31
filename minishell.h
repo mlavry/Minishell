@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:21 by mlavry            #+#    #+#             */
-/*   Updated: 2025/03/26 19:00:16 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/03/31 20:03:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <term.h>
+# include <stdbool.h>
 
-//------------------------First functions---------------------
+//------------------------Parsing functions---------------------
+bool	parse_line(char *line);
 
 #endif

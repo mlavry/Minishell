@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/03/26 21:05:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/03/31 20:03:20 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,13 @@ void	signal_handler(int sig)
 	{
 		ft_putstr_fd("\n", STDOUT_FILENO);
 		rl_replace_line("", 0);
-		rl_on_new_line();
+		if (rl_on_new_line() != 0)
+			ft_putstr_fd("Error: problem with new line\n", 2);
 		rl_redisplay();
 	}
 }
 
-int main(int argc, char *argv[], char **envp)
+/* int main(int argc, char *argv[], char **envp)
 {
 	char	*line;
 
@@ -33,10 +34,10 @@ int main(int argc, char *argv[], char **envp)
 	{
         return (0);
 	}
-	signal(SIGINT, signal_handler);
-	signal(SIGQUIT, SIG_IGN);
-	while (1)
+	while (1)//si on a un probleme avec la ligne actuelle on peut utiliser continue pour passer a la suivante
 	{
+		signal(SIGINT, signal_handler);
+		signal(SIGQUIT, SIG_IGN);
 		line = readline("minishell$ ");
 		if (!line)
 		{
@@ -47,5 +48,48 @@ int main(int argc, char *argv[], char **envp)
 			add_history(line);
 		free(line);
 	}
+	rl_clear_history();
 	return (0);
+} */
+
+init_data(int argc, char **argv)
+{
+	(void)argc;
+	(void)argv;
+}
+
+bool	empty_line(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] && line[i] == ' ')
+		i++;
+	if	(i == (int)ft_strlen(line))
+	{
+		free(line);
+		return (true);
+	}
+	return (false);
+}
+
+int	main(int argc, char *argv[], char **envp)
+{
+	char	*line;
+
+	init_data(argc, argv);
+	//Creer l'environnement et si sa echoue free les erreurs potentielles
+	while (1)
+	{
+		line = readline("minishell$ ");
+		if (!line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
+		{
+			ft_putstr_fd("exit\n", 2);
+			exit (0);
+		}
+		if (empty_line(line))
+			continue;
+		if (!parse_line(line))
+			continue;
+	}
 }

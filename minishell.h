@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:21 by mlavry            #+#    #+#             */
-/*   Updated: 2025/03/31 20:03:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/02 18:22:47 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,6 @@
 
 //------------------------Parsing functions---------------------
 bool	parse_line(char *line);
+int		open_quote(char *line);
 
 #endif

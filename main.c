@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/02 19:33:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/02 21:03:26 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,12 @@ void	signal_handler(int sig)
 	return (0);
 } */
 
-void	init_data(int argc, char **argv)
+void	init_data(t_data *data, int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
+	data->env = NULL;
+	data->exit_code = 0;
 }
 
 bool	empty_line(char *line)
@@ -76,9 +78,10 @@ bool	empty_line(char *line)
 int	main(int argc, char *argv[], char **envp)
 {
 	char	*line;
+	t_data	data;
 
 	(void)envp;
-	init_data(argc, argv);
+	init_data(&data, argc, argv);
 	//Creer l'environnement et si sa echoue free les erreurs potentielles
 	while (1)
 	{
@@ -90,7 +93,7 @@ int	main(int argc, char *argv[], char **envp)
 		}
 		if (empty_line(line))
 			continue;
-		if (!parse_line(line))
+		if (!parse_line(&data, line))
 			continue;
 		if (*line)
 			add_history(line);

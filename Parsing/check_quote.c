@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/02 19:31:05 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/02 21:03:54 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	quote_choice(bool *sq, bool *dq, char c)
 	}
 }
 
-int	open_quote(char *line)
+int	open_quote(t_data *data, char *line)
 {
 	bool	sq;
 	bool	dq;
@@ -47,6 +47,7 @@ int	open_quote(char *line)
 	}
 	if (sq || dq)
 	{
+		data->exit_code = 2;
 		ft_putstr_fd("open quote\n", 2);
 		return (1);
 	}

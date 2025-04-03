@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/02 21:03:26 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/03 16:43:25 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ int	main(int argc, char *argv[], char **envp)
 
 	(void)envp;
 	init_data(&data, argc, argv);
+	
 	//Creer l'environnement et si sa echoue free les erreurs potentielles
 	while (1)
 	{

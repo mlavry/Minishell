@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/02 21:03:54 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/03 16:37:58 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	quote_choice(bool *sq, bool *dq, char c)
 	}
 }
 
-int	open_quote(t_data *data, char *line)
+int	open_quote(t_data *data, char *line)//I think she work
 {
 	bool	sq;
 	bool	dq;
@@ -43,7 +43,7 @@ int	open_quote(t_data *data, char *line)
 	while (line[i])
 	{
 		quote_choice(&sq, &dq, line[i]);
-		i++;	
+		i++;
 	}
 	if (sq || dq)
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/07 20:47:47 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/07 21:53:25 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,22 @@
 # include <termios.h>
 # include <term.h>
 # include <stdbool.h>
+
+# define INPUT 1 //"<"
+# define HEREDOC 2 //"<<"
+# define OUTPUT 3 //">"
+# define APPEND 4 //">>"
+# define PIPE 5 //"|"
+# define CMD 6 //"cmd"
+# define ARG 7 //"arg"
+
+typedef struct	s_token
+{
+	char			*str;
+	int				type;
+	struct s_token	*next;
+	struct s_token	*prev;
+}	t_token;
 
 typedef struct	s_env
 {

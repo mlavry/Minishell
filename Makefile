@@ -1,41 +1,44 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: aboutale <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/03/24 18:01:52 by aboutale          #+#    #+#              #
+#    Updated: 2025/03/24 18:01:53 by aboutale         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+SRCS = main.c ft_split.c utils.c envp.c builtin.c 
+
+OBJS = $(SRCS:.c=.o)
+
 NAME = minishell
 
+CFLAGS = -Wall -Wextra -Werror -g3 -lreadline
+
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(SUBDIR)
 
-SRC = main.c Parsing/parsing_start.c Parsing/check_quote.c
+LIBFT = libft/libft.a
 
-OBJ = $(SRC:.c=.o)
-SUBDIR = Libft
+%.o: %.c
+	$(CC) -Wall -Wextra -Werror -g3 -c $< -o $@ 
 
-RED		:= \033[0;31m
-GREEN	:= \033[0;32m
-YELLOW	:= \033[0;33m
-BLUE	:= \033[0;34m
-NC		:= \033[0m
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(OBJS) -Llibft -lft -lreadline -o $(NAME) $(CFLAGS)
 
 all: $(NAME)
 
-$(NAME): $(SUBDIR)/libft.a $(OBJ)
-	$(CC)	$(CFLAGS)	$(OBJ)	$(SUBDIR)/libft.a -lreadline -o	$(NAME)
-	@echo "$(GREEN)FINISHED COMPILING $(NAME)!$(NC)"
-
-$(SUBDIR)/libft.a:
-	$(MAKE) -C $(SUBDIR)
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
+$(LIBFT) :
+	make all -C libft
 clean:
-	rm -f $(OBJ)
-	$(MAKE) -C $(SUBDIR) clean
-	@echo "$(YELLOW)OBJECTS FILES DELETED!$(NC)"
+	rm -rf $(OBJS) 
+	make clean -C libft
 
 fclean: clean
-	rm -f $(NAME)
-	$(MAKE) -C $(SUBDIR) fclean
-	@echo "$(RED)ALL FILES CLEAN!$(NC)"
+	rm -rf $(NAME)
+	make fclean -C libft
 
 re: fclean all
 
-.PHONY: all clean fclean re

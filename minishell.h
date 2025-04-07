@@ -3,51 +3,78 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
+/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/26 17:55:21 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/02 21:05:28 by mlavry           ###   ########.fr       */
+/*   Created: 2025/03/24 18:02:03 by aboutale          #+#    #+#             */
+/*   Updated: 2025/03/24 18:02:05 by aboutale         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-# define CODE_ERROR 2
-# define CODE_
 
-# include "Libft/libft.h"
+# include <stdio.h>
+# include <unistd.h>
+# include <stdlib.h>
 # include <sys/types.h>
+# include <sys/wait.h>
+# include <string.h>
+# include <fcntl.h>
+# include <errno.h>
+
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-# include <sys/wait.h>
-# include <signal.h>
-# include <sys/stat.h>
-# include <dirent.h>
-# include <string.h>
-# include <sys/ioctl.h>
-# include <termios.h>
-# include <term.h>
-# include <stdbool.h>
+# include "libft/libft.h"
+# define PROMPT "aboutale@k1r3p1:~$ "
 
-typedef struct	s_list_str
+
+
+//structure pour l'environnement et le PATH
+typedef struct s_env
 {
-	char				*str;
-	struct s_list_str	*next;
-	struct s_list_str	*prev;
-}						t_lis_str;
+	char			*name;
+	char			*value;
+	struct s_env	*next;
+}	t_env;
 
-typedef struct	s_data
+
+//structure pour les commandes 
+typedef struct s_cmd
 {
-	t_lis_str	*env;
-	int			exit_code;
-}				t_data;
+	char			*name;
+	char			**args;
+	int				fd_in;
+	int				fd_out;
+	struct s_cmd	*next;
+}	t_cmd;
 
-//------------------------Parsing functions---------------------
-bool	parse_line(t_data *data, char *line);
-int		open_quote(t_data *data, char *line);
+
+//structure pour les pipes et redirections
+typedef struct s_pipex
+{
+	int		infile;
+	int		outfile;
+	int		pipes[2][2];
+	char	**paths;
+	char	**cmds;
+	int		n_commands;
+	char	**envp;
+}	t_pipex;
+
+void	parse_env(char **envp, t_env **list);
+void	ft_pwd(void);
+void	executecommand(t_env *list, char *line, char **envp, t_cmd *cmd);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	**ft_split(const char *s, char c);
+char	*getenvp(t_env *list, char *name);
+void	execute_pipeline(t_env *env_list, char *line);
+void	free_split(char **split_paths);
+int		isbuiltin(t_cmd *cmd, t_env *env_list);
+void	builtin_env( t_env *env_list);
+void	builtin_cd(char *newpath);
+void	builtin_pwd(t_cmd *cmd);
+void	builtin_echo(t_cmd *cmd, t_env *env_list);
+void	builtin_exit(t_cmd *cmd);
+void	builtin_export(t_env *env_list, t_cmd *cmd);
 
 #endif

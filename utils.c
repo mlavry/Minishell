@@ -3,14 +3,64 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/25 21:15:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/25 21:15:05 by aboutale         ###   ########.fr       */
+/*   Created: 2025/04/07 20:29:56 by mlavry            #+#    #+#             */
+/*   Updated: 2025/04/07 20:30:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+char	*ft_strcat(char *dest, char *src)
+{
+	int	i;
+	int	o;
+
+	i = 0;
+	o = 0;
+	while (dest[i] != '\0')
+	{
+		i++;
+	}
+	while (src[o] != '\0')
+	{
+		dest[i] = src[o];
+		i++;
+		o++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+char	*ft_strcpy(char *dest, char *src)
+{
+	int	i;
+
+	i = 0;
+	while (src[i] != '\0')
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
+}
+
+int	ft_strcmp(char *s1, char *s2)
+
+{
+	int	i;
+
+	i = 0;
+	while (s1[i] != '\0' && s2[i] != '\0')
+	{
+		if (s1[i] != s2[i])
+			return (s1[i] - s2[i]);
+		i++;
+	}
+	return (s1[i] - s2[i]);
+}
 
 size_t  ft_strlen(const char *s) 
 {
@@ -112,7 +162,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 } */
 
 
-void	free_paths(t_pipex *pipex)
+/* void	free_paths(t_pipex *pipex)
 {
 	int	i;
 
@@ -142,7 +192,7 @@ void	free_pipex(t_pipex *pipex)
 		close(pipex->infile);
 	if (pipex->outfile >= 0)
 		close(pipex->outfile);
-}
+} */
 
 void	free_split(char **split_paths)
 {
@@ -173,7 +223,7 @@ char	*findpath(char **envp)
 	return (NULL);
 }
 
-void	get_path(t_pipex *pipex, char **args)
+/* void	get_path(t_pipex *pipex, char **args)
 {
 	int		i;
 	char	*fullcmd;
@@ -198,4 +248,4 @@ void	get_path(t_pipex *pipex, char **args)
 		free(fullcmd);
 		i++;
 	}
-}
+} */

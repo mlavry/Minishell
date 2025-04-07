@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   path.c                                             :+:      :+:    :+:   */
+/*   envp.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/25 15:43:11 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/07 21:03:16 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	add_env_var(t_env **env_list, char *name, char *value)
 	tmp->next = new_var;
 }
 
-void parse_env(char **envp, t_env **env_list)
+void parse_env(char **envp, t_data *env_list)
 {
 	int		i;
 	char	*name;
@@ -65,7 +65,7 @@ void parse_env(char **envp, t_env **env_list)
 		}
 		name = ft_substr(envp[i], 0, equal_pos - envp[i]); // Copie avant '='
 		value = ft_strdup(equal_pos + 1); // Copie après '='
-		add_env_var(env_list, name, value);
+		add_env_var(&env_list->env, name, value);
 		free(name);
 		free(value);
 		i++;
@@ -117,8 +117,6 @@ char *getpath(char **envp, char *cmd)
     return NULL;
 }
 
-
-
 void	exec_extern_command(char **args, t_env *env_list, char **envp)
 {
 	(void)env_list;
@@ -146,7 +144,7 @@ void	exec_extern_command(char **args, t_env *env_list, char **envp)
 }
 
 
-void	executecommand(t_env *env_list, char *line, char **envp, t_cmd *cmd)
+/* void	executecommand(t_env *env_list, char *line, char **envp, t_cmd *cmd)
 {
 	char	**args;
 	int		i;
@@ -172,5 +170,5 @@ void	executecommand(t_env *env_list, char *line, char **envp, t_cmd *cmd)
 		free(args[i++]);
 	free(args);
 
-}
+} */
 

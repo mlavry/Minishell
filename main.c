@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/07 21:36:27 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/08 20:56:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ void	init_data(t_data *data, int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	data->env = NULL;
+	data->token = NULL;
 	data->exit_code = 0;
 }
 
@@ -82,7 +83,6 @@ int	main(int argc, char *argv[], char **envp)
 
 	(void)envp;
 	init_data(&data, argc, argv);
-
 	//Creer l'environnement et si sa echoue free les erreurs potentielles
 	parse_env(envp, &data);
 	/* printf("%s", data.env->value); */

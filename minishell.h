@@ -6,7 +6,7 @@
 /*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/07 21:55:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/08 20:55:35 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,14 @@ typedef struct	s_env
 typedef struct	s_data
 {
 	t_env		*env;
+	t_token		*token;
 	int			exit_code;
 }				t_data;
 
 //------------------------Parsing functions---------------------
 bool	parse_line(t_data *data, char *line);
 int		open_quote(t_data *data, char *line);
+int		tokenize(t_data *data, char *line);
 
 //------------------------Make_env---------------------
 void	parse_env(char **envp, t_data *env_list);

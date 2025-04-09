@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/08 20:56:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/09 18:07:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	signal_handler(int sig)
+/*void	signal_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -22,7 +22,7 @@ void	signal_handler(int sig)
 			ft_putstr_fd("Error: problem with new line\n", 2);
 		rl_redisplay();
 	}
-}
+}*/
 
 /* int main(int argc, char *argv[], char **envp)
 {
@@ -101,6 +101,6 @@ int	main(int argc, char *argv[], char **envp)
 		if (*line)
 			add_history(line);
 	}
-	rl_clear_history();
+	clear_history();
 	return (0);
 }

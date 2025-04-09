@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/08 20:55:35 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/09 18:52:38 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ typedef struct	s_token
 	char			*str;
 	int				type;
 	struct s_token	*next;
-	struct s_token	*prev;
 }	t_token;
 
 typedef struct	s_env
@@ -52,7 +51,6 @@ typedef struct	s_env
 	char				*name;
 	char				*value;
 	struct s_env		*next;
-	struct s_env		*prev;
 }	t_env;
 
 typedef struct	s_data

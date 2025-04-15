@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/10 18:52:45 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/15 19:55:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ int	open_quote(t_data *data, char *line)//I think she work
 	sq = false;
 	dq = false;
 	i = 0;
-
 	while (line[i])
 	{
 		quote_choice(&sq, &dq, line[i]);

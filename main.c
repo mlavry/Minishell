@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/09 18:07:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/15 21:41:04 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ int	main(int argc, char *argv[], char **envp)
 	/* printf("%s", data.env->value); */
 	while (1)
 	{
+		//setup signal
 		line = readline("minishell$ ");
 		if (!line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
 		{

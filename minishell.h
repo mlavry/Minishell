@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/09 18:52:38 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/10 18:09:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ typedef struct	s_token
 {
 	char			*str;
 	int				type;
+	bool			sq;
+	bool			dq;
 	struct s_token	*next;
 }	t_token;
 
@@ -64,6 +66,7 @@ typedef struct	s_data
 bool	parse_line(t_data *data, char *line);
 int		open_quote(t_data *data, char *line);
 int		tokenize(t_data *data, char *line);
+int		is_quoted(const char *str);
 
 //------------------------Make_env---------------------
 void	parse_env(char **envp, t_data *env_list);

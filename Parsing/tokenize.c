@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/09 19:26:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/10 18:52:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,10 @@ void	add_token(t_token **head, char *value, int type)
 	new->str = ft_strdup(value);
 	new->type = type;
 	new->next = NULL;
+	if (is_quoted(value) == 1)
+		new->sq = true;
+	if (is_quoted(value) == 2)
+		new->dq = true;
 	if (!*head)
 		*head = new;
 	else
@@ -67,8 +71,9 @@ void	parse_token(t_data *data, char **tokens)
 	/*t_token *tmp = token_list;
 	while (tmp)
 	{
-		printf("Token: %-10s Type: %d\n", tmp->str, tmp->type);
-		tmp = tmp->next;	
+		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
+			tmp->str, tmp->type, tmp->sq, tmp->dq);
+		tmp = tmp->next;
 	}*/
 	data->token = token_list;
 }

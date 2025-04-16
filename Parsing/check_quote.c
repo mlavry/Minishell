@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/15 19:55:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/16 19:40:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ int	open_quote(t_data *data, char *line)//I think she work
 	return (0);
 }
 
-int	is_quoted(const char *str)
+/* int	is_quoted(const char *str)
 {
 	int	len;
 
@@ -65,4 +65,41 @@ int	is_quoted(const char *str)
 	if (str[0] == '"' && str[len - 1] == '"')
 		return (2);
 	return (0);
+} */
+
+int	is_quoted(char c)
+{
+	if (c == '\'')
+		return (1);
+	if (c == '"')
+		return (2);
+	return (0);
+}
+
+void	stock_and_delete_quote(t_token *token) //appeler une fois que les token sont deja initialiser et faire attention a ce que dq et sq soit bien initialiser
+{
+	int		len;
+	char	*tmp;
+
+	len = (int)ft_strlen(token->str);
+	if (!token || !token->str || len < 2)
+		return ;
+	if (token->str[0] == '\'' && token->str[len - 1] == '\'')
+	{
+		token->sq = true;
+		tmp = ft_substr(token->str, 1, len - 2);
+		if (!tmp)
+			return ;
+		free(token->str);
+		token->str = tmp;
+	}
+	else if (token->str[0] == '"' && token->str[len - 1] == '"')
+	{
+		token->dq = true;
+		tmp = ft_substr(token->str, 1, len - 2);
+		if (!tmp)
+			return ;
+		free(token->str);
+		token->str = tmp;
+	}
 }

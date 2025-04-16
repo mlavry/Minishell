@@ -3,7 +3,7 @@ NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -I$(SUBDIR)
 
-SRC = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c\
+SRC = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c\
 envp.c utils.c
 
 OBJ = $(SRC:.c=.o)

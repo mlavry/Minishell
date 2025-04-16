@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/10 18:09:41 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/16 19:39:46 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,8 @@ typedef struct	s_data
 bool	parse_line(t_data *data, char *line);
 int		open_quote(t_data *data, char *line);
 int		tokenize(t_data *data, char *line);
-int		is_quoted(const char *str);
+int		is_quoted(char c);
+void	stock_and_delete_quote(t_token *token);
 
 //------------------------Make_env---------------------
 void	parse_env(char **envp, t_data *env_list);

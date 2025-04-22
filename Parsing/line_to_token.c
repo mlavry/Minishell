@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 19:53:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 22:02:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,80 +99,6 @@ int	count_tokens(char *line)
 	return (count);
 }
 
-char	**line_to_token(char *line)
-{
-	char	**tokens;
-	int		start = 0;
-	int		i = 0;
-	bool	sq = false;
-	bool	dq = false;
-	int		token_index = 0;
-	int		nb_tokens;
-
-	nb_tokens = count_tokens(line);
-	tokens = malloc(sizeof(char *) * (nb_tokens + 1)); // +1 pour NULL final
-	if (!tokens)
-		return (NULL);
-
-	while (line[i])
-	{
-		quote_choice(&sq, &dq, line[i]);
-
-		if (!sq && !dq)
-		{
-			if (is_space(line[i]))
-			{
-				if (i > start)
-					tokens[token_index++] = ft_substr(line, start, i - start);
-				while (is_space(line[i]))
-					i++;
-				start = i;
-				continue;
-			}
-			if (is_operator(line[i]))
-			{
-				if (i > start)
-					tokens[token_index++] = ft_substr(line, start, i - start);
-				start = i;
-				while (is_operator(line[i]))
-					i++;
-				tokens[token_index++] = ft_substr(line, start, i - start);
-				start = i;
-				continue;
-			}
-		}
-		i++;
-	}
-	if (i > start)
-		tokens[token_index++] = ft_substr(line, start, i - start);
-	tokens[token_index] = NULL;
-	return (tokens);
-}
-
-/*char	**line_to_token(char *line)
-{
-	char	**tokens;	
-	int		start;
-	int		i;
-	int		token_index;
-	bool	sq;
-	bool	dq;
-
-	start = 0;
-	i = 0;
-	token_index = 0;
-	sq = false;
-	dq = false;
-	while (line[i])
-	{
-		quote_choice(&sq, &dq, line[i]);
-		if (!dq && !sq)
-		{
-			
-		}
-	}
-} */
-
 //----------------------------TEST COUNT TOKENS-----------------------------------
 
 /*int main(void)
@@ -200,7 +126,7 @@ char	**line_to_token(char *line)
 int	main(void)
 {
 	int i = 0;
-	char	**test = line_to_token("echo bonjour>>> < <<<           a");
+	char	**test = line_to_token("echo bonjour>>> < <<<\'Ca dit quoi      \'         a");
 
 	while(test[i])
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 19:29:13 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 21:53:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ int		tokenize(t_data *data, char *line);
 int		is_quoted(char c);
 void	stock_and_delete_quote(t_token *token);
 void	quote_choice(bool *sq, bool *dq, char c);
+int		count_tokens(char *line);
+char	**line_to_token(char *line);
 
 //------------------------Make_env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -78,5 +80,7 @@ char	*getenvp(t_env *list, char *name);
 int		ft_strcmp(char *s1, char *s2);
 char	*ft_strcpy(char *dest, char *src);
 char	*ft_strcat(char *dest, char *src);
+int		is_operator(char c);
+int		is_space(char c);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/16 19:39:46 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 19:29:13 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ int		open_quote(t_data *data, char *line);
 int		tokenize(t_data *data, char *line);
 int		is_quoted(char c);
 void	stock_and_delete_quote(t_token *token);
+void	quote_choice(bool *sq, bool *dq, char c);
 
 //------------------------Make_env---------------------
 void	parse_env(char **envp, t_data *env_list);

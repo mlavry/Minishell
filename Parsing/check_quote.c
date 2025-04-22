@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/16 19:40:41 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 22:28:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,20 +52,6 @@ int	open_quote(t_data *data, char *line)//I think she work
 	}
 	return (0);
 }
-
-/* int	is_quoted(const char *str)
-{
-	int	len;
-
-	if (!str)
-		return (0);
-	len = (int)ft_strlen(str);
-	if (str[0] == '\'' && str[len - 1] == '\'')
-		return (1);
-	if (str[0] == '"' && str[len - 1] == '"')
-		return (2);
-	return (0);
-} */
 
 int	is_quoted(char c)
 {

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 21:53:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 22:36:47 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 # define CMD 6 //"cmd"
 # define ARG 7 //"arg"
 
-typedef struct	s_token
+typedef struct s_token
 {
 	char			*str;
 	int				type;
@@ -48,14 +48,14 @@ typedef struct	s_token
 	struct s_token	*next;
 }	t_token;
 
-typedef struct	s_env
+typedef struct s_env
 {
 	char				*name;
 	char				*value;
 	struct s_env		*next;
 }	t_env;
 
-typedef struct	s_data
+typedef struct s_data
 {
 	t_env		*env;
 	t_token		*token;
@@ -82,5 +82,8 @@ char	*ft_strcpy(char *dest, char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
+
+//------------------------Free functions---------------------
+void	free_tab(char **tokens);
 
 #endif

@@ -6,29 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:02:17 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/22 22:38:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
-void	quote_choice(bool *sq, bool *dq, char c)
-{
-	if ((c == '\'' || c == '"') && !*sq && !*dq)
-	{
-		if (c == '\'' && !*dq)
-			*sq = true;
-		if (c == '"' && !*sq)
-			*dq = true;
-	}
-	else if (c == '\'' || c == '"')
-	{
-		if (c == '\'' && !*dq)
-			*sq = false;
-		if (c == '"' && !*sq)
-			*dq = false;
-	}
-}
 
 int	is_operator(char c)
 {
@@ -123,7 +105,7 @@ int	count_tokens(char *line)
 	return (0);
 }*/
 
-int	main(void)
+/*int	main(void)
 {
 	int i = 0;
 	char	**test = line_to_token("echo bonjour>>> < <<<\'Ca dit quoi      \'         a");
@@ -133,4 +115,5 @@ int	main(void)
 		printf("%s\n", test[i]);
 		i++;
 	}
-}
+	free_tab(test);
+}*/

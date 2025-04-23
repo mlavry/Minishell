@@ -135,5 +135,3 @@ void	forkprocess(t_pipex *pipex)
 			parentprocess(pipex, i);
 	}
 }
-
-

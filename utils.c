@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-size_t  ft_strlen(const char *s) 
+/* size_t  ft_strlen(const char *s) 
 {
 	size_t  i;
 
@@ -21,7 +21,6 @@ size_t  ft_strlen(const char *s)
 		i++;
 	return (i);
 }
-
 
 
  void	*ft_calloc(size_t nmemb, size_t size)
@@ -93,24 +92,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		j++;
 	}
 	return (joi);
-}
-
-/* int	ft_strncmp(char *s1, char *s2, unsigned int n)
-{
-	unsigned int	i ;
-
-	i = 0;
-	while ((i < n) && s1[i])
-	{
-		if (s1[i] != s2[i])
-			return (s1[i] - s2[i]);
-		i++;
-	}
-	if (i < n)
-		return (s1[i] - s2[i]);
-	return (0);
 } */
-
 
 void	free_paths(t_pipex *pipex)
 {

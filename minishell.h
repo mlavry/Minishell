@@ -25,9 +25,9 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
-# define PROMPT "aboutale@k1r3p1:~$ "
+# define PROMPT "minishell:~$ "
 
-
+extern int	g_exit ;
 
 //structure pour l'environnement et le PATH
 typedef struct s_env
@@ -36,7 +36,6 @@ typedef struct s_env
 	char			*value;
 	struct s_env	*next;
 }	t_env;
-
 
 //structure pour les commandes 
 typedef struct s_cmd
@@ -48,8 +47,15 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
+//structure pour les pipes 
+/* typedef struct s_pipex
+{
+	char			**args;
+	int				pipe_in;
+	int				pipe_out;
+	struct s_pipex	*next;
+}	t_pipex; */
 
-//structure pour les pipes et redirections
 typedef struct s_pipex
 {
 	int		infile;
@@ -61,20 +67,37 @@ typedef struct s_pipex
 	char	**envp;
 }	t_pipex;
 
-void	parse_env(char **envp, t_env **list);
-void	ft_pwd(void);
-void	executecommand(t_env *list, char *line, char **envp, t_cmd *cmd);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
-char	**ft_split(const char *s, char c);
 char	*getenvp(t_env *list, char *name);
-void	execute_pipeline(t_env *env_list, char *line);
-void	free_split(char **split_paths);
-int		isbuiltin(t_cmd *cmd, t_env *env_list);
+void	add_env_var(t_env **env_list, char *name, char *value);
+void	update_env_var(t_env **env_list, char *name, char *value);
+void	parse_env(char **envp, t_env **list);
+void	swap_env(t_env *a, t_env *b);
+void	sort_env(t_env **env_list);
+void	emptyenv(t_env **env_list);
+char	**convert_env(t_env *env_list);
+
+char	*get_absolute_path(char *cmd);
+char	*find_cmd_path(char *cmd);
+char	*getpath(char *cmd);
+
+void	exec_extern_command(char **args, t_env *env_list);
+void	executecommand(t_env *list, char *line, t_cmd *cmd);
+void	execshell(t_env **env_list);
+t_env	*find_env_var(t_env *env_list, char *name);
+
+int		isbuiltin(t_cmd *cmd, t_env *env_list, char **args);
 void	builtin_env( t_env *env_list);
-void	builtin_cd(char *newpath);
+void	builtin_cd(t_env **env_list, char *newpath);
 void	builtin_pwd(t_cmd *cmd);
 void	builtin_echo(t_cmd *cmd, t_env *env_list);
 void	builtin_exit(t_cmd *cmd);
-void	builtin_export(t_env *env_list, t_cmd *cmd);
+void	builtin_unset(t_env **env_list, char **args);
+
+int		validate_export_name(char *name);
+char	*extract_name(char *arg);
+char	*extract_value(char *arg);
+t_env	*copyenvlist(t_env *env_list);
+void	built_export(t_env *env_list);
+void	builtin_export(t_env **env_list, char **args);
 
 #endif

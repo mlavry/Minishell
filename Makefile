@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c ft_split.c utils.c envp.c builtin.c 
+SRCS = main.c envp.c builtin.c builtin2.c export.c export2.c getpath.c exec.c 
 
 OBJS = $(SRCS:.c=.o)
 

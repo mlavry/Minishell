@@ -14,28 +14,26 @@
 
 char	*getenvp(t_env *list, char *name)
 {
-
 	while (list)
 	{
 		if (ft_strcmp(list->name, name) == 0)
 			return (list->value);
 		list = list->next;
-
 	}
 	return (NULL);
 }
 
 void	add_env_var(t_env **env_list, char *name, char *value)
 {
-    t_env	*new_var = malloc(sizeof(t_env));
-    t_env	*tmp;
+	t_env	*new_var;
+	t_env	*tmp;
 
+	new_var = malloc(sizeof(t_env));
 	if (!new_var)
 		return ;
 	new_var->name = ft_strdup(name);
 	new_var->value = ft_strdup(value);
 	new_var->next = NULL;
-
 	if (!*env_list)
 	{
 		*env_list = new_var;
@@ -47,7 +45,55 @@ void	add_env_var(t_env **env_list, char *name, char *value)
 	tmp->next = new_var;
 }
 
-void parse_env(char **envp, t_env **env_list)
+void	copy_env(t_env *tmp, int count, char **envp)
+{
+	int		i;
+	size_t	len;
+
+	i = 0;
+	while (i < count)
+	{
+		len = ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2;
+		envp[i] = malloc(len);
+		if (!envp[i])
+		{
+			perror("malloc");
+			exit(EXIT_FAILURE);
+		}
+		ft_strcpy(envp[i], tmp->name);
+		ft_strcat(envp[i], "=");
+		ft_strcat(envp[i], tmp->value);
+		tmp = tmp->next;
+		i++;
+	}
+}
+
+char	**convert_env(t_env *env_list)
+{
+	int		count;
+	t_env	*tmp;
+	char	**envp;
+
+	tmp = env_list;
+	count = 0;
+	while (tmp)
+	{
+		count++;
+		tmp = tmp->next;
+	}
+	envp = malloc((count + 1) * sizeof(char *));
+	if (!envp)
+	{
+		perror("malloc");
+		exit(EXIT_FAILURE);
+	}
+	tmp = env_list;
+	copy_env(tmp, count, envp);
+	envp[count] = NULL;
+	return (envp);
+}
+
+void	parse_env(char **envp, t_env **env_list)
 {
 	int		i;
 	char	*name;
@@ -57,14 +103,14 @@ void parse_env(char **envp, t_env **env_list)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = strchr(envp[i], '=');
+		equal_pos = ft_strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;
 			continue ;
 		}
-		name = ft_substr(envp[i], 0, equal_pos - envp[i]); // Copie avant '='
-		value = ft_strdup(equal_pos + 1); // Copie après '='
+		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
+		value = ft_strdup(equal_pos + 1);
 		add_env_var(env_list, name, value);
 		free(name);
 		free(value);
@@ -72,105 +118,38 @@ void parse_env(char **envp, t_env **env_list)
 	}
 }
 
-
-
-
-char *getpath(char **envp, char *cmd)
+void	swap_env(t_env *a, t_env *b)
 {
-	char *path;
-	char **token;
-	char *full_path = NULL;
-	int i = 0;
-	path= getenv("PATH");
-	(void)envp;
+	char	*tmp;
 
-	if (cmd[0] == '/' || cmd[0] == '.')
-    {
-        if (access(cmd, X_OK) == 0) // Vérifie si l'exécutable existe
-            return ft_strdup(cmd); // Retourne directement le chemin
-        return NULL; // Le fichier n'existe pas ou n'est pas exécutable
-    }
-	if (!path)
-		return NULL;
-	token = ft_split(path, ':');
-	while (token[i])
-    {
-        full_path = malloc(strlen(token[i]) + strlen(cmd) + 2);
-        if (!full_path)
-            break;
-		ft_strcpy(full_path, token[i]);
-		ft_strcat(full_path, "/");
-		ft_strcat(full_path, cmd);
-
-        if (access(full_path, X_OK) == 0)
-        {
-            int j = 0;
-            while (token[j])
-                free(token[j++]);
-            free(token);
-            return full_path;
-        }
-
-        free(full_path);
-        i++;
-    }
-    return NULL;
+	tmp = a->name;
+	a->name = b->name;
+	b->name = tmp;
+	tmp = a->value;
+	a->value = b->value;
+	b->value = tmp;
 }
 
-
-
-void	exec_extern_command(char **args, t_env *env_list, char **envp)
+void	sort_env(t_env **env_list)
 {
-	(void)env_list;
-	pid_t pid= 0;
-	int status;
-	char *path = getpath(envp,args[0]);
+	t_env	*current ;
+	t_env	*nextnode;
+	int		swap;
 
-	if (!path)
+	swap = 1;
+	while (swap)
 	{
-		printf("bash : %s command not found\n", args[0]);
-		return ;
+		swap = 0;
+		current = *env_list;
+		while (current->next)
+		{
+			nextnode = current->next;
+			if (ft_strcmp(current->name, nextnode->name) > 0)
+			{
+				swap_env(current, nextnode);
+				swap = 1;
+			}
+			current = current->next;
+		}
 	}
-	pid = fork();
-	if (pid == -1)
-		return ;
-
-	if (pid == 0)
-	{
-		execve(path, args, envp);
-		exit(127);
-
-	}
-	else
-		waitpid(pid, &status, 0);
 }
-
-
-void	executecommand(t_env *env_list, char *line, char **envp, t_cmd *cmd)
-{
-	char	**args;
-	int		i;
-
-	i = 0;
-	args = ft_split(line, ' ');
-	if (!args[0])
-	{
-		free(args);
-		return ;
-	}
-    cmd->name = args[0];
-    cmd->args = args;
-    cmd->fd_in = 0;
-    cmd->fd_out = 1;
-    cmd->next = NULL;
-
-	if (!isbuiltin(cmd, env_list))
-		exec_extern_command(cmd->args, env_list, envp);
-
-
-	while (args[i])
-		free(args[i++]);
-	free(args);
-
-}
-

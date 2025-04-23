@@ -39,4 +39,3 @@ printf("%d\n",ft_strcmp(tabs1,tabs2));
 printf("%s\n%s ",tabs1,tabs2);
 }
 */
-

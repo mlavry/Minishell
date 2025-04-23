@@ -13,43 +13,44 @@
 #include "minishell.h"
 
 
+int g_exit = 0;
+
 int main(int argc, char **argv, char **envp)
 {
 	(void)argv;
-	t_env *list = NULL;
+	t_env *env_list = NULL;
 	t_cmd cmd;
 	char *line;
 
 	if (argc != 1)
 		exit(0);
-/* 
-	cmd.name = NULL;
-    cmd.args = NULL;
-    cmd.fd_in = 0;
-    cmd.fd_out = 1;
-    cmd.next = NULL; */
 
-	parse_env(envp, &list);
+	parse_env(envp, &env_list);
+	execshell( &env_list);
+	emptyenv(&env_list);
 	while (1)
 	{
-
 		line = readline(PROMPT);
 		if (line[0] == '\0')
 		{
+			g_exit = 127;
 			free(line);
 			continue ;
 		}
 		add_history(line);
 		if (line[0] == '$')
 		{
-			char *value = getenvp(list, line + 1);
+			if(line[1] == '?')
+				printf("%d: command not found\n", g_exit);
+			char *value = getenvp(env_list, line + 1);
 			if (value)
-				printf("shellmini : %s : command not founnd\n", value);
+				printf("bash : %s : command not founnd\n", value);
 		}
 		else 
-			executecommand(list, line, envp,&cmd);
+			executecommand(env_list, line,  &cmd);
 		free(line);
 	}
+	clear_history();
 }
 
 

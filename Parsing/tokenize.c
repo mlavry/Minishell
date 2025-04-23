@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:42:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/23 18:40:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void	add_token(t_token **head, char *value, int type)
 	new->next = NULL;
 	new->sq = false;
 	new->dq = false;
+	stock_and_delete_quote(new);
 	if (!*head)
 		*head = new;
 	else

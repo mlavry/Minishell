@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   getpath.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 21:43:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/26 21:43:32 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:50:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*get_absolute_path(char *cmd)
 {

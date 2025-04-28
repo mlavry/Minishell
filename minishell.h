@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:36:47 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/28 17:54:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ typedef struct s_token
 	bool			sq;
 	bool			dq;
 	struct s_token	*next;
+	struct s_token	*prev;
 }	t_token;
 
 typedef struct s_env

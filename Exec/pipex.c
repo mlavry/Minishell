@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 21:07:32 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/26 21:07:33 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:50:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp)
 {

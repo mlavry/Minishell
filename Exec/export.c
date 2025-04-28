@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:41:49 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/20 20:41:51 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:50:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	validate_export_name(char *name)
 {

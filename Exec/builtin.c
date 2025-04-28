@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/26 17:07:29 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:49:48 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	isbuiltin(t_cmd *cmd, t_env *env_list, char **args)
 {

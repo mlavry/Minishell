@@ -3,8 +3,12 @@ NAME = minishell
 CC = cc
 CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
 
-SRC = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
+SRC_EXEC = Exec/builtin.c Exec/builtin2.c Exec/exec.c Exec/export.c Exec/export2.c Exec/getpath.c Exec/pipex.c
+
+SRC_PARSING = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
 envp.c utils.c
+
+SRC = $(SRC_EXEC) $(SRC_PARSING)
 
 OBJ = $(SRC:.c=.o)
 SUBDIR = Libft

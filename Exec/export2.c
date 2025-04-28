@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   export2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:47:12 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/21 21:47:13 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:50:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	update_env_var(t_env **env_list, char *name, char *value)
 {

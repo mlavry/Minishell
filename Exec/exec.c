@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/20 20:57:17 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/28 17:49:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	exec_extern_command(char **args, t_env *env_list)
 {

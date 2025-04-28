@@ -1,7 +1,7 @@
 NAME = minishell
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I$(SUBDIR)
+CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
 
 SRC = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
 envp.c utils.c

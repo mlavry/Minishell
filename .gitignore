@@ -2,3 +2,5 @@
 *.a
 minishell
 Subjects
+command
+valgrind*

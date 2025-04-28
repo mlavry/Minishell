@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:38:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/28 16:20:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	space_and_operator_check(int *start, int *i, int *count, char *line)
 	{
 		if (*i > *start)
 			(*count)++;
-		while (is_operator(line[*i]))
+		while (line[*i] == line[*start])
 			(*i)++;
 		(*count)++;
 		*start = *i;

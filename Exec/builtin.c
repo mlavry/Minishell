@@ -6,15 +6,14 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/28 17:49:48 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 19:44:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	isbuiltin(t_cmd *cmd, t_env *env_list, char **args)
+int	isbuiltin(t_cmd *cmd, t_env *env_list)
 {
-	g_exit = 0;
 	if (!cmd || !cmd->name)
 		return (0);
 	if (ft_strcmp(cmd->name, "echo") == 0)
@@ -24,13 +23,13 @@ int	isbuiltin(t_cmd *cmd, t_env *env_list, char **args)
 	else if (ft_strcmp(cmd->name, "env") == 0)
 		builtin_env(env_list);
 	else if (ft_strcmp(cmd->name, "exit") == 0)
-		builtin_exit(cmd);
+		builtin_exit(cmd,env_list);
 	else if (ft_strcmp(cmd->name, "cd") == 0)
 		builtin_cd(&env_list, cmd->args[1]);
 	else if (ft_strcmp(cmd->name, "export") == 0)
-		builtin_export(&env_list, args);
+		builtin_export(&env_list, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
-		builtin_unset(&env_list, args);
+		builtin_unset(&env_list, cmd);
 	else
 		return (0);
 	return (1);
@@ -96,9 +95,11 @@ void	builtin_echo(t_cmd *cmd, t_env *env_list)
 		printf("\n");
 }
 
-void	builtin_exit(t_cmd *cmd)
+void	builtin_exit(t_cmd *cmd, t_env *env_list)
 {
 	(void)cmd;
 	printf("exit\n");
+	free_env_list(env_list);
+	free_tab(cmd->args);
 	exit(0);
 }

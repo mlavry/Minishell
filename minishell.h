@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/29 17:56:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 19:49:19 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,6 @@
 # define CMD 6 //"cmd"
 # define ARG 7 //"arg"
 
-extern int	g_exit ;
-
 typedef struct s_token
 {
 	char			*str;
@@ -56,6 +54,7 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
+	int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -103,22 +102,24 @@ int		is_space(char c);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
+void	free_env_list(t_env *env_list);
 
 //------------------------Exec---------------------
-int		isbuiltin(t_cmd *cmd, t_env *env_list, char **args);
-char	*getpath(char **envp,char *cmd);
+int		isbuiltin(t_cmd *cmd, t_env *env_list);
 void	builtin_env( t_env *env_list);
 void	builtin_cd(t_env **env_list, char *newpath);
 void	builtin_pwd(t_cmd *cmd);
 void	builtin_echo(t_cmd *cmd, t_env *env_list);
-void	builtin_exit(t_cmd *cmd);
-void	builtin_unset(t_env **env_list, char **args);
+void	builtin_exit(t_cmd *cmd,t_env *env_list);
+void	builtin_unset(t_env **env_list, t_cmd *cmd);
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_env *env_list);
 void	built_export(t_env *env_list);
-void	builtin_export(t_env **env_list, char **args);
+void	builtin_export(t_env **env_list, t_cmd *cmd);
+void	updatepwd(t_env **env_list, char *oldpath);
+char	*getpath(char *cmd, t_cmd *cmds);
 
 
 #endif

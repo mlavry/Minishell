@@ -1,6 +1,4 @@
 *.o
 *.a
 minishell
-Subjects
-command
-valgrind*
+No_git

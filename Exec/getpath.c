@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 21:43:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/28 17:50:21 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 19:50:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,25 +32,26 @@ char	*find_cmd_path(char *cmd)
 	i = 0;
 	path = getenv("PATH");
 	if (!path)
-		return (NULL);
+		return (free(path), NULL);
 	token = ft_split(path, ':');
 	while (token[i])
 	{
-		full_path = malloc(ft_strlen(token[i]) + strlen(cmd) + 2);
+		full_path = malloc(ft_strlen(token[i]) + ft_strlen(cmd) + 2);
 		if (!full_path)
 			break ;
 		ft_strcpy(full_path, token[i]);
 		ft_strcat(full_path, "/");
 		ft_strcat(full_path, cmd);
 		if (access(full_path, X_OK) == 0)
-			return (free(token[i]), free(token), full_path);
+			return (free_tab(token), full_path);
 		free(full_path);
 		i++;
 	}
+	free_tab(token);
 	return (NULL);
 }
 
-char	*getpath(char *cmd)
+char	*getpath(char *cmd, t_cmd *cmds)
 {
 	char	*fullpath;
 
@@ -58,6 +59,8 @@ char	*getpath(char *cmd)
 	if (fullpath)
 		return (fullpath);
 	else
-		g_exit = 127;
-	return (find_cmd_path(cmd));
+		cmds->g_exit = 127;
+	return (free(fullpath), find_cmd_path(cmd));
 }
+
+//void	is_directory()

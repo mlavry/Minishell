@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/28 17:49:54 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 19:42:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 void	builtin_env( t_env *env_list)
 {
+/* 	if (!env_list)
+		return ; */
+
 	while (env_list)
 	{
 		if (env_list->value != NULL && env_list->value[0] != '\0')
@@ -21,45 +24,19 @@ void	builtin_env( t_env *env_list)
 		env_list = env_list->next;
 	}
 	printf("_=/usr/bin/env\n");
-
 }
 
 void	emptyenv(t_env **env_list)
 {
-	char *cwd = getcwd(NULL, 0);
-	if(*env_list == NULL)
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (*env_list == NULL)
 	{
-		add_env_var(env_list, "PWD", cwd);     // PWD = chemin actuel
+		add_env_var(env_list, "PWD", cwd);// PWD = chemin actuel
 		add_env_var(env_list, "SHLVL", "1");
 	}
 	free(cwd);
-}
-
-
-void	updatepwd(t_env **env_list, char *oldpath)
-{
-
-	char newpwd[100];
-	getcwd(newpwd, sizeof(newpwd));
-
-	t_env *old = find_env_var(*env_list, "OLDPWD");
-	if (old)
-	{
-		free(old->value);
-		old->value = ft_strdup(oldpath);
-	}
-	else
-		add_env_var(env_list, "OLDPWD", oldpath);
-
-	t_env *pwd = find_env_var(*env_list, "PWD");
-	if (pwd)
-	{
-		free(pwd->value);
-		pwd->value = strdup(newpwd);
-	}
-	else
-		add_env_var(env_list, "PWD", newpwd);
-
 }
 
 void	builtin_cd(t_env **env_list, char *newpath)
@@ -106,17 +83,17 @@ void	unset(t_env **env_list, char *name )
 	}
 }
 
-void	builtin_unset(t_env **env_list, char **args)
+void	builtin_unset(t_env **env_list, t_cmd *cmd)
 {
 	char	*name;
 	int		i;
 
-	if (!args || !args[1])
+	if (!cmd->args || !cmd->args[1])
 		return ;
 	i = 1;
-	while (args[i])
+	while (cmd->args[i])
 	{
-		name = args[i];
+		name = cmd->args[i];
 		unset(env_list, name);
 		i++;
 	}

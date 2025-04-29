@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/28 17:54:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 17:56:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 # include <string.h>
 # include <sys/ioctl.h>
 # include <termios.h>
-# include <term.h>
 # include <stdbool.h>
 
 # define INPUT 1 //"<"
@@ -39,6 +38,8 @@
 # define CMD 6 //"cmd"
 # define ARG 7 //"arg"
 
+extern int	g_exit ;
+
 typedef struct s_token
 {
 	char			*str;
@@ -48,6 +49,15 @@ typedef struct s_token
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
+
+typedef struct s_cmd
+{
+	char			*name;
+	char			**args;
+	int				fd_in;
+	int				fd_out;
+	struct s_cmd	*next;
+}	t_cmd;
 
 typedef struct s_env
 {
@@ -73,9 +83,16 @@ void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
 char	**line_to_token(char *line);
 
-//------------------------Make_env---------------------
+//------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
 char	*getenvp(t_env *list, char *name);
+void	add_env_var(t_env **env_list, char *name, char *value);
+void	update_env_var(t_env **env_list, char *name, char *value);
+void	swap_env(t_env *a, t_env *b);
+void	sort_env(t_env **env_list);
+void	emptyenv(t_env **env_list);
+char	**convert_env(t_env *env_list);
+t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
 int		ft_strcmp(char *s1, char *s2);
@@ -86,5 +103,22 @@ int		is_space(char c);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
+
+//------------------------Exec---------------------
+int		isbuiltin(t_cmd *cmd, t_env *env_list, char **args);
+char	*getpath(char **envp,char *cmd);
+void	builtin_env( t_env *env_list);
+void	builtin_cd(t_env **env_list, char *newpath);
+void	builtin_pwd(t_cmd *cmd);
+void	builtin_echo(t_cmd *cmd, t_env *env_list);
+void	builtin_exit(t_cmd *cmd);
+void	builtin_unset(t_env **env_list, char **args);
+int		validate_export_name(char *name);
+char	*extract_name(char *arg);
+char	*extract_value(char *arg);
+t_env	*copyenvlist(t_env *env_list);
+void	built_export(t_env *env_list);
+void	builtin_export(t_env **env_list, char **args);
+
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/28 16:05:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 22:51:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ void	parse_token(t_data *data, char **tokens)
 		add_token(&token_list, tokens[i]);
 		i++;
 	}
+	data->token = token_list;
+	mark_commands(data);
 	t_token *tmp = token_list;
 	while (tmp)
 	{
@@ -72,7 +74,6 @@ void	parse_token(t_data *data, char **tokens)
 			tmp->str, tmp->type, tmp->sq, tmp->dq);
 		tmp = tmp->next;
 	}
-	data->token = token_list;
 }
 
 int	tokenize(t_data *data, char *line)

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/29 19:49:19 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 22:40:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ void	stock_and_delete_quote(t_token *token);
 void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
 char	**line_to_token(char *line);
+void	mark_commands(t_data *data);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);

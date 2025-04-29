@@ -85,4 +85,5 @@ void	built_export(t_env *env_list)
 			printf("declare -x %s=\"%s\"\n", current->name, current->value);
 		current = current->next;
 	}
+	free_env_list(sortedlist);
 }

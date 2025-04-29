@@ -27,8 +27,6 @@
 # include "libft/libft.h"
 # define PROMPT "minishell:~$ "
 
-extern int	g_exit ;
-
 //structure pour l'environnement et le PATH
 typedef struct s_env
 {
@@ -44,6 +42,7 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
+	int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -78,26 +77,31 @@ char	**convert_env(t_env *env_list);
 
 char	*get_absolute_path(char *cmd);
 char	*find_cmd_path(char *cmd);
-char	*getpath(char *cmd);
+char	*getpath(char *cmd, t_cmd *cmds);
 
-void	exec_extern_command(char **args, t_env *env_list);
+void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd);
 void	executecommand(t_env *list, char *line, t_cmd *cmd);
 void	execshell(t_env **env_list);
 t_env	*find_env_var(t_env *env_list, char *name);
 
-int		isbuiltin(t_cmd *cmd, t_env *env_list, char **args);
+int		isbuiltin(t_cmd *cmd, t_env *env_list);
 void	builtin_env( t_env *env_list);
 void	builtin_cd(t_env **env_list, char *newpath);
 void	builtin_pwd(t_cmd *cmd);
 void	builtin_echo(t_cmd *cmd, t_env *env_list);
-void	builtin_exit(t_cmd *cmd);
-void	builtin_unset(t_env **env_list, char **args);
+void	builtin_exit(t_cmd *cmd,t_env *env_list);
+void	builtin_unset(t_env **env_list, t_cmd *cmd);
 
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_env *env_list);
 void	built_export(t_env *env_list);
-void	builtin_export(t_env **env_list, char **args);
+void	builtin_export(t_env **env_list, t_cmd *cmd);
+void	updatepwd(t_env **env_list, char *oldpath);
+
+void	free_split(char **split_paths);
+void	free_env_list(t_env *env_list);
+void	free_env_var(t_env *var);
 
 #endif

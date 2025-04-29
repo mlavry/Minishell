@@ -29,6 +29,31 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	}
 }
 
+void	updatepwd(t_env **env_list, char *oldpath)
+{
+	char	newpwd[100];
+	t_env	*old;
+	t_env	*pwd;
+
+	getcwd(newpwd, sizeof(newpwd));
+	old = find_env_var(*env_list, "OLDPWD");
+	if (old)
+	{
+		free(old->value);
+		old->value = ft_strdup(oldpath);
+	}
+	else
+		add_env_var(env_list, "OLDPWD", oldpath);
+	pwd = find_env_var(*env_list, "PWD");
+	if (pwd)
+	{
+		free(pwd->value);
+		pwd->value = strdup(newpwd);
+	}
+	else
+		add_env_var(env_list, "PWD", newpwd);
+}
+
 void	existing_value(t_env **env_list, char *name, char *value)
 {
 	char	*existing_value;
@@ -76,10 +101,10 @@ void	built_export2(t_env **env_list, char **args)
 	}
 }
 
-void	builtin_export(t_env **env_list, char **args)
+void	builtin_export(t_env **env_list, t_cmd *cmd)
 {
-	if (!args[1])
+	if (!cmd->args[1])
 		built_export(*env_list);
 	else
-		built_export2(env_list, args);
+		built_export2(env_list, cmd->args);
 }

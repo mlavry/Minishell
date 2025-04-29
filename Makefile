@@ -10,13 +10,15 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c envp.c builtin.c builtin2.c export.c export2.c getpath.c exec.c 
+SRCS = main.c envp.c envp2.c builtin.c builtin2.c export.c export2.c getpath.c exec.c utils.c
 
 OBJS = $(SRCS:.c=.o)
 
 NAME = minishell
 
 CFLAGS = -Wall -Wextra -Werror -g3 -lreadline
+
+SANITIZE_FLAGS = -fsanitize=address,undefined
 
 CC = cc
 

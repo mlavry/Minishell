@@ -32,7 +32,11 @@ void	add_env_var(t_env **env_list, char *name, char *value)
 	if (!new_var)
 		return ;
 	new_var->name = ft_strdup(name);
+	if (!new_var->name)
+		return ;
 	new_var->value = ft_strdup(value);
+	if (!new_var->value)
+		return ;
 	new_var->next = NULL;
 	if (!*env_list)
 	{
@@ -110,46 +114,13 @@ void	parse_env(char **envp, t_env **env_list)
 			continue ;
 		}
 		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
-		value = ft_strdup(equal_pos + 1);
+	 	if (!name)
+			return ; 
+		value = equal_pos + 1;
+	 	/* if (!value)
+			return ;  */
 		add_env_var(env_list, name, value);
 		free(name);
-		free(value);
 		i++;
-	}
-}
-
-void	swap_env(t_env *a, t_env *b)
-{
-	char	*tmp;
-
-	tmp = a->name;
-	a->name = b->name;
-	b->name = tmp;
-	tmp = a->value;
-	a->value = b->value;
-	b->value = tmp;
-}
-
-void	sort_env(t_env **env_list)
-{
-	t_env	*current ;
-	t_env	*nextnode;
-	int		swap;
-
-	swap = 1;
-	while (swap)
-	{
-		swap = 0;
-		current = *env_list;
-		while (current->next)
-		{
-			nextnode = current->next;
-			if (ft_strcmp(current->name, nextnode->name) > 0)
-			{
-				swap_env(current, nextnode);
-				swap = 1;
-			}
-			current = current->next;
-		}
 	}
 }

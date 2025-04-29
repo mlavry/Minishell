@@ -12,22 +12,23 @@
 
 #include "minishell.h"
 
-void	exec_extern_command(char **args, t_env *env_list)
+void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 {
 	pid_t	pid;
 	int		status;
 	char	*path;
 
-	path = getpath(args[0]);
+	path = getpath(args[0], cmd);
 	if (!path)
 	{
 		printf("bash : %s command not found\n", args[0]);
-		g_exit = 127;
+		free(path);
+		cmd->g_exit = 127;
 		return ;
 	}
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), g_exit = 1, free(path));
+		return (perror("fork"), cmd->g_exit = 1, free(path));
 	if (pid == 0)
 	{
 		execve(path, args, convert_env(env_list));
@@ -35,11 +36,14 @@ void	exec_extern_command(char **args, t_env *env_list)
 		exit(127);
 	}
 	else
+	{
 		waitpid(pid, &status, 0);
+		free(path);
+	}
 	if (WIFEXITED(status))
-		g_exit = WEXITSTATUS(status);
+		cmd->g_exit = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		g_exit = 128 + WTERMSIG(status);
+		cmd->g_exit = 128 + WTERMSIG(status);
 }
 
 void	executecommand(t_env *env_list, char *line, t_cmd *cmd)
@@ -59,11 +63,9 @@ void	executecommand(t_env *env_list, char *line, t_cmd *cmd)
 	cmd->fd_in = 0;
 	cmd->fd_out = 1;
 	cmd->next = NULL;
-	if (!isbuiltin(cmd, env_list, cmd->args))
-		exec_extern_command(cmd->args, env_list);
-	while (args[i])
-		free(args[i++]);
-	free(args);
+	if (!isbuiltin(cmd, env_list))
+		exec_extern_command(cmd->args, env_list, cmd);
+	free_split(args);
 }
 
 t_env	*find_env_var(t_env *env_list, char *name)
@@ -77,18 +79,53 @@ t_env	*find_env_var(t_env *env_list, char *name)
 	return (NULL);
 }
 
+
+/* void cleanup_env(t_env **env_list)
+{
+    t_env *current;
+    t_env *temp;
+
+    current = *env_list;
+    while (current)
+    {
+        // Libérer la mémoire de la chaîne de chaque variable d'environnement
+        free(current->value);
+        
+        // Passer à l'élément suivant
+        temp = current;
+        current = current->next;
+
+        // Libérer la structure elle-même si nécessaire
+        free(temp);
+    }
+} */
+
+/* void free_env_var(t_env *var)
+{
+    if (var)
+    {
+        if (var->name)
+            free(var->name);
+        if (var->value)
+            free(var->value);
+        free(var);
+    }
+} */
+
 void	execshell( t_env **env_list)
 {
 	t_env	*shlvl;
+	int		level;
+	char	*new_val ;
 
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
 		return ;
 	if (shlvl)
 	{
-		int level = atoi(shlvl->value);
+		level = ft_atoi(shlvl->value);
 		level++;
-		char *new_val = ft_itoa(level);
+		new_val = ft_itoa(level);
 		if (new_val)
 		{
 			free(shlvl->value);
@@ -96,4 +133,3 @@ void	execshell( t_env **env_list)
 		}
 	}
 }
-

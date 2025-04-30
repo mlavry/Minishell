@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/29 22:40:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/30 17:43:14 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
 char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
+int		add_args(char ***args, char *str);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -100,6 +101,7 @@ char	*ft_strcpy(char *dest, char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
+bool	is_redir(int type);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

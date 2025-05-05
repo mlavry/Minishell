@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 22:08:30 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/30 22:45:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/05 22:03:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static char	**ft_grow(char **old, int size)
 	int		i;
 
 	i = -1;
-	new = malloc(sizeof(char *) * size + 2);
+	new = malloc(sizeof(char *) * (size + 2));
 	if (!new)
 		return (NULL);
 	while (++i < size)
@@ -89,5 +89,7 @@ int	add_args(char ***args, char *str)
 	tmp[nb] = ft_strdup(str);
 	if (!tmp[nb])
 		return (0);
-	return (*args = tmp, (1));
+	tmp[nb + 1] = NULL;
+	*args = tmp;
+	return (1);
 }

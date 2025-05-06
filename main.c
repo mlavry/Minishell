@@ -25,7 +25,7 @@ int main(int argc, char **argv, char **envp)
 
 	parse_env(envp, &env_list);
 	execshell(&env_list);
-	//emptyenv(&env_list);
+	emptyenv(&env_list);
 	while (1)
 	{
 		line = readline(PROMPT);
@@ -45,7 +45,7 @@ int main(int argc, char **argv, char **envp)
 			}
 			char *value = getenvp(env_list, line + 1);
 			if (value)
-				printf("bash : %s : command not founnd\n", value);
+				printf("bash : %s : command not found\n", value);
 			if (value && access(value, X_OK))
 				printf("bash : %s no such file or directory\n", value);
 			//else if (access(value, X_OK) != 0)
@@ -56,7 +56,6 @@ int main(int argc, char **argv, char **envp)
 		free(line);
 	}
 	free_env_list(env_list);
-	//free_split()
 	clear_history();
 	return 0;
 }

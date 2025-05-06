@@ -21,7 +21,7 @@
 # include <string.h>
 # include <fcntl.h>
 # include <errno.h>
-
+# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include "libft/libft.h"
@@ -86,10 +86,10 @@ t_env	*find_env_var(t_env *env_list, char *name);
 
 int		isbuiltin(t_cmd *cmd, t_env *env_list);
 void	builtin_env( t_env *env_list);
-void	builtin_cd(t_env **env_list, char *newpath);
+void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd);
 void	builtin_pwd(t_cmd *cmd);
 void	builtin_echo(t_cmd *cmd, t_env *env_list);
-void	builtin_exit(t_cmd *cmd,t_env *env_list);
+void	builtin_exit(t_cmd *cmd, t_env *env_list);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
 
 int		validate_export_name(char *name);
@@ -103,5 +103,7 @@ void	updatepwd(t_env **env_list, char *oldpath);
 void	free_split(char **split_paths);
 void	free_env_list(t_env *env_list);
 void	free_env_var(t_env *var);
+
+void	exec_pipe(t_cmd *cmd, t_env *env_list);
 
 #endif

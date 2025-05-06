@@ -10,7 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS = main.c envp.c envp2.c builtin.c builtin2.c export.c export2.c getpath.c exec.c utils.c
+SRCS = main.c envp.c envp2.c builtin.c builtin2.c export.c export2.c getpath.c exec.c utils.c \
+pipe.c
 
 OBJS = $(SRCS:.c=.o)
 

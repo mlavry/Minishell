@@ -17,14 +17,22 @@ void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 	pid_t	pid;
 	int		status;
 	char	*path;
+	struct stat sb;
 
 	path = getpath(args[0], cmd);
 	if (!path)
 	{
-		printf("bash : %s command not found\n", args[0]);
+		printf("bash : %s: command not found\n", args[0]);
 		free(path);
 		cmd->g_exit = 127;
 		return ;
+	}
+	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		printf("bash: %s: Is a directory\n", args[0]);
+		free(path);
+		cmd->g_exit = 126;
+		return;
 	}
 	pid = fork();
 	if (pid == -1)
@@ -63,8 +71,14 @@ void	executecommand(t_env *env_list, char *line, t_cmd *cmd)
 	cmd->fd_in = 0;
 	cmd->fd_out = 1;
 	cmd->next = NULL;
+	if (cmd->next)
+		exec_pipe(cmd, env_list);
+	else
+	{
+
 	if (!isbuiltin(cmd, env_list))
 		exec_extern_command(cmd->args, env_list, cmd);
+	}
 	free_split(args);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:49:42 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:34:27 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,22 @@ void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 	pid_t	pid;
 	int		status;
 	char	*path;
+	struct stat sb;
 
 	path = getpath(args[0], cmd);
 	if (!path)
 	{
-		printf("bash : %s command not found\n", args[0]);
+		printf("bash : %s: command not found\n", args[0]);
 		free(path);
 		cmd->g_exit = 127;
 		return ;
+	}
+	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		printf("bash: %s: Is a directory\n", args[0]);
+		free(path);
+		cmd->g_exit = 126;
+		return;
 	}
 	pid = fork();
 	if (pid == -1)
@@ -46,26 +54,64 @@ void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 		cmd->g_exit = 128 + WTERMSIG(status);
 }
 
-void	executecommand(t_env *env_list, char *line, t_cmd *cmd)
+/*  utilitaire : libère puis remet à zéro le buffer commande de data */
+static void	clear_cmd(t_data *data)
+{
+	if (!data || !data->cmd)
+		return ;
+	free_tab(data->cmd->args);   /* libère le tableau argv */
+	ft_bzero(data->cmd, sizeof(t_cmd));
+}
+
+/*  découpe la ligne en argv et remplit data->cmd                    */
+static int	init_cmd_from_line(t_data *data)
 {
 	char	**args;
-	int		i;
 
-	i = 0;
-	args = ft_split(line, ' ');
-	if (!args[0])
+	args = ft_split(data->line, ' ');
+	if (!args || !args[0])              /* ligne vide → rien à exécuter  */
 	{
-		free(args);
-		return ;
+		free_tab(args);
+		return (0);
 	}
-	cmd->name = args[0];
-	cmd->args = args;
-	cmd->fd_in = 0;
-	cmd->fd_out = 1;
-	cmd->next = NULL;
-	if (!isbuiltin(cmd, env_list))
-		exec_extern_command(cmd->args, env_list, cmd);
-	free_tab(args);
+	if (!data->cmd)                     /* première utilisation          */
+		data->cmd = ft_calloc(1, sizeof(t_cmd));
+	if (!data->cmd)
+		return (0);
+	data->cmd->name   = args[0];
+	data->cmd->args   = args;
+	data->cmd->fd_in  = STDIN_FILENO;
+	data->cmd->fd_out = STDOUT_FILENO;
+	data->cmd->next   = NULL;
+	return (1);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  APPEL PUBLIC : exécute la commande contenue dans data->line               */
+/* -------------------------------------------------------------------------- */
+void	executecommand(t_data *data)
+{
+	if (!data || !data->line || !data->env)
+		return ;
+
+	/* 1) Prépare le t_cmd à partir de la ligne courante ------------------- */
+	clear_cmd(data);                       /* réinitialise éventuellement   */
+	if (!init_cmd_from_line(data))
+		return ;
+
+	/* 2) Si un pipe est déjà chainé (cas futur), on lancerait exec_pipe ---- */
+	//if (data->cmd->next)
+		//par la suite exec_pipe ici
+	else
+	{
+		/* 3) Built‑in sinon programme externe ----------------------------- */
+		if (!isbuiltin(data->cmd, data->env))
+			exec_extern_command(data->cmd->args, data->env, data->cmd);
+	}
+
+	/* 4) Nettoyage local : les fd (si redirs) seraient fermés ailleurs ----- */
+	/*    On ne libère PAS data->cmd lui‑même : il est conservé pour réutili‑
+	      sation. Seul le tableau args est libéré juste avant le prochain tour */
 }
 
 t_env	*find_env_var(t_env *env_list, char *name)

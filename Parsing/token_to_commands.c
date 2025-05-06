@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/05 23:15:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/06 15:29:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,9 +108,9 @@ static t_token *chain_tokens(char *arr[], int types[], int n)
         cur = t;
     }
     return head;
-}
+}*/
 
-static void print_cmds(t_cmd *c)
+void print_cmds(t_cmd *c)
 {
     int idx;
     while (c)
@@ -123,7 +123,7 @@ static void print_cmds(t_cmd *c)
     }
 }
 
-int main(void)
+/*int main(void)
 {
     // --- TEST 1 : ls -l ---    
     {

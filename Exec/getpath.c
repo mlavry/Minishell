@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 21:43:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:50:17 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:35:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,5 +62,28 @@ char	*getpath(char *cmd, t_cmd *cmds)
 		cmds->g_exit = 127;
 	return (free(fullpath), find_cmd_path(cmd));
 }
+/* 
+void	exit_status(t_cmd *cmd)
+{
 
-//void	is_directory()
+	if (cmd->g_exit == 0)
+		printf("0: command not found\n");
+	else if (cmd->g_exit == 127)
+		printf("127: command not found\n");
+	else if (cmd->g_exit == )
+
+} */
+
+/* 
+void error_message(t_cmd *cmd, const char *info)
+{
+    if (cmd->g_exit == 127)
+        printf("bash: %s: command not found\n", info);
+    else if (cmd->g_exit == 126)
+        printf("bash: %s: Permission denied\n", info);
+    else if (cmd->g_exit == 2)
+        printf("bash: syntax error near unexpected token `%s'\n", info);
+    else if (cmd->g_exit == 1)
+        printf("bash: %s\n", info); // erreur générique, message déjà préparé
+    // Tu peux étendre ici selon les codes que tu utilises
+} */

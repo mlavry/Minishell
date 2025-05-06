@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:47:12 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:42:44 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:30:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,10 @@ void	built_export2(t_env **env_list, char **args)
 		value = extract_value(arg);
 		if (!validate_export_name(name))
 		{
-			printf("bash: export: `%s': not a valid identifier\n", name);
+			if (name && name[0] == '\0')
+				printf("bash: export: `': not a valid identifier\n");
+			else
+				printf("bash: export: `%s': not a valid identifier\n", arg);
 			free(name);
 			free(value);
 			i++;

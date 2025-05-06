@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/15 21:41:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:37:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,29 +78,44 @@ bool	empty_line(char *line)
 
 int	main(int argc, char *argv[], char **envp)
 {
-	char	*line;
 	t_data	data;
 
 	(void)envp;
 	init_data(&data, argc, argv);
 	//Creer l'environnement et si sa echoue free les erreurs potentielles
 	parse_env(envp, &data);
+	execshell(&data.env);
+	emptyenv(&data.env);
 	/* printf("%s", data.env->value); */
 	while (1)
 	{
 		//setup signal
-		line = readline("minishell$ ");
-		if (!line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
+		data.line = readline("minishell$ ");
+		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
 		{
 			ft_putstr_fd("exit\n", 2);
 			exit (0);
 		}
-		if (empty_line(line))
+		if (empty_line(data.line))
 			continue;
-		if (!parse_line(&data, line))
+		add_history(data.line);
+		if (!parse_line(&data, data.line))
 			continue;
-		if (*line)
-			add_history(line);
+		if (data.line[0] == '$')
+		{
+			if (data.line[1] == '?')
+			{
+				printf("%d: command not found\n", data.cmd->g_exit);
+				data.cmd->g_exit = 127;
+			}
+			char *value = getenvp(data.env, data.line + 1);
+			if (value)
+				printf("bash : %s : command not found\n", value);
+			if (value && access(value, X_OK))
+				printf("bash : %s no such file or directory\n", value);
+		}
+		else
+			executecommand(&data);
 	}
 	clear_history();
 	return (0);

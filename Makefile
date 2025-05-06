@@ -6,7 +6,7 @@ CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
 SRC_EXEC = Exec/builtin.c Exec/builtin2.c Exec/exec.c Exec/export.c Exec/export2.c Exec/getpath.c Exec/envp2.c
 
 SRC_PARSING = main.c Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
-Parsing/free.c envp.c utils.c Parsing/make_commands.c
+Parsing/free.c envp.c utils.c Parsing/make_commands.c Parsing/token_to_commands.c
 
 SRC = $(SRC_EXEC) $(SRC_PARSING)
 

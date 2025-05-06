@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 22:08:30 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/05 22:03:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/06 15:15:58 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,6 @@ int	add_args(char ***args, char *str)
 	char	**tmp;
 	int		nb;
 
-	if (!str)
-		return (1);
 	if (!*args)
 	{
 		*args = malloc(sizeof(char *) * 2);

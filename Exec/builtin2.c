@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:42:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:30:42 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	emptyenv(t_env **env_list)
 	free(cwd);
 }
 
-void	builtin_cd(t_env **env_list, char *newpath)
+void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd)
 {
 	char	path[1024];
 
@@ -51,6 +51,7 @@ void	builtin_cd(t_env **env_list, char *newpath)
 	if (access(newpath, F_OK) != 0)
 	{
 		printf("bash: cd: %s: No such file or directory\n", newpath);
+		cmd->g_exit = 1;
 		return ;
 	}
 	getcwd(path, sizeof(path));

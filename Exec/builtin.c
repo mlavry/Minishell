@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:44:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:33:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	isbuiltin(t_cmd *cmd, t_env *env_list)
 	else if (ft_strcmp(cmd->name, "exit") == 0)
 		builtin_exit(cmd,env_list);
 	else if (ft_strcmp(cmd->name, "cd") == 0)
-		builtin_cd(&env_list, cmd->args[1]);
+		builtin_cd(&env_list, cmd->args[1], cmd);
 	else if (ft_strcmp(cmd->name, "export") == 0)
 		builtin_export(&env_list, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
@@ -56,10 +56,22 @@ void	echo(t_env *env_list, int i, t_cmd *cmd)
 
 	if (cmd->args[i][0] == '$')
 	{
+		if (cmd->args[i][1] == '\0')
+			printf("$");
+		else if (cmd->args[i][1] == '?')
+		{
+			printf("%d", cmd->g_exit);
+			if (cmd->args[i][2] != '\0')
+				printf("%s", &cmd->args[i][2]);
+		}
 		value = getenvp(env_list, cmd->args[i] + 1);
 		if (value)
 			printf("%s", value);
 	}
+	else if (cmd->args[i][0] == '\\' && cmd->args[i][1] == '$')
+		printf("%s", &cmd->args[i][1]);
+	else if (cmd->args[i][0] == '\\' && cmd->args[i][1] == 'n')
+		printf("%s", &cmd->args[i][1]);
 	else
 		printf("%s", cmd->args[i]);
 	if (cmd->args[i + 1])
@@ -77,10 +89,14 @@ void	builtin_echo(t_cmd *cmd, t_env *env_list)
 	j = 1;
 	newline = 1;
 	args = cmd->args;
+
 	while (args[i] && args[i][0] == '-' && args[i][1] == 'n')
 	{
 		while (args[i][j] == 'n')
+		{
 			j++;
+			cmd->g_exit = 0;
+		}
 		if (args[i][j] != '\0')
 			break ;
 		newline = 0;
@@ -92,7 +108,10 @@ void	builtin_echo(t_cmd *cmd, t_env *env_list)
 		i++;
 	}
 	if (newline)
+	{
 		printf("\n");
+		cmd->g_exit = 0;
+	}
 }
 
 void	builtin_exit(t_cmd *cmd, t_env *env_list)

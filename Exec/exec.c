@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:34:27 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 19:57:32 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,36 +54,13 @@ void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 		cmd->g_exit = 128 + WTERMSIG(status);
 }
 
-/*  utilitaire : libère puis remet à zéro le buffer commande de data */
-static void	clear_cmd(t_data *data)
+/* utilitaire : libère puis remet à zéro le buffer commande de data */
+void	clear_cmd(t_data *data)
 {
 	if (!data || !data->cmd)
 		return ;
 	free_tab(data->cmd->args);   /* libère le tableau argv */
 	ft_bzero(data->cmd, sizeof(t_cmd));
-}
-
-/*  découpe la ligne en argv et remplit data->cmd                    */
-static int	init_cmd_from_line(t_data *data)
-{
-	char	**args;
-
-	args = ft_split(data->line, ' ');
-	if (!args || !args[0])              /* ligne vide → rien à exécuter  */
-	{
-		free_tab(args);
-		return (0);
-	}
-	if (!data->cmd)                     /* première utilisation          */
-		data->cmd = ft_calloc(1, sizeof(t_cmd));
-	if (!data->cmd)
-		return (0);
-	data->cmd->name   = args[0];
-	data->cmd->args   = args;
-	data->cmd->fd_in  = STDIN_FILENO;
-	data->cmd->fd_out = STDOUT_FILENO;
-	data->cmd->next   = NULL;
-	return (1);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -95,9 +72,7 @@ void	executecommand(t_data *data)
 		return ;
 
 	/* 1) Prépare le t_cmd à partir de la ligne courante ------------------- */
-	clear_cmd(data);                       /* réinitialise éventuellement   */
-	if (!init_cmd_from_line(data))
-		return ;
+	//clear_cmd(data);                       /* réinitialise éventuellement   */
 
 	/* 2) Si un pipe est déjà chainé (cas futur), on lancerait exec_pipe ---- */
 	//if (data->cmd->next)

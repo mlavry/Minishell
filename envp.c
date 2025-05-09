@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   path.c                                             :+:      :+:    :+:   */
+/*   envp.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/25 15:43:11 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/04/29 19:55:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 char	*getenvp(t_env *list, char *name)
 {
+
 	while (list)
 	{
 		if (ft_strcmp(list->name, name) == 0)
 			return (list->value);
 		list = list->next;
+
 	}
 	return (NULL);
 }
@@ -97,7 +99,7 @@ char	**convert_env(t_env *env_list)
 	return (envp);
 }
 
-void	parse_env(char **envp, t_env **env_list)
+void	parse_env(char **envp, t_data *env_list)
 {
 	int		i;
 	char	*name;
@@ -107,19 +109,17 @@ void	parse_env(char **envp, t_env **env_list)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = ft_strchr(envp[i], '=');
+		equal_pos = strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;
 			continue ;
 		}
 		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
-	 	if (!name)
-			return ; 
+		if (!name)
+			return ;
 		value = equal_pos + 1;
-	 	/* if (!value)
-			return ;  */
-		add_env_var(env_list, name, value);
+		add_env_var(&env_list->env, name, value);
 		free(name);
 		i++;
 	}

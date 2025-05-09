@@ -3,95 +3,121 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/24 18:02:03 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/24 18:02:05 by aboutale         ###   ########.fr       */
+/*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
+/*   Updated: 2025/05/07 00:32:43 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdio.h>
-# include <unistd.h>
-# include <stdlib.h>
+# include "Libft/libft.h"
 # include <sys/types.h>
-# include <sys/wait.h>
-# include <string.h>
-# include <fcntl.h>
-# include <errno.h>
-# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "libft/libft.h"
-# define PROMPT "minishell:~$ "
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <fcntl.h>
+# include <sys/wait.h>
+# include <signal.h>
+# include <sys/stat.h>
+# include <dirent.h>
+# include <string.h>
+# include <sys/ioctl.h>
+# include <termios.h>
+# include <stdbool.h>
 
-//structure pour l'environnement et le PATH
-typedef struct s_env
+# define INPUT 1 //"<"
+# define HEREDOC 2 //"<<"
+# define OUTPUT 3 //">"
+# define APPEND 4 //">>"
+# define PIPE 5 //"|"
+# define CMD 6 //"cmd"
+# define ARG 7 //"arg"
+
+typedef struct s_token
 {
-	char			*name;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+	char			*str;
+	int				type;
+	bool			sq;
+	bool			dq;
+	struct s_token	*next;
+	struct s_token	*prev;
+}	t_token;
 
-//structure pour les commandes 
 typedef struct s_cmd
 {
 	char			*name;
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	int				g_exit;
+	//int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
-//structure pour les pipes 
-/* typedef struct s_pipex
+typedef struct s_env
 {
-	char			**args;
-	int				pipe_in;
-	int				pipe_out;
-	struct s_pipex	*next;
-}	t_pipex; */
+	char				*name;
+	char				*value;
+	struct s_env		*next;
+}	t_env;
 
-typedef struct s_pipex
+typedef struct s_data
 {
-	int		infile;
-	int		outfile;
-	int		pipes[2][2];
-	char	**paths;
-	char	**cmds;
-	int		n_commands;
-	char	**envp;
-}	t_pipex;
+	char		*line;
+	t_env		*env;
+	t_token		*token;
+	t_cmd		*cmd;
+	int			exit_code;
+}				t_data;
 
+//------------------------Parsing functions---------------------
+bool	parse_line(t_data *data, char *line);
+int		open_quote(t_data *data, char *line);
+int		tokenize(t_data *data, char *line);
+int		is_quoted(char c);
+void	stock_and_delete_quote(t_token *token);
+void	quote_choice(bool *sq, bool *dq, char c);
+int		count_tokens(char *line);
+char	**line_to_token(char *line);
+void	mark_commands(t_data *data);
+int		add_args(char ***args, char *str);
+t_cmd   *tokens_to_commands(t_token *tokens);
+
+//------------------------Env---------------------
+void	parse_env(char **envp, t_data *env_list);
 char	*getenvp(t_env *list, char *name);
 void	add_env_var(t_env **env_list, char *name, char *value);
 void	update_env_var(t_env **env_list, char *name, char *value);
-void	parse_env(char **envp, t_env **list);
 void	swap_env(t_env *a, t_env *b);
 void	sort_env(t_env **env_list);
 void	emptyenv(t_env **env_list);
 char	**convert_env(t_env *env_list);
-
-char	*get_absolute_path(char *cmd);
-char	*find_cmd_path(char *cmd);
-char	*getpath(char *cmd, t_cmd *cmds);
-
-void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd);
-void	executecommand(t_env *list, char *line, t_cmd *cmd);
-void	execshell(t_env **env_list);
 t_env	*find_env_var(t_env *env_list, char *name);
 
-int		isbuiltin(t_cmd *cmd, t_env *env_list);
-void	builtin_env( t_env *env_list);
-void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd);
-void	builtin_pwd(t_cmd *cmd);
-void	builtin_echo(t_cmd *cmd, t_env *env_list);
-void	builtin_exit(t_cmd *cmd, t_env *env_list);
-void	builtin_unset(t_env **env_list, t_cmd *cmd);
+//------------------------Utils---------------------
+int		ft_strcmp(char *s1, char *s2);
+char	*ft_strcpy(char *dest, char *src);
+char	*ft_strcat(char *dest, char *src);
+int		is_operator(char c);
+int		is_space(char c);
+bool	is_redir(int type);
 
+//------------------------Free functions---------------------
+void	free_tab(char **tokens);
+void	free_env_list(t_env *env_list);
+
+//------------------------Exec---------------------
+int		isbuiltin(t_data *data);
+void	builtin_env( t_env *env_list);
+void	builtin_cd(t_env **env_list, char *newpath, t_data *data);
+void	builtin_pwd(t_cmd *cmd);
+void	builtin_echo(t_data *data);
+void	builtin_exit(t_data *data);
+void	builtin_unset(t_env **env_list, t_cmd *cmd);
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);
@@ -99,11 +125,13 @@ t_env	*copyenvlist(t_env *env_list);
 void	built_export(t_env *env_list);
 void	builtin_export(t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_env **env_list, char *oldpath);
+char	*getpath(char *cmd, t_data *data);
+void	execshell( t_env **env_list);
+void	executecommand(t_data *data, t_env *env_list);
+void	exec_extern_command(char **args, t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
 
-void	free_split(char **split_paths);
-void	free_env_list(t_env *env_list);
-void	free_env_var(t_env *var);
-
-void	exec_pipe(t_cmd *cmd, t_env *env_list);
+//------------Debug Functions---------------------
+void	print_cmds(t_cmd *c);
 
 #endif

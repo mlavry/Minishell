@@ -3,61 +3,135 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/24 19:04:40 by aboutale          #+#    #+#             */
-/*   Updated: 2025/03/24 19:04:41 by aboutale         ###   ########.fr       */
+/*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
+/*   Updated: 2025/05/07 00:37:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-
-int main(int argc, char **argv, char **envp)
+/*void	signal_handler(int sig)
 {
-	(void)argv;
-	t_env *env_list = NULL;
-	t_cmd cmd;
-	char *line;
-	cmd.g_exit = 0;
-	if (argc != 1)
-		exit(0);
+	if (sig == SIGINT)
+	{
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		rl_replace_line("", 0);
+		if (rl_on_new_line() != 0)
+			ft_putstr_fd("Error: problem with new line\n", 2);
+		rl_redisplay();
+	}
+}*/
 
-	parse_env(envp, &env_list);
-	execshell(&env_list);
-	emptyenv(&env_list);
+/* int main(int argc, char *argv[], char **envp)
+{
+	char	*line;
+
+	(void) argv;
+	(void) envp;
+    if (argc != 1)
+	{
+        return (0);
+	}
+	while (1)//si on a un probleme avec la ligne actuelle on peut utiliser continue pour passer a la suivante
+	{
+		signal(SIGINT, signal_handler);
+		signal(SIGQUIT, SIG_IGN);
+		line = readline("minishell$ ");
+		if (!line)
+		{
+			ft_putstr_fd("exit\n", 1);
+			break;
+		}
+		if (*line)
+			add_history(line);
+		free(line);
+	}
+	rl_clear_history();
+	return (0);
+} */
+
+void init_cmd(t_cmd *cmd) 
+{
+	cmd->name = NULL;
+	cmd->args = NULL;
+	cmd->fd_in = 0;
+	cmd->fd_out = 1;
+	cmd->next = NULL;
+}
+
+
+void	init_data(t_data *data, int argc, char **argv)
+{
+	(void)argc;
+	(void)argv;
+	data->env = NULL;
+	data->token = NULL;
+	data->exit_code = 0;
+}
+
+bool	empty_line(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] && line[i] == ' ')
+		i++;
+	if (i == (int)ft_strlen(line))
+	{
+		free(line);
+		return (true);
+	}
+	return (false);
+}
+
+int	main(int argc, char *argv[], char **envp)
+{
+	t_data	data;
+	t_cmd cmd;
+
+	 data.exit_code= 0;
+	t_env *env_list = NULL;
+
+	(void)envp;
+	init_data(&data, argc, argv);
+	init_cmd(&cmd);
+	//Creer l'environnement et si sa echoue free les erreurs potentielles
+	parse_env(envp, &data);
+	execshell(&data.env);
+	emptyenv(&data.env);
+	/* printf("%s", data.env->value); */
 	while (1)
 	{
-		line = readline(PROMPT);
-		if (line[0] == '\0')
+		//setup signal
+		data.line = readline("minishell$ ");
+		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
 		{
-			cmd.g_exit = 127;
-			free(line);
-			continue ;
+			ft_putstr_fd("exit\n", 2);
+			exit (0);
 		}
-		add_history(line);
-		if (line[0] == '$')
+		if (empty_line(data.line))
+			continue ;
+		add_history(data.line);
+		if (!parse_line(&data, data.line))
+			continue ;
+		if (data.line[0] == '$')
 		{
-			if (line[1] == '?')
+			if (data.line[1] == '?')
 			{
-				printf("%d: command not found\n", cmd.g_exit);
-				cmd.g_exit = 127;
+				printf("%d: command not found\n", data.exit_code);
+				data.exit_code = 127;
 			}
-			char *value = getenvp(env_list, line + 1);
+			char *value = getenvp(data.env, data.line + 1);
 			if (value)
 				printf("bash : %s : command not found\n", value);
 			if (value && access(value, X_OK))
 				printf("bash : %s no such file or directory\n", value);
-			//else if (access(value, X_OK) != 0)
-			//	printf("bash : %s Persmission denied\n", value);
 		}
 		else
-			executecommand(env_list, line, &cmd);
-		free(line);
+			executecommand(&data, env_list);
 	}
-	free_env_list(env_list);
 	clear_history();
-	return 0;
+	return (0);
 }
-
-

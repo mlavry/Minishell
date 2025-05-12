@@ -85,7 +85,7 @@ int		count_tokens(char *line);
 char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd   *tokens_to_commands(t_token *tokens);
+t_cmd	*tokens_to_commands(t_token *tokens);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -112,9 +112,10 @@ void	free_env_list(t_env *env_list);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
-void	builtin_env( t_env *env_list);
-void	builtin_cd(t_env **env_list, char *newpath, t_data *data);
-void	builtin_pwd(t_cmd *cmd);
+void	exec_builtin(t_data *data);
+void	builtin_env(t_env *env_list);
+void	builtin_cd( char *newpath, t_data *data);
+void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
 void	builtin_exit(t_data *data);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);

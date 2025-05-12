@@ -89,15 +89,14 @@ bool	empty_line(char *line)
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
-	t_cmd cmd;
+	//t_cmd cmd;
 
 	 data.exit_code= 0;
 	t_env *env_list = NULL;
 
 	(void)envp;
 	init_data(&data, argc, argv);
-	init_cmd(&cmd);
-	//Creer l'environnement et si sa echoue free les erreurs potentielles
+	//init_cmd(&cmd);
 	parse_env(envp, &data);
 	execshell(&data.env);
 	emptyenv(&data.env);

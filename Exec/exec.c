@@ -6,39 +6,50 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 19:57:32 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:34:27 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
+void	exec_extern_command(char **args, t_env *env_list, t_data *data)
 {
-	pid_t	pid;
-	int		status;
-	char	*path;
-	struct stat sb;
+	pid_t		pid;
+	int			status;
+	char		*path;
+	struct stat	sb;
 
-	path = getpath(args[0], cmd);
+	path = getpath(args[0],data);
 	if (!path)
 	{
 		printf("bash : %s: command not found\n", args[0]);
 		free(path);
-		cmd->g_exit = 127;
+		data->exit_code = 127;
 		return ;
 	}
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
 		printf("bash: %s: Is a directory\n", args[0]);
 		free(path);
-		cmd->g_exit = 126;
-		return;
+		data->exit_code = 126;
+		return ;
 	}
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), cmd->g_exit = 1, free(path));
+		return (perror("fork"), data->exit_code = 1, free(path));
 	if (pid == 0)
 	{
+		 if (data->cmd->fd_in != STDIN_FILENO)
+		{
+			dup2(data->cmd->fd_in, STDIN_FILENO);
+			close(data->cmd->fd_in);
+		}
+
+		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
+			dup2(data->cmd->fd_out, STDOUT_FILENO);
+			close(data->cmd->fd_out);
+		} 
 		execve(path, args, convert_env(env_list));
 		perror("execve");
 		exit(127);
@@ -49,39 +60,56 @@ void	exec_extern_command(char **args, t_env *env_list, t_cmd *cmd)
 		free(path);
 	}
 	if (WIFEXITED(status))
-		cmd->g_exit = WEXITSTATUS(status);
+		data->exit_code = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		cmd->g_exit = 128 + WTERMSIG(status);
+		data->exit_code = 128 + WTERMSIG(status);
 }
 
-/* utilitaire : libère puis remet à zéro le buffer commande de data */
-void	clear_cmd(t_data *data)
+/*  utilitaire : libère puis remet à zéro le buffer commande de data */
+
+/* static void	clear_cmd(t_data *data)
 {
 	if (!data || !data->cmd)
 		return ;
-	free_tab(data->cmd->args);   /* libère le tableau argv */
+	free_tab(data->cmd->args);   // libère le tableau argv 
 	ft_bzero(data->cmd, sizeof(t_cmd));
-}
+} */
 
 /* -------------------------------------------------------------------------- */
 /*  APPEL PUBLIC : exécute la commande contenue dans data->line               */
 /* -------------------------------------------------------------------------- */
-void	executecommand(t_data *data)
+void	executecommand(t_data *data, t_env *env_list)
 {
 	if (!data || !data->line || !data->env)
 		return ;
 
 	/* 1) Prépare le t_cmd à partir de la ligne courante ------------------- */
 	//clear_cmd(data);                       /* réinitialise éventuellement   */
+/* 	if (!init_cmd_from_line(data))
+		return ; */
 
 	/* 2) Si un pipe est déjà chainé (cas futur), on lancerait exec_pipe ---- */
-	//if (data->cmd->next)
-		//par la suite exec_pipe ici
+
+
+	/* if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		dup2(data->cmd->fd_in, STDIN_FILENO);
+		close(data->cmd->fd_in);
+	}
+
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(data->cmd->fd_out, STDOUT_FILENO);
+		close(data->cmd->fd_out);
+	}
+ */
+	if (data->cmd->next)
+		exec_pipe(data->cmd, env_list, data);
 	else
 	{
 		/* 3) Built‑in sinon programme externe ----------------------------- */
-		if (!isbuiltin(data->cmd, data->env))
-			exec_extern_command(data->cmd->args, data->env, data->cmd);
+		if (!isbuiltin(data))
+			exec_extern_command(data->cmd->args, data->env, data);
 	}
 
 	/* 4) Nettoyage local : les fd (si redirs) seraient fermés ailleurs ----- */

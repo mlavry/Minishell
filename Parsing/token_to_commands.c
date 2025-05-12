@@ -57,6 +57,45 @@ int handle_pipe(t_cmd **cur)
     return (1);
 }
 
+
+
+/* void handle_input(t_token *tokens, t_cmd *cur)
+{
+     // Si le token suivant est un mot, on a le fichier cible pour la redirection
+     if (tokens->next && tokens->next->type == ARG )
+     {
+         // Ouvre le fichier pour la redirection
+         cur->fd_in = open(tokens->next->str, O_RDONLY);
+         if (cur->fd_in < 0)
+         {
+             perror("open");
+             return ;
+         }
+         // On saute le token du fichier, car il est déjà pris en compte
+         tokens = tokens->next;
+     }
+
+
+}
+
+void    handle_output(t_token *tokens, t_cmd *cur)
+{
+     // Si le token suivant est un mot, on a le fichier cible pour la redirection
+     if (tokens->next && tokens->next->type == ARG )
+     {
+         // Ouvre le fichier pour la redirection
+         cur->fd_out = open(tokens->next->str, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+         if (cur->fd_out < 0)
+         {
+             perror("open");
+             return ;
+         }
+         // On saute le token du fichier, car il est déjà pris en compte
+         tokens = tokens->next;
+     }
+} */
+
+
 t_cmd   *tokens_to_commands(t_token *tokens)
 {
     t_cmd   *head;
@@ -76,6 +115,39 @@ t_cmd   *tokens_to_commands(t_token *tokens)
             if (!handle_arg(cur, tokens))
                 return (NULL);
         }
+        if (tokens->type == OUTPUT)
+        {
+             // Si le token suivant est un mot, on a le fichier cible pour la redirection
+            if (tokens->next && tokens->next->type == ARG )
+            {
+         // Ouvre le fichier pour la redirection
+                 cur->fd_out = open(tokens->next->str, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+                 if (cur->fd_out < 0)
+                 {
+                     perror("open");
+                     return NULL;
+                 }
+         // On saute le token du fichier, car il est déjà pris en compte
+         tokens = tokens->next;
+     }  
+        }
+        if (tokens->type == INPUT)
+        {
+            // Si le token suivant est un mot, on a le fichier cible pour la redirection
+             if (tokens->next && tokens->next->type == ARG )
+             {
+         // Ouvre le fichier pour la redirection
+                cur->fd_in = open(tokens->next->str, O_RDONLY);
+                if (cur->fd_in < 0)
+                {
+                    perror("open");
+                    return NULL;
+                }
+         // On saute le token du fichier, car il est déjà pris en compte
+             tokens = tokens->next;
+             }  
+        }
+
         if (tokens->type == PIPE)
         {
             if (!handle_pipe(&cur))

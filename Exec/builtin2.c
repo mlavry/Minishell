@@ -39,8 +39,9 @@ void	emptyenv(t_env **env_list)
 	free(cwd);
 }
 
-void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd)
+void	builtin_cd(t_env **env_list, char *newpath,  t_data *data)
 {
+	
 	char	path[1024];
 
 	if (newpath == NULL)
@@ -51,7 +52,7 @@ void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd)
 	if (access(newpath, F_OK) != 0)
 	{
 		printf("bash: cd: %s: No such file or directory\n", newpath);
-		cmd->g_exit = 1;
+		data->exit_code = 1;
 		return ;
 	}
 	getcwd(path, sizeof(path));

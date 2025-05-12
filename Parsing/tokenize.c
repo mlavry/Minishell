@@ -67,13 +67,13 @@ void	parse_token(t_data *data, char **tokens)
 	}
 	data->token = token_list;
 	mark_commands(data);
-	t_token *tmp = token_list;
-	while (tmp)
+	//t_token *tmp = token_list;
+/* 	while (tmp)
 	{
 		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
 			tmp->str, tmp->type, tmp->sq, tmp->dq);
 		tmp = tmp->next;
-	}
+	} */
 }
 
 int	tokenize(t_data *data, char *line)

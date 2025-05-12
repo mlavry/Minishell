@@ -48,27 +48,6 @@ void	sort_env(t_env **env_list)
 	}
 }
 
-/* void free_envp(char **envp)
-{
-    for (int i = 0; envp[i] != NULL; i++)
-    {
-        free(envp[i]);
-    }
-    free(envp);
-}  */
-
-/* void free_env_var(t_env *var)
-{
-    if (var)
-    {
-        if (var->name)
-            free(var->name);
-        if (var->value)
-            free(var->value);
-        free(var);
-    }
-} */
-
 void	free_env_list(t_env *env_list)
 {
 	t_env	*tmp;
@@ -82,14 +61,3 @@ void	free_env_list(t_env *env_list)
 		free(tmp);
 	}
 }
-
-/* void free_env_list(t_env *env_list)
-{
-    t_env *tmp;
-    while (env_list)
-    {
-        tmp = env_list;             // Sauvegarde l'élément actuel
-        env_list = env_list->next;  // Passe à l'élément suivant
-        free_env_var(tmp);          // Libère l'élément actuel
-    }
-}  */

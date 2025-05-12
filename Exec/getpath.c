@@ -51,7 +51,7 @@ char	*find_cmd_path(char *cmd)
 	return (NULL);
 }
 
-char	*getpath(char *cmd, t_cmd *cmds)
+char	*getpath(char *cmd,  t_data *data)
 {
 	char	*fullpath;
 
@@ -59,7 +59,7 @@ char	*getpath(char *cmd, t_cmd *cmds)
 	if (fullpath)
 		return (fullpath);
 	else
-		cmds->g_exit = 127;
+		data->exit_code = 127;
 	return (free(fullpath), find_cmd_path(cmd));
 }
 /* 

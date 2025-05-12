@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/07 00:32:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/12 20:29:47 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -85,7 +84,8 @@ int		count_tokens(char *line);
 char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd   *tokens_to_commands(t_token *tokens);
+t_cmd	*tokens_to_commands(t_token *tokens);
+void	init_data(t_data *data, int argc, char **argv, char **envp);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -111,12 +111,12 @@ void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
 
 //------------------------Exec---------------------
-int		isbuiltin(t_cmd *cmd, t_env *env_list);
+int		isbuiltin(t_data *data);
 void	builtin_env( t_env *env_list);
-void	builtin_cd(t_env **env_list, char *newpath, t_cmd *cmd);
+void	builtin_cd(t_env **env_list, char *newpath, t_data *data);
 void	builtin_pwd(t_cmd *cmd);
-void	builtin_echo(t_cmd *cmd, t_env *env_list);
-void	builtin_exit(t_cmd *cmd,t_env *env_list);
+void	builtin_echo(t_data *data);
+void	builtin_exit(t_data *data);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
@@ -125,9 +125,11 @@ t_env	*copyenvlist(t_env *env_list);
 void	built_export(t_env *env_list);
 void	builtin_export(t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_env **env_list, char *oldpath);
-char	*getpath(char *cmd, t_cmd *cmds);
+char	*getpath(char *cmd, t_data *data);
 void	execshell( t_env **env_list);
-void	executecommand(t_data *data);
+void	executecommand(t_data *data, t_env *env_list);
+void	exec_extern_command(char **args, t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd, t_env *env_list, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

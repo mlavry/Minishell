@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/07 00:37:00 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/12 21:06:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,6 @@
 	return (0);
 } */
 
-void	init_data(t_data *data, int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-	data->env = NULL;
-	data->token = NULL;
-	data->exit_code = 0;
-}
-
 bool	empty_line(char *line)
 {
 	int	i;
@@ -68,7 +59,7 @@ bool	empty_line(char *line)
 	i = 0;
 	while (line[i] && line[i] == ' ')
 		i++;
-	if	(i == (int)ft_strlen(line))
+	if (i == (int)ft_strlen(line))
 	{
 		free(line);
 		return (true);
@@ -80,8 +71,7 @@ int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
-	(void)envp;
-	init_data(&data, argc, argv);
+	init_data(&data, argc, argv, envp);
 	//Creer l'environnement et si sa echoue free les erreurs potentielles
 	parse_env(envp, &data);
 	execshell(&data.env);
@@ -97,16 +87,18 @@ int	main(int argc, char *argv[], char **envp)
 			exit (0);
 		}
 		if (empty_line(data.line))
-			continue;
+			continue ;
 		add_history(data.line);
 		if (!parse_line(&data, data.line))
-			continue;
+		{
+			continue ;
+		}
 		if (data.line[0] == '$')
 		{
 			if (data.line[1] == '?')
 			{
-				printf("%d: command not found\n", data.cmd->g_exit);
-				data.cmd->g_exit = 127;
+				printf("%d: command not found\n", data.exit_code);
+				data.exit_code = 127;
 			}
 			char *value = getenvp(data.env, data.line + 1);
 			if (value)
@@ -115,7 +107,7 @@ int	main(int argc, char *argv[], char **envp)
 				printf("bash : %s no such file or directory\n", value);
 		}
 		else
-			executecommand(&data);
+			executecommand(&data, data.env);
 	}
 	clear_history();
 	return (0);

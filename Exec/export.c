@@ -81,11 +81,15 @@ void	built_export(t_env *env_list)
 	current = sortedlist;
 	while (current)
 	{
-		if (current->value == NULL || current->value[0] == '\0')
-			printf("declare -x %s\n", current->name);
-		else
-			printf("declare -x %s=\"%s\"\n", current->name, current->value);
+		if (ft_strcmp(current->name, "_") != 0)
+		{
+			if (current->value == NULL || current->value[0] == '\0')
+				printf("declare -x %s\n", current->name);
+			else
+				printf("declare -x %s=\"%s\"\n", current->name, current->value);
+		}
 		current = current->next;
+
 	}
 	free_env_list(sortedlist);
 }

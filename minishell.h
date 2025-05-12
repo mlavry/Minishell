@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/12 20:29:47 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/12 21:21:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
+	//int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -112,9 +113,10 @@ void	free_env_list(t_env *env_list);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
-void	builtin_env( t_env *env_list);
-void	builtin_cd(t_env **env_list, char *newpath, t_data *data);
-void	builtin_pwd(t_cmd *cmd);
+void	exec_builtin(t_data *data);
+void	builtin_env(t_env *env_list);
+void	builtin_cd( char *newpath, t_data *data);
+void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
 void	builtin_exit(t_data *data);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
@@ -129,7 +131,7 @@ char	*getpath(char *cmd, t_data *data);
 void	execshell( t_env **env_list);
 void	executecommand(t_data *data, t_env *env_list);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
-void	exec_pipe(t_cmd *cmd, t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

@@ -39,7 +39,7 @@ void	exec_extern_command(char **args, t_env *env_list, t_data *data)
 		return (perror("fork"), data->exit_code = 1, free(path));
 	if (pid == 0)
 	{
-		 if (data->cmd->fd_in != STDIN_FILENO)
+	   if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			dup2(data->cmd->fd_in, STDIN_FILENO);
 			close(data->cmd->fd_in);
@@ -78,6 +78,11 @@ void	exec_extern_command(char **args, t_env *env_list, t_data *data)
 /* -------------------------------------------------------------------------- */
 /*  APPEL PUBLIC : exécute la commande contenue dans data->line               */
 /* -------------------------------------------------------------------------- */
+
+
+
+
+
 void	executecommand(t_data *data, t_env *env_list)
 {
 	if (!data || !data->line || !data->env)
@@ -105,10 +110,33 @@ void	executecommand(t_data *data, t_env *env_list)
  */
 	if (data->cmd->next)
 		exec_pipe(data->cmd, env_list, data);
+	else if (isbuiltin(data))
+	{
+		int saved_in = dup(STDIN_FILENO);
+		int saved_out = dup(STDOUT_FILENO);
+
+		if (data->cmd->fd_in != STDIN_FILENO)
+		{
+			dup2(data->cmd->fd_in, STDIN_FILENO);
+			close(data->cmd->fd_in);
+		}
+		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
+			dup2(data->cmd->fd_out, STDOUT_FILENO);
+			close(data->cmd->fd_out);
+		}
+
+		exec_builtin(data);
+
+		dup2(saved_in, STDIN_FILENO);
+		dup2(saved_out, STDOUT_FILENO);
+		close(saved_in);
+		close(saved_out);
+	}
 	else
 	{
 		/* 3) Built‑in sinon programme externe ----------------------------- */
-		if (!isbuiltin(data))
+		//if (!isbuiltin(data))
 			exec_extern_command(data->cmd->args, data->env, data);
 	}
 

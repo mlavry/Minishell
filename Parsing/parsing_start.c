@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/12 19:29:02 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/06 23:54:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 bool	parse_line(t_data *data, char *line)
 {
-	if (open_quote(data, line))
+	if (open_quote(data, line))//return (1) en cas d'erreur
 	{
 		free(line);
 		return (false);

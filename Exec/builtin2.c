@@ -6,35 +6,35 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:30:42 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/13 22:46:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	builtin_env( t_env *env_list)
+void	builtin_env(t_data *data)
 {
 /* 	if (!env_list)
 		return ; */
 
-	while (env_list)
+	while (data->env)
 	{
-		if (env_list->value != NULL && env_list->value[0] != '\0')
-			printf("%s=%s\n", env_list->name, env_list->value);
-		env_list = env_list->next;
+		if (data->env->value != NULL && data->env->value[0] != '\0')
+			printf("%s=%s\n", data->env->name, data->env->value);
+		data->env = data->env->next;
 	}
 	printf("_=/usr/bin/env\n");
 }
 
-void	emptyenv(t_env **env_list)
+void	emptyenv(t_data *data)
 {
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
-	if (*env_list == NULL)
+	if (data->env == NULL)
 	{
-		add_env_var(env_list, "PWD", cwd);// PWD = chemin actuel
-		add_env_var(env_list, "SHLVL", "1");
+		add_env_var(data, "PWD", cwd);// PWD = chemin actuel
+		add_env_var(data, "SHLVL", "1");
 	}
 	free(cwd);
 }
@@ -68,7 +68,7 @@ void	builtin_cd(char *newpath, t_data *data)
 	}
 	getcwd(path, sizeof(path));
 	chdir(newpath);
-	updatepwd(&data->env, path);
+	updatepwd(data, path);
 }
 
 void	unset(t_env **env_list, char *name )

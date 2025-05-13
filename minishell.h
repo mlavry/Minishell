@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/13 20:57:11 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/13 22:45:03 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,11 +91,11 @@ void	init_data(t_data *data, int argc, char **argv, char **envp);
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
 char	*getenvp(t_env *list, char *name);
-void	add_env_var(t_env **env_list, char *name, char *value);
-void	update_env_var(t_env **env_list, char *name, char *value);
+void	add_env_var(t_data *data, char *name, char *value);
+void	update_env_var(t_data *data, char *name, char *value);
 void	swap_env(t_env *a, t_env *b);
 void	sort_env(t_env **env_list);
-void	emptyenv(t_env **env_list);
+void	emptyenv(t_data *data);
 char	**convert_env(t_env *env_list);
 t_env	*find_env_var(t_env *env_list, char *name);
 
@@ -120,7 +120,7 @@ void	malloc_failed(t_data *data);
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
 void	exec_builtin(t_data *data);
-void	builtin_env(t_env *env_list);
+void	builtin_env(t_data *data);
 void	builtin_cd( char *newpath, t_data *data);
 void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
@@ -130,9 +130,9 @@ int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_env *env_list);
-void	built_export(t_env *env_list);
-void	builtin_export(t_env **env_list, t_cmd *cmd);
-void	updatepwd(t_env **env_list, char *oldpath);
+void	built_export(t_data *data);
+void	builtin_export(t_data *data, t_cmd *cmd);
+void	updatepwd(t_data *data, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell( t_env **env_list);
 void	executecommand(t_data *data, t_env *env_list);

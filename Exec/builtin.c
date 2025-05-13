@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:33:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/13 22:43:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,7 @@ int	isbuiltin(t_data *data)
 void	exec_builtin(t_data *data)
 {
 	t_cmd	*cmd;
-	t_env	*env_list;
 
-	env_list = data->env;
 	cmd = data->cmd;
 	/* if (!cmd || !cmd->name)
 		return (0); */
@@ -50,15 +48,15 @@ void	exec_builtin(t_data *data)
 	else if (ft_strcmp(cmd->name, "pwd") == 0)
 		builtin_pwd();
 	else if (ft_strcmp(cmd->name, "env") == 0)
-		builtin_env(env_list);
+		builtin_env(data);
 	else if (ft_strcmp(cmd->name, "exit") == 0)
 		builtin_exit(data);
 	else if (ft_strcmp(cmd->name, "cd") == 0)
 		builtin_cd(cmd->args[1], data);
 	else if (ft_strcmp(cmd->name, "export") == 0)
-		builtin_export(&env_list, cmd);
+		builtin_export(data, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
-		builtin_unset(&env_list, cmd);
+		builtin_unset(data, cmd);
 }
 
 void	builtin_pwd(void)

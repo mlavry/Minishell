@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 19:51:27 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/12 21:09:14 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/13 21:20:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,18 @@ static void	init_cmd(t_cmd *cmd)
 
 void	init_data(t_data *data, int argc, char **argv, char **envp)
 {
+	ft_bzero(data, sizeof(t_data));
 	(void)envp;
 	(void)argc;
 	(void)argv;
 	data->env = NULL;
 	data->cmd = malloc(sizeof(t_cmd));
 	if (!data->cmd)
-		return ; //exit avec une fonction expres
+		malloc_failed(data);
 	init_cmd(data->cmd);
 	data->token = malloc(sizeof(t_token));
 	if (!data->token)
-		return ; //exit avec une fonction expres
+		malloc_failed(data);
 	init_token(data->token);
 	data->line = NULL;
 	data->exit_code = 0;

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/12 21:21:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/13 20:57:11 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,12 @@ bool	is_redir(int type);
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
+void	safe_close(int fd);
+void	free_env(t_env **env);
+void	free_token(t_token **token);
+void	free_cmd(t_cmd **cmd);
+void	free_all(t_data *data, int exit_code);
+void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);

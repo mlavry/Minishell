@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/22 16:20:24 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/05/13 20:18:24 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,4 +198,4 @@ void	exec_pipe(t_cmd *cmd, t_env *env_list, t_data *data)
 	// Attend tous les enfants
 	while (wait(NULL) > 0)
 		;
-} 
+}

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 21:57:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 22:11:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,9 @@ int	main(int argc, char *argv[], char **envp)
 		}
 		else
 			executecommand(&data);
+		free_token(&data.token);
+		free_cmd(&data.cmd);
+		free(data.line);
 	}
-	clear_history();
-	return (0);
+	free_all(&data, 0, true);
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 21:51:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 22:03:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,11 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 		free(data->line);
 		data->line = NULL;
 	}
-	clear_history();
 	if (exit_or_not)
+	{
+		clear_history();
 		exit(exit_code);
+	}
 }
 
 void	malloc_failed(t_data *data)

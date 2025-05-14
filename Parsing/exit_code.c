@@ -1,35 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_start.c                                    :+:      :+:    :+:   */
+/*   exit_code.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/06 23:54:07 by mlavry           ###   ########.fr       */
+/*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
+/*   Updated: 2025/05/14 22:03:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-bool	parse_line(t_data *data, char *line)
+void	free_all(t_data *data, int exit_code, bool exit_or_not)
 {
-	if (open_quote(data, line))//return (1) en cas d'erreur
+	free_env(&data->env);
+	free_token(&data->token);
+	free_cmd(&data->cmd);
+	if (data->line)
 	{
-		free(line);
-		return (false);
+		free(data->line);
+		data->line = NULL;
 	}
-	if (!tokenize(data, line))
+	if (exit_or_not)
 	{
-		free(line);
-		return (false);
+		clear_history();
+		exit(exit_code);
 	}
-	data->cmd = tokens_to_commands(data->token);
-	if(!(data->cmd))
-	{
-		free(line);
-		return (false);
-	}
-	//print_cmds(data->cmd);
-	return (true);
+}
+
+void	malloc_failed(t_data *data)
+{
+	ft_putstr_fd("minishell: malloc failed\n", 2);
+	free_all(data, 1, true);
 }

@@ -1,0 +1,12 @@
+
+Test a gerer : echo '"'$USER'"'
+
+Remplacer free_env_List par free_env
+
+Proteger toute la libft
+
+Expand
+
+Test avc des quotes 
+
+Signaux

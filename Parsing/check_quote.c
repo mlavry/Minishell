@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/23 19:47:33 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/28 16:02:24 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	is_quoted(char c)
 	return (0);
 }
 
-void	stock_and_delete_quote(t_token *token) //appeler une fois que les token sont deja initialiser et faire attention a ce que dq et sq soit bien initialiser
+void	stock_and_delete_quote(t_token *token)
 {
 	int		len;
 	char	*tmp;

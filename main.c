@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/15 21:41:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 22:11:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,6 @@
 	return (0);
 } */
 
-void	init_data(t_data *data, int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-	data->env = NULL;
-	data->token = NULL;
-	data->exit_code = 0;
-}
-
 bool	empty_line(char *line)
 {
 	int	i;
@@ -68,7 +59,7 @@ bool	empty_line(char *line)
 	i = 0;
 	while (line[i] && line[i] == ' ')
 		i++;
-	if	(i == (int)ft_strlen(line))
+	if (i == (int)ft_strlen(line))
 	{
 		free(line);
 		return (true);
@@ -78,30 +69,44 @@ bool	empty_line(char *line)
 
 int	main(int argc, char *argv[], char **envp)
 {
-	char	*line;
 	t_data	data;
 
-	(void)envp;
-	init_data(&data, argc, argv);
-	//Creer l'environnement et si sa echoue free les erreurs potentielles
+	init_data(&data, argc, argv, envp);
 	parse_env(envp, &data);
-	/* printf("%s", data.env->value); */
+	execshell(&data, &data.env);
+	emptyenv(&data, &data.env);
 	while (1)
 	{
 		//setup signal
-		line = readline("minishell$ ");
-		if (!line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
+		data.line = readline("minishell$ ");
+		if (!data.line)
 		{
 			ft_putstr_fd("exit\n", 2);
-			exit (0);
+			free_all(&data, 0, true);
 		}
-		if (empty_line(line))
-			continue;
-		if (!parse_line(&data, line))
-			continue;
-		if (*line)
-			add_history(line);
+		if (empty_line(data.line))
+			continue ;
+		add_history(data.line);
+		if (!parse_line(&data, data.line))
+			continue ;
+		if (data.line[0] == '$')
+		{
+			if (data.line[1] == '?')
+			{
+				printf("%d: command not found\n", data.exit_code);
+				data.exit_code = 127;
+			}
+			char *value = getenvp(data.env, data.line + 1);
+			if (value)
+				printf("bash : %s : command not found\n", value);
+			if (value && access(value, X_OK))
+				printf("bash : %s no such file or directory\n", value);
+		}
+		else
+			executecommand(&data);
+		free_token(&data.token);
+		free_cmd(&data.cmd);
+		free(data.line);
 	}
-	clear_history();
-	return (0);
+	free_all(&data, 0, true);
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/23 19:38:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 22:18:02 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,15 @@ void	parse_token(t_data *data, char **tokens)
 		add_token(&token_list, tokens[i]);
 		i++;
 	}
-	t_token *tmp = token_list;
-	while (tmp)
+	data->token = token_list;
+	mark_commands(data);
+	//t_token *tmp = token_list;
+/* 	while (tmp)
 	{
 		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
 			tmp->str, tmp->type, tmp->sq, tmp->dq);
 		tmp = tmp->next;
-	}
-	data->token = token_list;
+	} */
 }
 
 int	tokenize(t_data *data, char *line)
@@ -86,5 +87,6 @@ int	tokenize(t_data *data, char *line)
 		return (0);
 	}
 	parse_token(data, token);
+	free_tab(token);
 	return (1);
 }

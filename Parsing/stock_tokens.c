@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:13:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/28 15:22:23 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ int	handle_splitter(char *line, char **tokens, int *pos)
 		if (pos[1] > pos[0])
 			tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0]);
 		pos[0] = pos[1];
-		while (is_operator(line[pos[1]]))
+		while (line[pos[1]] == line[pos[0]])
 			pos[1]++;
 		tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0]);
 		pos[0] = pos[1];

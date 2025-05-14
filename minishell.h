@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/22 22:36:47 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:50:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 # include <string.h>
 # include <sys/ioctl.h>
 # include <termios.h>
-# include <term.h>
 # include <stdbool.h>
 
 # define INPUT 1 //"<"
@@ -46,7 +45,18 @@ typedef struct s_token
 	bool			sq;
 	bool			dq;
 	struct s_token	*next;
+	struct s_token	*prev;
 }	t_token;
+
+typedef struct s_cmd
+{
+	char			*name;
+	char			**args;
+	int				fd_in;
+	int				fd_out;
+	//int				g_exit;
+	struct s_cmd	*next;
+}	t_cmd;
 
 typedef struct s_env
 {
@@ -57,8 +67,10 @@ typedef struct s_env
 
 typedef struct s_data
 {
+	char		*line;
 	t_env		*env;
 	t_token		*token;
+	t_cmd		*cmd;
 	int			exit_code;
 }				t_data;
 
@@ -71,10 +83,21 @@ void	stock_and_delete_quote(t_token *token);
 void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
 char	**line_to_token(char *line);
+void	mark_commands(t_data *data);
+int		add_args(char ***args, char *str);
+t_cmd	*tokens_to_commands(t_token *tokens);
+void	init_data(t_data *data, int argc, char **argv, char **envp);
 
-//------------------------Make_env---------------------
+//------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
 char	*getenvp(t_env *list, char *name);
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value);
+void	update_env_var(t_env **env_list, char *name, char *value);
+void	swap_env(t_env *a, t_env *b);
+void	sort_env(t_env **env_list);
+void	emptyenv(t_data *data, t_env **env_list);
+char	**convert_env(t_env *env_list);
+t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
 int		ft_strcmp(char *s1, char *s2);
@@ -82,8 +105,41 @@ char	*ft_strcpy(char *dest, char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
+bool	is_redir(int type);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
+void	free_env_list(t_env *env_list);
+void	safe_close(int fd);
+void	free_env(t_env **env);
+void	free_token(t_token **token);
+void	free_cmd(t_cmd **cmd);
+void	free_all(t_data *data, int exit_code, bool exit_or_not);
+void	malloc_failed(t_data *data);
+
+//------------------------Exec---------------------
+int		isbuiltin(t_data *data);
+void	exec_builtin(t_data *data);
+void	builtin_env(t_env *env_list);
+void	builtin_cd( char *newpath, t_data *data);
+void	builtin_pwd(void);
+void	builtin_echo(t_data *data);
+void	builtin_exit(t_data *data);
+void	builtin_unset(t_env **env_list, t_cmd *cmd);
+int		validate_export_name(char *name);
+char	*extract_name(char *arg);
+char	*extract_value(char *arg);
+t_env	*copyenvlist(t_data *data, t_env *env_list);
+void	built_export(t_data *data, t_env *env_list);
+void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
+void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
+char	*getpath(char *cmd, t_data *data);
+void	execshell(t_data *data, t_env **env_list);
+void	executecommand(t_data *data);
+void	exec_extern_command(char **args, t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
+
+//------------Debug Functions---------------------
+void	print_cmds(t_cmd *c);
 
 #endif

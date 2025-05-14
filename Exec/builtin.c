@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:33:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 20:50:43 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	exec_builtin(t_data *data)
 	else if (ft_strcmp(cmd->name, "cd") == 0)
 		builtin_cd(cmd->args[1], data);
 	else if (ft_strcmp(cmd->name, "export") == 0)
-		builtin_export(&env_list, cmd);
+		builtin_export(data, &env_list, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
 		builtin_unset(&env_list, cmd);
 }

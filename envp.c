@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/29 19:55:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 20:30:48 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,20 +25,21 @@ char	*getenvp(t_env *list, char *name)
 	return (NULL);
 }
 
-void	add_env_var(t_env **env_list, char *name, char *value)
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*new_var;
 	t_env	*tmp;
 
 	new_var = malloc(sizeof(t_env));
 	if (!new_var)
-		return ;
+		malloc_failed(data);
 	new_var->name = ft_strdup(name);
-	if (!new_var->name)
-		return ;
 	new_var->value = ft_strdup(value);
-	if (!new_var->value)
-		return ;
+	if (!new_var->name || !new_var->value)
+	{
+		free_env(&new_var);
+		malloc_failed(data);
+	}
 	new_var->next = NULL;
 	if (!*env_list)
 	{
@@ -99,7 +100,7 @@ char	**convert_env(t_env *env_list)
 	return (envp);
 }
 
-void	parse_env(char **envp, t_data *env_list)
+void	parse_env(char **envp, t_data *data)
 {
 	int		i;
 	char	*name;
@@ -109,7 +110,7 @@ void	parse_env(char **envp, t_data *env_list)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = strchr(envp[i], '=');
+		equal_pos = ft_strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;
@@ -117,9 +118,9 @@ void	parse_env(char **envp, t_data *env_list)
 		}
 		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
 		if (!name)
-			return ;
+			malloc_failed(data);
 		value = equal_pos + 1;
-		add_env_var(&env_list->env, name, value);
+		add_env_var(data, &data->env, name, value);
 		free(name);
 		i++;
 	}

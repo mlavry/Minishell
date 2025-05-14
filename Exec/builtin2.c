@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:30:42 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 20:46:32 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,15 @@ void	builtin_env( t_env *env_list)
 	printf("_=/usr/bin/env\n");
 }
 
-void	emptyenv(t_env **env_list)
+void	emptyenv(t_data *data, t_env **env_list)
 {
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
 	if (*env_list == NULL)
 	{
-		add_env_var(env_list, "PWD", cwd);// PWD = chemin actuel
-		add_env_var(env_list, "SHLVL", "1");
+		add_env_var(data, env_list, "PWD", cwd);// PWD = chemin actuel
+		add_env_var(data, env_list, "SHLVL", "1");
 	}
 	free(cwd);
 }
@@ -68,7 +68,7 @@ void	builtin_cd(char *newpath, t_data *data)
 	}
 	getcwd(path, sizeof(path));
 	chdir(newpath);
-	updatepwd(&data->env, path);
+	updatepwd(data, &data->env, path);
 }
 
 void	unset(t_env **env_list, char *name )

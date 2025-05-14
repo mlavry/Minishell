@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/07 00:32:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 19:39:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,7 @@ char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_token *tokens);
+void	init_data(t_data *data, int argc, char **argv, char **envp);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -100,7 +101,7 @@ t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
 int		ft_strcmp(char *s1, char *s2);
-char	*ft_strcpy(char *dest, char *src);
+char	*ft_strcpy(char *dest, const char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
@@ -109,6 +110,12 @@ bool	is_redir(int type);
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
+void	safe_close(int fd);
+void	free_env(t_env **env);
+void	free_token(t_token **token);
+void	free_cmd(t_cmd **cmd);
+void	free_all(t_data *data, int exit_code);
+void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
@@ -128,9 +135,9 @@ void	builtin_export(t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell( t_env **env_list);
-void	executecommand(t_data *data, t_env *env_list);
+void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
-void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

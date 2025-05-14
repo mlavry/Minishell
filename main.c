@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/07 00:37:00 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 19:37:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,25 +52,6 @@
 	return (0);
 } */
 
-void init_cmd(t_cmd *cmd) 
-{
-	cmd->name = NULL;
-	cmd->args = NULL;
-	cmd->fd_in = 0;
-	cmd->fd_out = 1;
-	cmd->next = NULL;
-}
-
-
-void	init_data(t_data *data, int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-	data->env = NULL;
-	data->token = NULL;
-	data->exit_code = 0;
-}
-
 bool	empty_line(char *line)
 {
 	int	i;
@@ -89,18 +70,11 @@ bool	empty_line(char *line)
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
-	//t_cmd cmd;
 
-	 data.exit_code= 0;
-	t_env *env_list = NULL;
-
-	(void)envp;
-	init_data(&data, argc, argv);
-	//init_cmd(&cmd);
+	init_data(&data, argc, argv, envp);
 	parse_env(envp, &data);
 	execshell(&data.env);
 	emptyenv(&data.env);
-	/* printf("%s", data.env->value); */
 	while (1)
 	{
 		//setup signal
@@ -129,7 +103,7 @@ int	main(int argc, char *argv[], char **envp)
 				printf("bash : %s no such file or directory\n", value);
 		}
 		else
-			executecommand(&data, env_list);
+			executecommand(&data);
 	}
 	clear_history();
 	return (0);

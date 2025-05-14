@@ -16,7 +16,6 @@ void	builtin_env( t_env *env_list)
 {
 /* 	if (!env_list)
 		return ; */
-
 	while (env_list)
 	{
 		if (env_list->value != NULL && env_list->value[0] != '\0')
@@ -39,27 +38,10 @@ void	emptyenv(t_env **env_list)
 	free(cwd);
 }
 
-void	builtin_cd(char *newpath, t_data *data)
+void	built_path(char *newpath, t_data *data)
 {
 	char	path[1024];
 
-	if ( newpath[0] == '~')
-	{
-		const char *home = getenv("HOME");
-   	 	if (home) 
-		{
-        // Crée une nouvelle chaîne en remplaçant ~ par le chemin complet
-        	char *expanded_path = malloc(strlen(home) + strlen(newpath));
-        	strcpy(expanded_path, home);
-        	strcat(expanded_path, newpath + 1); // Ignore le ~ et concatène le reste
-        	newpath = expanded_path;
-    	}
-	}
-	if (newpath == NULL)
-	{
-		newpath = getenv("HOME");
-		chdir("/home");
-	}
 	if (access(newpath, F_OK) != 0)
 	{
 		printf("bash: cd: %s: No such file or directory\n", newpath);
@@ -69,6 +51,32 @@ void	builtin_cd(char *newpath, t_data *data)
 	getcwd(path, sizeof(path));
 	chdir(newpath);
 	updatepwd(&data->env, path);
+}
+
+void	builtin_cd(char *newpath, t_data *data)
+{
+	const char	*home;
+	char		*expanded_path ;
+
+	expanded_path = NULL;
+	if (newpath == NULL)
+	{
+		newpath = getenv("HOME");
+		chdir("/home");
+	}
+	if (newpath[0] == '~')
+	{
+		home = getenv("HOME");
+		if (home)
+		{
+			expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+			ft_strcpy(expanded_path, home);
+			ft_strcat(expanded_path, newpath + 1);
+			newpath = expanded_path;
+		}
+	}
+	built_path(newpath, data);
+	free(expanded_path);
 }
 
 void	unset(t_env **env_list, char *name )

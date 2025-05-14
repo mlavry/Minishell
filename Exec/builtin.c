@@ -106,7 +106,7 @@ void	print_antislash(const char *str)
 	while (str[i])
 	{
 		b_slash = 0;
-		i = antislash(str,i);
+		i = antislash(str, i);
 	}
 }
 
@@ -181,7 +181,7 @@ void	builtin_echo(t_data *data)
 		printf("\n");
 		data->exit_code = 0;
 	}
-} 
+}
 
 void	builtin_exit(t_data *data)
 {

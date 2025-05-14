@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 18:31:55 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:30:42 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,22 @@ void	emptyenv(t_env **env_list)
 	free(cwd);
 }
 
-void	builtin_cd(t_env **env_list, char *newpath,  t_data *data)
+void	builtin_cd(char *newpath, t_data *data)
 {
-	
 	char	path[1024];
 
+	if ( newpath[0] == '~')
+	{
+		const char *home = getenv("HOME");
+   	 	if (home) 
+		{
+        // Crée une nouvelle chaîne en remplaçant ~ par le chemin complet
+        	char *expanded_path = malloc(strlen(home) + strlen(newpath));
+        	strcpy(expanded_path, home);
+        	strcat(expanded_path, newpath + 1); // Ignore le ~ et concatène le reste
+        	newpath = expanded_path;
+    	}
+	}
 	if (newpath == NULL)
 	{
 		newpath = getenv("HOME");
@@ -57,7 +68,7 @@ void	builtin_cd(t_env **env_list, char *newpath,  t_data *data)
 	}
 	getcwd(path, sizeof(path));
 	chdir(newpath);
-	updatepwd(env_list, path);
+	updatepwd(&data->env, path);
 }
 
 void	unset(t_env **env_list, char *name )

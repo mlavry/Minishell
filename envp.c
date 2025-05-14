@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/13 22:35:25 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 18:24:06 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,27 +25,27 @@ char	*getenvp(t_env *list, char *name)
 	return (NULL);
 }
 
-void	add_env_var(t_data *data, char *name, char *value)
+void	add_env_var(t_env **env_list, char *name, char *value)
 {
 	t_env	*new_var;
 	t_env	*tmp;
 
 	new_var = malloc(sizeof(t_env));
 	if (!new_var)
-		malloc_failed(data);
+		return ;
 	new_var->name = ft_strdup(name);
 	if (!new_var->name)
-		malloc_failed(data);
+		return ;
 	new_var->value = ft_strdup(value);
 	if (!new_var->value)
-		malloc_failed(data);
+		return ;
 	new_var->next = NULL;
-	if (!data->env)
+	if (!*env_list)
 	{
-		data->env = new_var;
+		*env_list = new_var;
 		return ;
 	}
-	tmp = *data->env;
+	tmp = *env_list;
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new_var;
@@ -99,17 +99,17 @@ char	**convert_env(t_env *env_list)
 	return (envp);
 }
 
-void	parse_env(char **envp, t_data *data)
+void	parse_env(char **envp, t_data *env_list)
 {
 	int		i;
 	char	*name;
 	char	*value;
 	char	*equal_pos;
-void	updatepwd(t_env **env_list, char *oldpath);
+
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = ft_strchr(envp[i], '=');
+		equal_pos = strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;
@@ -117,9 +117,9 @@ void	updatepwd(t_env **env_list, char *oldpath);
 		}
 		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
 		if (!name)
-			malloc_failed(data);
+			return ;
 		value = equal_pos + 1;
-		add_env_var(data, name, value);
+		add_env_var(&env_list->env, name, value);
 		free(name);
 		i++;
 	}

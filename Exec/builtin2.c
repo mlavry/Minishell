@@ -6,55 +6,44 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/13 22:46:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 18:31:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	builtin_env(t_data *data)
+void	builtin_env( t_env *env_list)
 {
 /* 	if (!env_list)
 		return ; */
 
-	while (data->env)
+	while (env_list)
 	{
-		if (data->env->value != NULL && data->env->value[0] != '\0')
-			printf("%s=%s\n", data->env->name, data->env->value);
-		data->env = data->env->next;
+		if (env_list->value != NULL && env_list->value[0] != '\0')
+			printf("%s=%s\n", env_list->name, env_list->value);
+		env_list = env_list->next;
 	}
 	printf("_=/usr/bin/env\n");
 }
 
-void	emptyenv(t_data *data)
+void	emptyenv(t_env **env_list)
 {
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
-	if (data->env == NULL)
+	if (*env_list == NULL)
 	{
-		add_env_var(data, "PWD", cwd);// PWD = chemin actuel
-		add_env_var(data, "SHLVL", "1");
+		add_env_var(env_list, "PWD", cwd);// PWD = chemin actuel
+		add_env_var(env_list, "SHLVL", "1");
 	}
 	free(cwd);
 }
 
-void	builtin_cd(char *newpath, t_data *data)
+void	builtin_cd(t_env **env_list, char *newpath,  t_data *data)
 {
+	
 	char	path[1024];
 
-	if ( newpath[0] == '~')
-	{
-		const char *home = getenv("HOME");
-   	 	if (home) 
-		{
-        // Crée une nouvelle chaîne en remplaçant ~ par le chemin complet
-        	char *expanded_path = malloc(strlen(home) + strlen(newpath));
-        	strcpy(expanded_path, home);
-        	strcat(expanded_path, newpath + 1); // Ignore le ~ et concatène le reste
-        	newpath = expanded_path;
-    	}
-	}
 	if (newpath == NULL)
 	{
 		newpath = getenv("HOME");
@@ -68,7 +57,7 @@ void	builtin_cd(char *newpath, t_data *data)
 	}
 	getcwd(path, sizeof(path));
 	chdir(newpath);
-	updatepwd(data, path);
+	updatepwd(env_list, path);
 }
 
 void	unset(t_env **env_list, char *name )

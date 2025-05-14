@@ -6,63 +6,45 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/13 22:43:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 18:31:30 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-
-
-
-
 int	isbuiltin(t_data *data)
 {
-	char *cmd;
-
-	if (!data || !data->cmd || !data->cmd->name)
-		return (0);
-
-	cmd = data->cmd->name;
-
-	return (
-		ft_strcmp(cmd, "echo") == 0 ||
-		ft_strcmp(cmd, "pwd") == 0 ||
-		ft_strcmp(cmd, "env") == 0 ||
-		ft_strcmp(cmd, "exit") == 0 ||
-		ft_strcmp(cmd, "cd") == 0 ||
-		ft_strcmp(cmd, "export") == 0 ||
-		ft_strcmp(cmd, "unset") == 0
-	);
-}
-
-void	exec_builtin(t_data *data)
-{
 	t_cmd	*cmd;
+	t_env	*env_list;
 
+	env_list = data->env;
 	cmd = data->cmd;
-	/* if (!cmd || !cmd->name)
-		return (0); */
+	if (!cmd || !cmd->name)
+		return (0);
 	if (ft_strcmp(cmd->name, "echo") == 0)
-		builtin_echo(data);
+		builtin_echo( data);
 	else if (ft_strcmp(cmd->name, "pwd") == 0)
-		builtin_pwd();
+		builtin_pwd(cmd);
 	else if (ft_strcmp(cmd->name, "env") == 0)
-		builtin_env(data);
+		builtin_env(env_list);
 	else if (ft_strcmp(cmd->name, "exit") == 0)
 		builtin_exit(data);
 	else if (ft_strcmp(cmd->name, "cd") == 0)
-		builtin_cd(cmd->args[1], data);
+		builtin_cd(&env_list, cmd->args[1], data);
 	else if (ft_strcmp(cmd->name, "export") == 0)
-		builtin_export(data, cmd);
+		builtin_export(&env_list, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
-		builtin_unset(data, cmd);
+		builtin_unset(&env_list, cmd);
+	else
+		return (0);
+	return (1);
 }
 
-void	builtin_pwd(void)
+void	builtin_pwd(t_cmd *cmd)
 {
 	char	*cwd;
 
+	(void)cmd;
 	cwd = getcwd(NULL, 0);
 	if (cwd)
 	{
@@ -110,41 +92,38 @@ void	antislash(const char *str, int *b_slash, int *i)
 
 int	antislash(const char *str, int i)
 {
-	int	j;
-	int	b_slash;
-
-	j = 0;
-	b_slash = 0;
+	int j=0;
+	int b_slash = 0;
 	while (str[i] == '\\')
-	{
-		b_slash++;
-		i++;
-	}
-	while (j < (b_slash / 2))
-	{
-		ft_putchar ('\\');
-		j++;
-	}
-	if (b_slash % 2 == 1)
-	{
-		if (str[i] != '\0')
 		{
-			if (str[i] == 'n')
-				ft_putchar('n');
-			else if (str[i] == 't')
-				ft_putchar('t');
-			else
-				ft_putchar(str[i]);
+			(b_slash)++;
 			i++;
 		}
-	}
-	else if (str[i] != '\0')
-	{
-		ft_putchar(str[i]);
-		i++;
-	}
-	return (i);
-}
+		while (j < (b_slash / 2))
+		{
+			ft_putchar ('\\');
+			j++;
+		}
+		if (b_slash % 2 == 1)
+		{
+			if (str[i] != '\0')
+			{
+				if (str[i] == 'n')
+					ft_putchar('n');
+				else if (str[i] == 't')
+					ft_putchar('t');
+				else
+					ft_putchar(str[i]);
+				(i)++;
+			}
+		} 
+	 	else if (str[i] != '\0')
+		{
+			ft_putchar(str[i]);
+			i++;
+		}
+		return (i);
+} 
 
 void	print_antislash(const char *str)
 {
@@ -402,14 +381,14 @@ void	builtin_echo(t_data *data)
 
 void	builtin_exit(t_data *data)
 {
-	/* t_env	*env_list;
+	t_env	*env_list;
 	t_cmd	*cmd;
 
 	env_list = data->env;
-	cmd = data->cmd; */
+	cmd = data->cmd;
 
 	printf("exit\n");
-	free_env_list(data->env);
-	free_tab(data->cmd->args);
+	free_env_list(env_list);
+	free_tab(cmd->args);
 	exit(0);
 }

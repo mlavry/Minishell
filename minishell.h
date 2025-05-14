@@ -5,10 +5,11 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/13 22:45:03 by mlavry           ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/05/14 18:28:11 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -30,6 +31,15 @@
 # include <termios.h>
 # include <stdbool.h>
 
+# define INPUT 1 //"<"
+# define HEREDOC 2 //"<<"
+# define OUTPUT 3 //">"
+# define APPEND 4 //">>"
+# define PIPE 5 //"|"
+# define CMD 6 //"cmd"
+# define ARG 7 //"arg"
+
+typedef struct s_token
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
 # define OUTPUT 3 //">"
@@ -64,9 +74,38 @@ typedef struct s_env
 	char				*value;
 	struct s_env		*next;
 }	t_env;
+	char			*str;
+	int				type;
+	bool			sq;
+	bool			dq;
+	struct s_token	*next;
+	struct s_token	*prev;
+}	t_token;
+
+typedef struct s_cmd
+{
+	char			*name;
+	char			**args;
+	int				fd_in;
+	int				fd_out;
+	//int				g_exit;
+	struct s_cmd	*next;
+}	t_cmd;
+
+typedef struct s_env
+{
+	char				*name;
+	char				*value;
+	struct s_env		*next;
+}	t_env;
 
 typedef struct s_data
+typedef struct s_data
 {
+	char		*line;
+	t_env		*env;
+	t_token		*token;
+	t_cmd		*cmd;
 	char		*line;
 	t_env		*env;
 	t_token		*token;

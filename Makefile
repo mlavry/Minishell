@@ -2,6 +2,7 @@ NAME = minishell
 
 CC = cc
 CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
+CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
 
 SRC_EXEC = main.c Exec/pipe.c Exec/builtin.c Exec/builtin2.c Exec/exec.c Exec/export.c Exec/export2.c Exec/getpath.c Exec/envp2.c
 

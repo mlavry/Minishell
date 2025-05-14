@@ -5,13 +5,16 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/13 22:21:08 by mlavry           ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/05/14 18:23:16 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
 #include "minishell.h"
 
+/*void	signal_handler(int sig)
 /*void	signal_handler(int sig)
 {
 	if (sig == SIGINT)
@@ -22,6 +25,7 @@
 			ft_putstr_fd("Error: problem with new line\n", 2);
 		rl_redisplay();
 	}
+}*/
 }*/
 
 /* int main(int argc, char *argv[], char **envp)
@@ -60,6 +64,7 @@ bool	empty_line(char *line)
 	while (line[i] && line[i] == ' ')
 		i++;
 	if (i == (int)ft_strlen(line))
+	if (i == (int)ft_strlen(line))
 	{
 		free(line);
 		return (true);
@@ -78,6 +83,9 @@ int	main(int argc, char *argv[], char **envp)
 	/* printf("%s", data.env->value); */
 	while (1)
 	{
+		//setup signal
+		data.line = readline("minishell$ ");
+		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
 		//setup signal
 		data.line = readline("minishell$ ");
 		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long

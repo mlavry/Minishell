@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 21:09:55 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:57:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,10 +79,10 @@ int	main(int argc, char *argv[], char **envp)
 	{
 		//setup signal
 		data.line = readline("minishell$ ");
-		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
+		if (!data.line)
 		{
 			ft_putstr_fd("exit\n", 2);
-			exit (0);
+			free_all(&data, 0, true);
 		}
 		if (empty_line(data.line))
 			continue ;

@@ -6,13 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/13 21:12:23 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:51:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	free_all(t_data *data, int exit_code)
+void	free_all(t_data *data, int exit_code, bool exit_or_not)
 {
 	free_env(&data->env);
 	free_token(&data->token);
@@ -23,11 +23,12 @@ void	free_all(t_data *data, int exit_code)
 		data->line = NULL;
 	}
 	clear_history();
-	exit(exit_code);
+	if (exit_or_not)
+		exit(exit_code);
 }
 
 void	malloc_failed(t_data *data)
 {
 	ft_putstr_fd("minishell: malloc failed\n", 2);
-	free_all(data, 1);
+	free_all(data, 1, true);
 }

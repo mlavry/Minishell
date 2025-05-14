@@ -19,7 +19,7 @@ void	exec_extern_command(char **args, t_env *env_list, t_data *data)
 	char		*path;
 	struct stat	sb;
 
-	path = getpath(args[0],data);
+	path = getpath(args[0], data);
 	if (!path)
 	{
 		printf("bash : %s: command not found\n", args[0]);
@@ -58,6 +58,10 @@ void	exec_extern_command(char **args, t_env *env_list, t_data *data)
 	{
 		waitpid(pid, &status, 0);
 		free(path);
+		if (data->cmd->fd_in != STDIN_FILENO)
+			close(data->cmd->fd_in);
+		if (data->cmd->fd_out != STDOUT_FILENO)
+			close(data->cmd->fd_out);
 	}
 	if (WIFEXITED(status))
 		data->exit_code = WEXITSTATUS(status);
@@ -138,6 +142,10 @@ void	executecommand(t_data *data, t_env *env_list)
 		/* 3) Built‑in sinon programme externe ----------------------------- */
 		//if (!isbuiltin(data))
 			exec_extern_command(data->cmd->args, data->env, data);
+			if (data->cmd->fd_in != STDIN_FILENO)
+				close(data->cmd->fd_in);
+			if (data->cmd->fd_out != STDOUT_FILENO)
+				close(data->cmd->fd_out);
 	}
 
 	/* 4) Nettoyage local : les fd (si redirs) seraient fermés ailleurs ----- */

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 19:33:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:18:14 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,7 @@ t_env	*find_env_var(t_env *env_list, char *name)
     }
 } */
 
-void	execshell( t_env **env_list)
+void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
 	int		level;
@@ -211,10 +211,9 @@ void	execshell( t_env **env_list)
 		level = ft_atoi(shlvl->value);
 		level++;
 		new_val = ft_itoa(level);
-		if (new_val)
-		{
-			free(shlvl->value);
-			shlvl->value = new_val;
-		}
+		if (!new_val)
+			malloc_failed(data);
+		free(shlvl->value);
+		shlvl->value = new_val;
 	}
 }

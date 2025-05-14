@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 20:49:33 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:09:13 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ void	built_export(t_data *data, t_env *env_list);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
-void	execshell( t_env **env_list);
+void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);

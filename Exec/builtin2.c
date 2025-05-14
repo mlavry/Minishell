@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 20:46:32 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:32:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ void	emptyenv(t_data *data, t_env **env_list)
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		malloc_failed(data);
 	if (*env_list == NULL)
 	{
 		add_env_var(data, env_list, "PWD", cwd);// PWD = chemin actuel

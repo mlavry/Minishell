@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 20:41:58 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 21:09:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	main(int argc, char *argv[], char **envp)
 
 	init_data(&data, argc, argv, envp);
 	parse_env(envp, &data);
-	execshell(&data.env);
+	execshell(&data, &data.env);
 	emptyenv(&data, &data.env);
 	while (1)
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 19:33:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/15 18:19:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,10 +140,7 @@ void	execshell(t_data *data, t_env **env_list)
 		new_val = ft_itoa(level);
 		if (!new_val)
 			malloc_failed(data);
-		else
-		{
-			free(shlvl->value);
-			shlvl->value = new_val;
-		}
+		free(shlvl->value);
+		shlvl->value = new_val;
 	}
 }

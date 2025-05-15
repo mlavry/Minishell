@@ -12,22 +12,23 @@
 
 #include "../minishell.h"
 
-bool	parse_line(t_data *data, char *line)
+bool	parse_line(t_data *data)
 {
-	if (open_quote(data, line))//return (1) en cas d'erreur
+	if (open_quote(data, data->line))//return (1) en cas d'erreur
 	{
-		free(line);
+		free(data->line);
 		return (false);
 	}
-	if (!tokenize(data, line))
+	replace_dollars(data);
+	if (!tokenize(data, data->line))
 	{
-		free(line);
+		free(data->line);
 		return (false);
 	}
 	data->cmd = tokens_to_commands(data->token);
 	if(!(data->cmd))
 	{
-		free(line);
+		free(data->line);
 		return (false);
 	}
 	//print_cmds(data->cmd);

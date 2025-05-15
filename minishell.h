@@ -75,7 +75,7 @@ typedef struct s_data
 }				t_data;
 
 //------------------------Parsing functions---------------------
-bool	parse_line(t_data *data, char *line);
+bool	parse_line(t_data *data);
 int		open_quote(t_data *data, char *line);
 int		tokenize(t_data *data, char *line);
 int		is_quoted(char c);
@@ -87,6 +87,7 @@ void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_token *tokens);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
+void	replace_dollars(t_data *data);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -106,6 +107,9 @@ char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
 bool	is_redir(int type);
+int		str_append(char **res, int *len_buf, const char *add);
+int		char_append(char **res, int *len_buf, char c);
+
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

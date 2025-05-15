@@ -60,3 +60,32 @@ int	ft_strcmp(char *s1, char *s2)
 	}
 	return (s1[i] - s2[i]);
 }
+
+int	str_append(char **res, int *len_buf, const char *add)
+{
+	size_t	add_len;
+	char	*new;
+
+	add_len = ft_strlen(add);
+	new = malloc((size_t)(*len_buf + add_len) + 1);
+	if (!new)
+		return (0);
+	if (*res)
+	{
+		ft_memcpy(new, *res, *len_buf);
+		free(*res);
+	}
+	ft_memcpy(new + *len_buf, add, add_len + 1);
+	*res = new;
+	*len_buf += add_len;
+	return (1);
+}
+
+int	char_append(char **res, int *len_buf, char c)
+{
+	char	tmp[2];
+
+	tmp[0] = c;
+	tmp[1] = '\0';
+	return (str_append(res, len_buf, tmp));
+}

@@ -78,7 +78,7 @@ int	main(int argc, char *argv[], char **envp)
 	while (1)
 	{
 		data.line = readline("minishell$ ");
-		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
+		if (!data.line)
 		{
 			ft_putstr_fd("exit\n", 2);
 			free_all(&data, 0, true);
@@ -87,21 +87,8 @@ int	main(int argc, char *argv[], char **envp)
 		if (empty_line(data.line))
 			continue ;
 		add_history(data.line);
-		if (!parse_line(&data, data.line))
+		if (!parse_line(&data))
 			continue ;
-		if (data.line[0] == '$')
-		{
-			if (data.line[1] == '?')
-			{
-				printf("%d: command not found\n", data.exit_code);
-				data.exit_code = 127;
-			}
-			char *value = getenvp(data.env, data.line + 1);
-			if (value)
-				printf("bash : %s : command not found\n", value);
-			if (value && access(value, X_OK))
-				printf("bash : %s no such file or directory\n", value);
-		}
 		else
 			executecommand(&data);
 		free_token(&data.token);

@@ -12,9 +12,10 @@
 
 #include "../minishell.h"
 
-void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
+
+void	input(t_data *data, int prev_fd)
 {
-			if (data->cmd->fd_in != STDIN_FILENO)
+	if (data->cmd->fd_in != STDIN_FILENO)
 			{
 				dup2(data->cmd->fd_in, STDIN_FILENO);
 				close(data->cmd->fd_in);
@@ -24,7 +25,11 @@ void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 				dup2(prev_fd, STDIN_FILENO);
 				close(prev_fd);
 			}
-			if (data->cmd->fd_out != STDOUT_FILENO)
+}
+
+void output(t_data *data, int pipe_fd[2])
+{
+	if (data->cmd->fd_out != STDOUT_FILENO)
 			{
     			dup2(data->cmd->fd_out, STDOUT_FILENO);
 				close(data->cmd->fd_out);
@@ -34,6 +39,12 @@ void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
     			dup2(pipe_fd[1], STDOUT_FILENO);
 				close(pipe_fd[1]);
 			}
+}
+void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
+{
+
+			input(data, prev_fd);
+			output(data, pipe_fd);
 			if (prev_fd != -1)
 				close(prev_fd);
 			if (data->cmd->next)
@@ -47,8 +58,6 @@ void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 				exec_extern_command(data->cmd->args, data->env,  data);
 			exit(EXIT_SUCCESS); // Important si builtin ne fait pas exit
 }
-
-
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
 {
@@ -84,7 +93,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			cmd = cmd->next;
 		}
 	}
-
 	while (wait(NULL) > 0)
 		;
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 20:50:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:33:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,12 @@ int	isbuiltin(t_data *data)
 
 	if (!data || !data->cmd || !data->cmd->name)
 		return (0);
-
 	cmd = data->cmd->name;
-
 	return (ft_strcmp(cmd, "echo") == 0 || ft_strcmp(cmd, "pwd") == 0
 		|| ft_strcmp(cmd, "env") == 0 || ft_strcmp(cmd, "exit") == 0
 		|| ft_strcmp(cmd, "cd") == 0 || ft_strcmp(cmd, "export") == 0
 		|| ft_strcmp(cmd, "unset") == 0);
 }
-
 
 void	exec_builtin(t_data *data)
 {
@@ -35,8 +32,8 @@ void	exec_builtin(t_data *data)
 
 	env_list = data->env;
 	cmd = data->cmd;
-	//if (!cmd || !cmd->name)
-	//	return (0);
+	if (!cmd || !cmd->name)
+		exit(0);
 	if (ft_strcmp(cmd->name, "echo") == 0)
 		builtin_echo(data);
 	else if (ft_strcmp(cmd->name, "pwd") == 0)
@@ -66,7 +63,6 @@ void	builtin_pwd(void)
 	else
 		perror("cwd");
 }
-
 
 int	antislash(const char *str, int i)
 {
@@ -106,10 +102,9 @@ void	print_antislash(const char *str)
 	while (str[i])
 	{
 		b_slash = 0;
-		i = antislash(str,i);
+		i = antislash(str, i);
 	}
 }
-
 
 void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 {
@@ -140,11 +135,34 @@ void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 		printf("%s", cmd->args[i]);
 }
 
+int	check_newline(t_data *data, char **args, int *i)
+{
+
+	int j;
+	int newline ;
+
+	newline = 1;
+	while (args[*i] && args[*i][0] == '-' && args[*i][1] == 'n')
+	{
+		j = 1;
+		while (args[*i][j] == 'n')
+		{
+			j++;
+			data->exit_code = 0;
+		}
+		if (args[*i][j] != '\0')
+			break ;
+		newline = 0;
+		(*i)++;
+	}
+	return newline;
+
+}
+
 
 void	builtin_echo(t_data *data)
 {
 	int		i;
-	int		j;
 	int		newline;
 	char	**args;
 	t_cmd	*cmd;
@@ -153,22 +171,9 @@ void	builtin_echo(t_data *data)
 	cmd = data->cmd;
 	env_list = data->env;
 	i = 1;
-	j = 1;
-	newline = 1;
 	args = cmd->args;
 
-	while (args[i] && args[i][0] == '-' && args[i][1] == 'n')
-	{
-		while (args[i][j] == 'n')
-		{
-			j++;
-			data->exit_code = 0;
-		}
-		if (args[i][j] != '\0')
-			break ;
-		newline = 0;
-		i++;
-	}
+	newline = check_newline(data, args, &i);
 	while (args[i])
 	{
 		echo(env_list, i, cmd, data);
@@ -181,11 +186,10 @@ void	builtin_echo(t_data *data)
 		printf("\n");
 		data->exit_code = 0;
 	}
-} 
+}
 
 void	builtin_exit(t_data *data)
 {
-
 	printf("exit\n");
 	free_env_list(data->env);
 	free_tab(data->cmd->args);

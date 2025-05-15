@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 19:51:27 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 22:25:31 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 19:41:20 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,12 @@ void	init_data(t_data *data, int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	data->env = NULL;
-	data->cmd = NULL;//malloc(sizeof(t_cmd));
+	data->cmd = NULL;
 	/* if (!data->cmd)
 		malloc_failed(data);
 	init_cmd(data->cmd); */
-	data->token = NULL;//malloc(sizeof(t_token));
-	/*if (!data->token)
+	data->token = NULL;
+	/* if (!data->token)
 		malloc_failed(data);
 	init_token(data->token); */
 	data->line = NULL;

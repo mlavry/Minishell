@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:41:49 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 20:44:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/07 00:30:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ void	built_export(t_data *data, t_env *env_list)
 				printf("declare -x %s=\"%s\"\n", current->name, current->value);
 		}
 		current = current->next;
-
 	}
 	free_env_list(sortedlist);
 }

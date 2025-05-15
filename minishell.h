@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 21:50:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 19:39:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
 int		ft_strcmp(char *s1, char *s2);
-char	*ft_strcpy(char *dest, char *src);
+char	*ft_strcpy(char *dest, const char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
@@ -137,7 +137,7 @@ char	*getpath(char *cmd, t_data *data);
 void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
-void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

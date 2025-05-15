@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 21:38:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/04/29 19:55:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,11 @@
 
 char	*getenvp(t_env *list, char *name)
 {
-
 	while (list)
 	{
 		if (ft_strcmp(list->name, name) == 0)
 			return (list->value);
 		list = list->next;
-
 	}
 	return (NULL);
 }
@@ -110,7 +108,7 @@ void	parse_env(char **envp, t_data *data)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = ft_strchr(envp[i], '=');
+		equal_pos = strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;

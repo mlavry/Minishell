@@ -30,3 +30,18 @@ mlavry@k1r4p12:~/Documents/Minishell$ echo "'""""""$USER""""""""''"
 mlavry@k1r4p12:~/Documents/Minishell$ 
 
 Exemple de comment gerer les quotes multiples
+
+mpanic
+
+
+Truc erreur 
+
+mlavry@k1r4p12:Documents/Minishell ‹main*›$ bash
+mlavry@k1r4p12:~/Documents/Minishell$ $? | echo bonjour
+bonjour
+0: command not found
+mlavry@k1r4p12:~/Documents/Minishell$ vjhADVB | echo bonjour
+bonjour
+vjhADVB: command not found
+mlavry@k1r4p12:~/Documents/Minishell$ 
+exit

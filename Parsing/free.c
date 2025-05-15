@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 22:31:47 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 18:33:17 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/15 22:38:05 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,16 @@ void	free_tab(char **tokens)
 	free(tokens);
 }
 
-void	safe_close(int fd)
+void	close_all_fd(void)
 {
-	if (fd > 2)
+	int	fd;
+
+	fd = 3;
+	while (fd < 1024)
+	{
 		close(fd);
+		fd++;
+	}
 }
 
 void	free_env(t_env **env)
@@ -82,8 +88,7 @@ void	free_cmd(t_cmd **cmd)
 			free((*cmd)->name);
 		if ((*cmd)->args)
 			free_tab((*cmd)->args);
-		safe_close((*cmd)->fd_in);
-		safe_close((*cmd)->fd_out);
+		close_all_fd();
 		free(*cmd);
 		*cmd = tmp;
 	}

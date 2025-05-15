@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:33:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/15 22:38:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,23 +108,9 @@ void	print_antislash(const char *str)
 
 void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 {
-	char	*value;
-
-	if (cmd->args[i][0] == '$')
-	{
-		if (cmd->args[i][1] == '\0')
-			printf("$");
-		else if (cmd->args[i][1] == '?')
-		{
-			printf("%d", data->exit_code);
-			if (cmd->args[i][2] != '\0')
-				printf("%s", &cmd->args[i][2]);
-		}
-		value = getenvp(env_list, cmd->args[i] + 1);
-		if (value)
-			printf("%s", value);
-	}
-	else if (cmd->args[i][0] == '\\')
+	(void)env_list;
+	(void)data;
+	if (cmd->args[i][0] == '\\')
 	{
 		if (cmd->args[i][1] >= 'a' && cmd->args[i][1] <= 'z')
 			printf("%s", &cmd->args[i][1]);
@@ -191,7 +177,5 @@ void	builtin_echo(t_data *data)
 void	builtin_exit(t_data *data)
 {
 	printf("exit\n");
-	free_env_list(data->env);
-	free_tab(data->cmd->args);
-	exit(0);
+	free_all(data, data->exit_code, true);
 }

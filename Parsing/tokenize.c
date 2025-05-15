@@ -87,5 +87,6 @@ int	tokenize(t_data *data, char *line)
 		return (0);
 	}
 	parse_token(data, token);
+	free_tab(token);
 	return (1);
 }

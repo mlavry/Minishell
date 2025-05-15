@@ -91,11 +91,11 @@ void	init_data(t_data *data, int argc, char **argv, char **envp);
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
 char	*getenvp(t_env *list, char *name);
-void	add_env_var(t_env **env_list, char *name, char *value);
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value);
 void	update_env_var(t_env **env_list, char *name, char *value);
 void	swap_env(t_env *a, t_env *b);
 void	sort_env(t_env **env_list);
-void	emptyenv(t_env **env_list);
+void	emptyenv(t_data *data, t_env **env_list);
 char	**convert_env(t_env *env_list);
 t_env	*find_env_var(t_env *env_list, char *name);
 
@@ -114,7 +114,7 @@ void	safe_close(int fd);
 void	free_env(t_env **env);
 void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);
-void	free_all(t_data *data, int exit_code);
+void	free_all(t_data *data, int exit_code, bool exit_or_not);
 void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
@@ -129,12 +129,12 @@ void	builtin_unset(t_env **env_list, t_cmd *cmd);
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);
-t_env	*copyenvlist(t_env *env_list);
-void	built_export(t_env *env_list);
-void	builtin_export(t_env **env_list, t_cmd *cmd);
-void	updatepwd(t_env **env_list, char *oldpath);
+t_env	*copyenvlist(t_data *data, t_env *env_list);
+void	built_export(t_data *data, t_env *env_list);
+void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
+void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
-void	execshell( t_env **env_list);
+void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);

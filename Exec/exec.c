@@ -12,8 +12,6 @@
 
 #include "../minishell.h"
 
-
-
 void	extern_childprocess(t_data *data, char *path, t_env *env_list,char **args)
 {
 	if (data->cmd->fd_in != STDIN_FILENO)
@@ -126,11 +124,11 @@ t_env	*find_env_var(t_env *env_list, char *name)
 	return (NULL);
 }
 
-void	execshell( t_env **env_list)
+void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
 	int		level;
-	char	*new_val ;
+	char	*new_val;
 
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
@@ -140,7 +138,9 @@ void	execshell( t_env **env_list)
 		level = ft_atoi(shlvl->value);
 		level++;
 		new_val = ft_itoa(level);
-		if (new_val)
+		if (!new_val)
+			malloc_failed(data);
+		else
 		{
 			free(shlvl->value);
 			shlvl->value = new_val;

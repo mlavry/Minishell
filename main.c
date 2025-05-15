@@ -73,15 +73,15 @@ int	main(int argc, char *argv[], char **envp)
 
 	init_data(&data, argc, argv, envp);
 	parse_env(envp, &data);
-	execshell(&data.env);
-	emptyenv(&data.env);
+	execshell(&data, &data.env);
+	emptyenv(&data, &data.env);
 	while (1)
 	{
-		//setup signal
 		data.line = readline("minishell$ ");
 		if (!data.line)//modifier afin de free tout ce qui est potentiellement malloc et mettre en place un systeme permettant der quitter a la so_long
 		{
 			ft_putstr_fd("exit\n", 2);
+			free_all(&data, 0, true);
 			exit (0);
 		}
 		if (empty_line(data.line))
@@ -104,7 +104,11 @@ int	main(int argc, char *argv[], char **envp)
 		}
 		else
 			executecommand(&data);
+		free_token(&data.token);
+		free_cmd(&data.cmd);
+		free(data.line);
 	}
+	free_all(&data, 0, true);
 	clear_history();
 	return (0);
 }

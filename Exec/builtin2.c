@@ -25,15 +25,17 @@ void	builtin_env( t_env *env_list)
 	printf("_=/usr/bin/env\n");
 }
 
-void	emptyenv(t_env **env_list)
+void	emptyenv(t_data *data, t_env **env_list)
 {
 	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		malloc_failed(data);
 	if (*env_list == NULL)
 	{
-		add_env_var(env_list, "PWD", cwd);// PWD = chemin actuel
-		add_env_var(env_list, "SHLVL", "1");
+		add_env_var(data, env_list, "PWD", cwd);// PWD = chemin actuel
+		add_env_var(data, env_list, "SHLVL", "1");
 	}
 	free(cwd);
 }
@@ -50,7 +52,7 @@ void	built_path(char *newpath, t_data *data)
 	}
 	getcwd(path, sizeof(path));
 	chdir(newpath);
-	updatepwd(&data->env, path);
+	updatepwd(data, &data->env, path);
 }
 
 void	builtin_cd(char *newpath, t_data *data)

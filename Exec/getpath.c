@@ -62,4 +62,3 @@ char	*getpath(char *cmd, t_data *data)
 		data->exit_code = 127;
 	return (free(fullpath), find_cmd_path(cmd));
 }
-

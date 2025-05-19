@@ -110,7 +110,6 @@ bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
 
-
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
@@ -135,6 +134,7 @@ char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_data *data, t_env *env_list);
 void	built_export(t_data *data, t_env *env_list);
+void	built_export2(t_data *data, t_env **env_list, char **args);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);

@@ -12,86 +12,86 @@
 
 #include "../minishell.h"
 
-
-void	input(t_data *data, int prev_fd)
+void	input(t_data *data, int prev_fd, int pipe_fd[2])
 {
 	if (data->cmd->fd_in != STDIN_FILENO)
-			{
-				dup2(data->cmd->fd_in, STDIN_FILENO);
-				close(data->cmd->fd_in);
-			}
-			else if (prev_fd != -1)
-			{
-				dup2(prev_fd, STDIN_FILENO);
-				close(prev_fd);
-			}
+	{
+		dup2(data->cmd->fd_in, STDIN_FILENO);
+		close(data->cmd->fd_in);
+	}
+	else if (prev_fd != -1)
+	{
+		dup2(prev_fd, STDIN_FILENO);
+		close(prev_fd);
+	}
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(data->cmd->fd_out, STDOUT_FILENO);
+		close(data->cmd->fd_out);
+	}
+	else if (data->cmd->next)
+	{
+		dup2(pipe_fd[1], STDOUT_FILENO);
+		close(pipe_fd[1]);
+	}
 }
 
-void output(t_data *data, int pipe_fd[2])
-{
-	if (data->cmd->fd_out != STDOUT_FILENO)
-			{
-    			dup2(data->cmd->fd_out, STDOUT_FILENO);
-				close(data->cmd->fd_out);
-			}
-			else if (data->cmd->next)
-			{
-    			dup2(pipe_fd[1], STDOUT_FILENO);
-				close(pipe_fd[1]);
-			}
-}
 void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 {
+	input_and_output(data, prev_fd, pipe_fd);
+	if (prev_fd != -1)
+		close(prev_fd);
+	if (data->cmd->next)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+	}
+	if (isbuiltin(data))
+		exec_builtin(data);
+	else
+		exec_extern_command(data->cmd->args, data->env, data);
+	exit(EXIT_SUCCESS);
+}
 
-			input(data, prev_fd);
-			output(data, pipe_fd);
-			if (prev_fd != -1)
-				close(prev_fd);
-			if (data->cmd->next)
-			{
-				close(pipe_fd[0]);
-				close(pipe_fd[1]);
-			}
-			if (isbuiltin(data))
-				exec_builtin(data);
-			else
-				exec_extern_command(data->cmd->args, data->env,  data);
-			exit(EXIT_SUCCESS); // Important si builtin ne fait pas exit
+void	parent_process(int *prev_fd, t_cmd **cmd, int *pipe_fd)
+{
+	if (*prev_fd != -1)
+		close(*prev_fd);
+	if ((*cmd)->next)
+	{
+		close(pipe_fd[1]);
+		*prev_fd = pipe_fd[0];
+	}
+	else
+		*prev_fd = -1;
+	*cmd = (*cmd)->next;
+}
+
+void	handle_error(char *message)
+{
+	ft_putstr_fd(message, 2);
+	exit(EXIT_FAILURE);
 }
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
 {
 	int		pipe_fd[2];
 	pid_t	pid;
-	int		prev_fd = -1;
+	int		prev_fd;
 
+	prev_fd = -1;
 	while (cmd)
 	{
 		data->cmd = cmd;
 		if (cmd->next && pipe(pipe_fd) == -1)
-		{
-			perror("pipe");
-			exit(EXIT_FAILURE);
-		}
-
+			handle_error("pipe failed\n");
 		pid = fork();
 		if (pid == -1)
-		{
-			perror("fork");
-			exit(EXIT_FAILURE);
-		}
-
+			handle_error("fork error\n");
 		if (pid == 0)
 			childprocess(data, prev_fd, pipe_fd);
 		else
-		{
-			if (prev_fd != -1)
-				close(prev_fd);
-			if (cmd->next)
-				close(pipe_fd[1]); // le parent ne garde que la lecture
-			prev_fd = (cmd->next) ? pipe_fd[0] : -1;
-			cmd = cmd->next;
-		}
+			parent_process(&prev_fd, &cmd, pipe_fd);
 	}
 	while (wait(NULL) > 0)
 		;

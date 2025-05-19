@@ -12,7 +12,6 @@
 
 #include "../minishell.h"
 
-
 void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 {
 	waitpid(pid, &status, 0);
@@ -27,7 +26,6 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 		data->exit_code = 128 + WTERMSIG(status);
 }
 
-
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 {
 	if (data->cmd->fd_in != STDIN_FILENO)
@@ -35,7 +33,6 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		dup2(data->cmd->fd_in, STDIN_FILENO);
 		close(data->cmd->fd_in);
 	}
-
 	if (data->cmd->fd_out != STDOUT_FILENO)
 	{
 		dup2(data->cmd->fd_out, STDOUT_FILENO);
@@ -46,13 +43,25 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 	exit(127);
 }
 
+bool	is_a_directory(char *path, char **args, t_data *data)
+{
+	struct stat	sb;
+
+	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		printf("bash: %s: Is a directory\n", args[0]);
+		free(path);
+		data->exit_code = 126;
+		return (true);
+	}
+	return (false);
+}
 
 void	exec_extern_command(char **args, t_env *env, t_data *data)
 {
 	pid_t		pid;
 	int			status;
 	char		*path;
-	struct stat	sb;
 
 	status = 0;
 	path = getpath(args[0], data);
@@ -63,13 +72,8 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		data->exit_code = 127;
 		return ;
 	}
-	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
-	{
-		printf("bash: %s: Is a directory\n", args[0]);
-		free(path);
-		data->exit_code = 126;
+	if (is_a_directory(path, args, data))
 		return ;
-	}
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), data->exit_code = 1, free(path));
@@ -77,99 +81,4 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		extern_childprocess(data, path, env, args);
 	else
 		parent_and_wait(status, path, data, pid);
-}
-
-
-void	exec_builtin_redirection(t_data *data)
-{
-	int saved_in = dup(STDIN_FILENO);
-	int saved_out = dup(STDOUT_FILENO);
-
-	if (data->cmd->fd_in != STDIN_FILENO)
-	{
-		dup2(data->cmd->fd_in, STDIN_FILENO);
-		close(data->cmd->fd_in);
-	}
-	if (data->cmd->fd_out != STDOUT_FILENO)
-	{
-		dup2(data->cmd->fd_out, STDOUT_FILENO);
-		close(data->cmd->fd_out);
-	}
-	exec_builtin(data);
-	dup2(saved_in, STDIN_FILENO);
-	dup2(saved_out, STDOUT_FILENO);
-	close(saved_in);
-	close(saved_out);
-}
-
-
-void	executecommand(t_data *data)
-{
-	if (!data || !data->line || !data->env)
-		return ;
-
-	if (data->cmd->next)
-		exec_pipe(data->cmd, data);
-	else if (isbuiltin(data))
-	{
-		exec_builtin_redirection(data);
-	/* 	int saved_in = dup(STDIN_FILENO);
-		int saved_out = dup(STDOUT_FILENO);
-
-		if (data->cmd->fd_in != STDIN_FILENO)
-		{
-			dup2(data->cmd->fd_in, STDIN_FILENO);
-			close(data->cmd->fd_in);
-		}
-		if (data->cmd->fd_out != STDOUT_FILENO)
-		{
-			dup2(data->cmd->fd_out, STDOUT_FILENO);
-			close(data->cmd->fd_out);
-		}
-		exec_builtin(data);
-		dup2(saved_in, STDIN_FILENO);
-		dup2(saved_out, STDOUT_FILENO);
-		close(saved_in);
-		close(saved_out); */
-	}
-	else
-	{
-			exec_extern_command(data->cmd->args, data->env, data);
-			if (data->cmd->fd_in != STDIN_FILENO)
-				close(data->cmd->fd_in);
-			if (data->cmd->fd_out != STDOUT_FILENO)
-				close(data->cmd->fd_out);
-	}
-}
-
-t_env	*find_env_var(t_env *env_list, char *name)
-{
-	while (env_list != NULL)
-	{
-		if (ft_strcmp(env_list->name, name) == 0)
-			return (env_list);
-		env_list = env_list->next;
-	}
-	return (NULL);
-}
-
-void	execshell(t_data *data, t_env **env_list)
-{
-	t_env	*shlvl;
-	int		level;
-	char	*new_val;
-
-	shlvl = find_env_var(*env_list, "SHLVL");
-	if (!shlvl)
-		return ;
-	if (shlvl)
-	{
-		level = ft_atoi(shlvl->value);
-		level++;
-		new_val = ft_itoa(level);
-		if (!new_val)
-			malloc_failed(data);
-		free(shlvl->value);
-		shlvl->value = new_val;
-	}
 }

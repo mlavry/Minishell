@@ -12,19 +12,6 @@
 
 #include "../minishell.h"
 
-void	builtin_env( t_env *env_list)
-{
-/* 	if (!env_list)
-		return ; */
-	while (env_list)
-	{
-		if (env_list->value != NULL && env_list->value[0] != '\0')
-			printf("%s=%s\n", env_list->name, env_list->value);
-		env_list = env_list->next;
-	}
-	printf("_=/usr/bin/env\n");
-}
-
 void	emptyenv(t_data *data, t_env **env_list)
 {
 	char	*cwd;
@@ -34,7 +21,7 @@ void	emptyenv(t_data *data, t_env **env_list)
 		malloc_failed(data);
 	if (*env_list == NULL)
 	{
-		add_env_var(data, env_list, "PWD", cwd);// PWD = chemin actuel
+		add_env_var(data, env_list, "PWD", cwd);
 		add_env_var(data, env_list, "SHLVL", "1");
 	}
 	free(cwd);

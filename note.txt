@@ -29,6 +29,18 @@ mlavry@k1r4p12:~/Documents/Minishell$ echo "'""""""$USER""""""""''"
 'mlavry''
 mlavry@k1r4p12:~/Documents/Minishell$ 
 
+mlavry@k1r4p13:Documents/Minishell ‹main›$ ./minishell
+minishell$ echo "'""""""$USER""""""""''"
+'""""""$USER""""""""''
+minishell$ echo "' """"""$USER"""""""" ''"
+' """"""$USER"""""""" ''
+minishell$ echo "' " """""$USER"""""""" ''"
+'  """"$USER"""""""" ''
+minishell$ echo "' " " " " " "$USER"""""""" ''"
+'      $USER"""""""" ''
+minishell$ 
+
+
 Exemple de comment gerer les quotes multiples
 
 mpanic

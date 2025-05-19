@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/15 21:50:06 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/05/19 18:32:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,28 @@ int	dollar_exit(t_data *data, char **src, char **res, int *len_buf)
 	return (1);
 }
 
+int	dollar_var(t_data *data, char **src, char **res, int *len_buf)
+{
+	size_t	i;
+	char	*key;
+	char	*value;
+
+	i = 1;
+	while ((*src)[i] && (ft_isalnum((*src)[i]) || (*src)[i] == '_'))
+		i++;
+	if (i <= 1)
+		return (0);
+	key = ft_substr(*src + 1, 0, i - 1);
+	if (!key)
+		malloc_failed(data);
+	value = getenvp(data->env, key);
+	free(key);
+	if (value && !str_append(res, len_buf, value))
+		malloc_failed(data);
+	*src += i;
+	return (true);
+}
+
 void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 {
 	if ((*src)[1] == '?')
@@ -37,6 +59,8 @@ void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 			malloc_failed(data);
 		return ;
 	}
+	if (dollar_var(data, src, res, len_buf))
+		return ;
 	if (!char_append(res, len_buf, *(*src)))
 		malloc_failed(data);
 	(*src)++;

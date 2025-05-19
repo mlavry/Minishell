@@ -168,3 +168,8 @@ int	count_tokens(char *line)
 		count++;
 	return (count);
 }
+
+
+minishell$ echo "'"""""""$USER"""""""''"
+
+Le probleme est lorsque 

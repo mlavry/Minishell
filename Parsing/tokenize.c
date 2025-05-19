@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/29 22:51:49 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/19 22:54:14 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	add_token(t_token **head, char *value)
 	new->str = ft_strdup(value);
 	new->sq = false;
 	new->dq = false;
-	stock_and_delete_quote(new);
+	//stock_and_delete_quote(new);
 	new->type = get_token_type(new->str);
 	new->next = NULL;
 	if (!*head)
@@ -67,13 +67,13 @@ void	parse_token(t_data *data, char **tokens)
 	}
 	data->token = token_list;
 	mark_commands(data);
-	//t_token *tmp = token_list;
-/* 	while (tmp)
+	t_token *tmp = token_list;
+ 	while (tmp)
 	{
 		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
 			tmp->str, tmp->type, tmp->sq, tmp->dq);
 		tmp = tmp->next;
-	} */
+	}
 }
 
 int	tokenize(t_data *data, char *line)

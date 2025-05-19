@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/28 16:20:17 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/19 22:24:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,42 @@ int	count_tokens(char *line)
 	while (line[i])
 	{
 		quote_choice(&sq, &dq, line[i]);
+		if (sq)
+		{
+			if (i > start)
+				count++;
+			i++;
+			int s = i;
+			while (line[i] && line[i] != '\'')
+				i++;
+			if (i > s)
+				count++;
+			if (line[i] == '\'')
+			{
+				sq = false;
+				i++;
+			}
+			start = i;
+			continue ;
+		}
+		if (dq)
+		{
+			if (i > start)
+				count++;
+			i++;
+			int s = i;
+			while (line[i] && line[i] != '"')
+				i++;
+			if (i > s)
+				count++;
+			if (line[i] == '"')
+			{
+				dq = false;
+				i++;
+			}
+			start = i;
+			continue ;
+		}
 		if (!sq && !dq)
 		{
 			if (space_and_operator_check(&start, &i, &count, line))
@@ -78,6 +114,7 @@ int	count_tokens(char *line)
 	}
 	if (i > start)
 		count++;
+	printf("%d\n", count);
 	return (count);
 }
 

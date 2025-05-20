@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/15 22:37:01 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 19:39:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,11 +110,10 @@ bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
 
-
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
-void	close_all_fd(void);
+void	safe_close(int fd);
 void	free_env(t_env **env);
 void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);
@@ -135,6 +134,7 @@ char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_data *data, t_env *env_list);
 void	built_export(t_data *data, t_env *env_list);
+void	built_export2(t_data *data, t_env **env_list, char **args);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);

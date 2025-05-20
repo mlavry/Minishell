@@ -73,6 +73,13 @@ void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 	}
 }
 
+void	increment_and_free(int *i, char *value, char *name)
+{
+	free(name);
+	free(value);
+	(*i)++;
+}
+
 void	built_export2(t_data *data, t_env **env_list, char **args)
 {
 	int		i;
@@ -92,22 +99,10 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 				printf("bash: export: `': not a valid identifier\n");
 			else
 				printf("bash: export: `%s': not a valid identifier\n", arg);
-			free(name);
-			free(value);
-			i++;
+			increment_and_free(&i, value, name);
 			continue ;
 		}
 		existing_value(data, env_list, name, value);
-		free(name);
-		free(value);
-		i++;
+		increment_and_free(&i, value, name);
 	}
-}
-
-void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd)
-{
-	if (!cmd->args[1])
-		built_export(data, *env_list);
-	else
-		built_export2(data, env_list, cmd->args);
 }

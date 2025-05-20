@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/19 18:32:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 02:27:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,18 +94,3 @@ void	replace_dollars(t_data *data)
 	free(data->line);
 	data->line = res;
 }
-
-/*if (data.line[0] == '$')
-		{
-			if (data.line[1] == '?')
-			{
-				printf("%d: command not found\n", data.exit_code);
-				data.exit_code = 127;
-			}
-			char *value = getenvp(data.env, data.line + 1);
-			if (value)
-				printf("bash : %s : command not found\n", value);
-			if (value && access(value, X_OK))
-				printf("bash : %s no such file or directory\n", value);
-		}
-*/

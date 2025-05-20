@@ -61,3 +61,11 @@ void	free_env_list(t_env *env_list)
 		free(tmp);
 	}
 }
+
+void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd)
+{
+	if (!cmd->args[1])
+		built_export(data, *env_list);
+	else
+		built_export2(data, env_list, cmd->args);
+}

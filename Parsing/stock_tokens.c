@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/04/28 15:22:23 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 02:32:54 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,42 @@ char	**line_to_token(char *line)
 		{
 			if (handle_splitter(line, tokens, pos))
 				continue ;
+		}
+		if (sq)
+		{
+			if (pos[1] > pos[0])
+				tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0]);
+			pos[1]++;
+			int s = pos[1];
+			while (line[pos[1]] && line[pos[1]] != '\'')
+				pos[1]++;
+			if (pos[1] > s)
+				tokens[pos[2]++] = ft_substr(line, s, pos[1] - s);
+			if (line[pos[1]] == '\'')
+			{
+				sq = false;
+				pos[1]++;
+			}
+			pos[0] = pos[1];
+			continue ;
+		}
+		if (dq)
+		{
+			if (pos[1] > pos[0])
+				tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0]);
+			pos[1]++;
+			int s = pos[1];
+			while (line[pos[1]] && line[pos[1]] != '"')
+				pos[1]++;
+			if (pos[1] > s)
+				tokens[pos[2]++] = ft_substr(line, s, pos[1] - s);
+			if (line[pos[1]] == '"')
+			{
+				dq = false;
+				pos[1]++;
+			}
+			pos[0] = pos[1];
+			continue ;
 		}
 		pos[1]++;
 	}

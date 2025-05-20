@@ -78,23 +78,3 @@ mlavry@k1r4p1:~ $ ls | echo "$$" $USER "'$USER'"
 mlavry@k1r4p1:~ $ ls | echo "$$" $USER '"'$USER'"'
 2794728 mlavry "mlavry"
 
-mlavry@k1r4p1:Documents/Minishell ‹main*›$ ./minishell
-minishell$ ls | ls
-Exec   main.c	 minishell    note.txt	readline.supp  utils.c
-Libft  Makefile  minishell.h  Parsing	utils_2.c
-minishell$ ls | .c
-bash : .c: command not found
-minishell$ ls | cat
-Exec
-Libft
-main.c
-Makefile
-minishell
-minishell.h
-note.txt
-Parsing
-readline.supp
-utils_2.c
-utils.c
-free(): invalid pointer
-[1]    2848291 IOT instruction  ./minishell

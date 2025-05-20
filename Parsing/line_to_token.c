@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 18:42:49 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 19:07:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	is_sq(char *line, bool *sq, int *pos)
 {
 	int	s;
 
-	if (sq)
+	if (*sq)
 	{
 		if (pos[1] > pos[0])
 			pos[2]++;
@@ -61,7 +61,7 @@ int	is_sq(char *line, bool *sq, int *pos)
 			pos[2]++;
 		if (line[pos[1]] == '\'')
 		{
-			sq = false;
+			*sq = false;
 			pos[1]++;
 		}
 		pos[0] = pos[1];
@@ -74,7 +74,7 @@ int	is_dq(char *line, bool *dq, int *pos)
 {
 	int	s;
 
-	if (dq)
+	if (*dq)
 	{
 		if (pos[1] > pos[0])
 			pos[2]++;
@@ -86,7 +86,7 @@ int	is_dq(char *line, bool *dq, int *pos)
 			pos[2]++;
 		if (line[pos[1]] == '"')
 		{
-			dq = false;
+			*dq = false;
 			pos[1]++;
 		}
 		pos[0] = pos[1];

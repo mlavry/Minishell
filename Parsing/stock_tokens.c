@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 19:09:19 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 19:21:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,14 +110,10 @@ char	**line_to_token(char *line)
 	while (line[pos[1]])
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);
-		if (!sq && !dq)
-		{
-			if (handle_splitter(line, tokens, pos))
-				continue ;
-		}
-		if (stock_sq(line, tokens, &sq, pos))
+		if (!sq && !dq && handle_splitter(line, tokens, pos))
 			continue ;
-		if (stock_dq(line, tokens, &dq, pos))
+		if (stock_sq(line, tokens, &sq, pos)
+			|| stock_dq(line, tokens, &dq, pos))
 			continue ;
 		pos[1]++;
 	}

@@ -66,15 +66,3 @@ ls: cannot access '|': No such file or directory
 ls: cannot access 'wc': No such file or directory
 mlavry@k1r4p1:~$ ls | wc -l
 12
-
-mlavry@k1r4p1:Documents/Minishell ‹main*›$ ./minishell
-minishell$ echo '"'$USER'"'
-" mlavry "
-minishell$ echo '"'$USER'"' | ls
-[1]    2847177 segmentation fault  ./minishell
-
-mlavry@k1r4p1:~ $ ls | echo "$$" $USER "'$USER'"
-2794728 mlavry 'mlavry'
-mlavry@k1r4p1:~ $ ls | echo "$$" $USER '"'$USER'"'
-2794728 mlavry "mlavry"
-

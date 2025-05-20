@@ -6,113 +6,117 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 17:38:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 18:42:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	is_operator(char c)
+int	space_and_operator_check(char *line, int *pos)
 {
-	if (c == '|' || c == '<' || c == '>')
+	if (is_space(line[pos[1]]))
+	{
+		if (pos[1] > pos[0])
+			pos[2]++;
+		while (is_space(line[pos[1]]))
+			pos[1]++;
+		pos[0] = pos[1];
 		return (1);
+	}
+	else if (is_operator(line[pos[1]]))
+	{
+		if (pos[1] > pos[0])
+			pos[2]++;
+		while (line[pos[1]] == line[pos[0]])
+			pos[1]++;
+		pos[2]++;
+		pos[0] = pos[1];
+		return (1);
+	}
 	return (0);
 }
 
-int	is_space(char c)
+static void	init_var(int pos[3], bool *sq, bool *dq)
 {
-	if (c == ' ' || (c >= 9 && c <= 13))
+	pos[0] = 0;
+	pos[1] = 0;
+	pos[2] = 0;
+	*sq = false;
+	*dq = false;
+}
+
+int	is_sq(char *line, bool *sq, int *pos)
+{
+	int	s;
+
+	if (sq)
+	{
+		if (pos[1] > pos[0])
+			pos[2]++;
+		pos[1]++;
+		s = pos[1];
+		while (line[pos[1]] && line[pos[1]] != '\'')
+			pos[1]++;
+		if (pos[1] > s)
+			pos[2]++;
+		if (line[pos[1]] == '\'')
+		{
+			sq = false;
+			pos[1]++;
+		}
+		pos[0] = pos[1];
 		return (1);
+	}
 	return (0);
 }
 
-int	space_and_operator_check(int *start, int *i, int *count, char *line)
+int	is_dq(char *line, bool *dq, int *pos)
 {
-	int	advanced;
+	int	s;
 
-	advanced = 0;
-	if (is_space(line[*i]))
+	if (dq)
 	{
-		if (*i > *start)
-			(*count)++;
-		while (is_space(line[*i]))
-			(*i)++;
-		*start = *i;
-		advanced = 1;
+		if (pos[1] > pos[0])
+			pos[2]++;
+		pos[1]++;
+		s = pos[1];
+		while (line[pos[1]] && line[pos[1]] != '"')
+			pos[1]++;
+		if (pos[1] > s)
+			pos[2]++;
+		if (line[pos[1]] == '"')
+		{
+			dq = false;
+			pos[1]++;
+		}
+		pos[0] = pos[1];
+		return (1);
 	}
-	else if (is_operator(line[*i]))
-	{
-		if (*i > *start)
-			(*count)++;
-		while (line[*i] == line[*start])
-			(*i)++;
-		(*count)++;
-		*start = *i;
-		advanced = 1;
-	}
-	return (advanced);
+	return (0);
 }
 
 int	count_tokens(char *line)
 {
-	int		start;
-	int		i;
-	int		count;
+	int		pos[3];
 	bool	sq;
 	bool	dq;
 
-	start = 0;
-	i = 0;
-	count = 0;
-	sq = false;
-	dq = false;
-	while (line[i])
+	init_var(pos, &sq, &dq);
+	while (line[pos[1]])
 	{
-		quote_choice(&sq, &dq, line[i]);
-		if (sq)
-		{
-			if (i > start)
-				count++;
-			i++;
-			int s = i;
-			while (line[i] && line[i] != '\'')
-				i++;
-			if (i > s)
-				count++;
-			if (line[i] == '\'')
-			{
-				sq = false;
-				i++;
-			}
-			start = i;
+		quote_choice(&sq, &dq, line[pos[1]]);
+		if (is_sq(line, &sq, pos))
 			continue ;
-		}
-		if (dq)
-		{
-			if (i > start)
-				count++;
-			i++;
-			int s = i;
-			while (line[i] && line[i] != '"')
-				i++;
-			if (i > s)
-				count++;
-			if (line[i] == '"')
-			{
-				dq = false;
-				i++;
-			}
-			start = i;
+		if (is_dq(line, &dq, pos))
 			continue ;
-		}
 		if (!sq && !dq)
 		{
-			if (space_and_operator_check(&start, &i, &count, line))
+			if (space_and_operator_check(line, pos))
 				continue ;
 		}
-		i++;
+		pos[1]++;
 	}
-	if (i > start)
-		count++;
-	return (count);
+	if (pos[1] > pos[0])
+		pos[2]++;
+	return (pos[2]);
 }

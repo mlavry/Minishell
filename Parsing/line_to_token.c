@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 02:30:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 17:38:04 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,5 @@ int	count_tokens(char *line)
 	}
 	if (i > start)
 		count++;
-	printf("%d\n", count);
 	return (count);
 }

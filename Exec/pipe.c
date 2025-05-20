@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/22 16:20:24 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/05/20 17:35:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	input(t_data *data, int prev_fd, int pipe_fd[2])
 
 void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 {
-	input_and_output(data, prev_fd, pipe_fd);
+	input(data, prev_fd, pipe_fd);
 	if (prev_fd != -1)
 		close(prev_fd);
 	if (data->cmd->next)

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/20 17:36:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 19:55:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	parse_env(char **envp, t_data *data)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = strchr(envp[i], '=');
+		equal_pos = ft_strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;

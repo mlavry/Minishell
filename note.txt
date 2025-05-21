@@ -3,45 +3,11 @@ Test a gerer :
 echo '"'$USER'"'
 $? | echo bonjour
 
-Remplacer free_env_List par free_env
-
 Proteger toute la libft
-
-Expand
-
-Test avc des quotes 
 
 Signaux
 
 
-mlavry@k1r4p12:Documents/Minishell ‹main*›$ bash 
-mlavry@k1r4p12:~/Documents/Minishell$ echo '""""""$USER""""""""'
-""""""$USER""""""""
-mlavry@k1r4p12:~/Documents/Minishell$ echo '""""""$USER""""""""
-> ^C
-mlavry@k1r4p12:~/Documents/Minishell$ echo """"""$USER""""""""
-mlavry
-mlavry@k1r4p12:~/Documents/Minishell$ echo """"""$USER"""""""""
-> ^C
-mlavry@k1r4p12:~/Documents/Minishell$ echo "'""""""$USER""""""""''
-> ^C
-mlavry@k1r4p12:~/Documents/Minishell$ echo "'""""""$USER""""""""''"
-'mlavry''
-mlavry@k1r4p12:~/Documents/Minishell$ 
-
-mlavry@k1r4p13:Documents/Minishell ‹main›$ ./minishell
-minishell$ echo "'""""""$USER""""""""''"
-'""""""$USER""""""""''
-minishell$ echo "' """"""$USER"""""""" ''"
-' """"""$USER"""""""" ''
-minishell$ echo "' " """""$USER"""""""" ''"
-'  """"$USER"""""""" ''
-minishell$ echo "' " " " " " "$USER"""""""" ''"
-'      $USER"""""""" ''
-minishell$ 
-
-
-Exemple de comment gerer les quotes multiples
 
 mpanic
 
@@ -66,3 +32,69 @@ ls: cannot access '|': No such file or directory
 ls: cannot access 'wc': No such file or directory
 mlavry@k1r4p1:~$ ls | wc -l
 12
+
+
+mlavry@k1r1p11:~$ echo '"'$USER'"'
+"mlavry"
+mlavry@k1r1p11:~$ echo '"' $USER '"'
+" mlavry "
+
+
+//PROBLEME MALLOC ERROR
+
+"Cannot allocate memory\n" cest le mesage derreur quqnd malloc echoue et le code erreur cest 12
+
+
+//PROBLEME EXPORT 
+
+export a un probleme si on export un SHLVL superieur a 999 et qu'on relance un minishell
+
+//POUR RESOUDRE PARSING 
+
+regarder apres la quote fermante si il y a un espace
+
+
+
+//NE PAS AFFICHER L'ENV SI IL Y A QUELQUE CHOSE DERRIERE 
+
+mlavry@k1r4p3:Documents/exec ‹exec*›$ env -i ./minishell
+minishell$ env -i ./minishell
+3
+Token: env             | Type: 6  | SQ: 0 | DQ: 0
+Token: -i              | Type: 7  | SQ: 0 | DQ: 0
+Token: ./minishell     | Type: 7  | SQ: 0 | DQ: 0
+PWD=/home/mlavry/Documents/exec
+SHLVL=1
+_=/usr/bin/env
+minishell$ env -i ./minishell
+3
+Token: env             | Type: 6  | SQ: 0 | DQ: 0
+Token: -i              | Type: 7  | SQ: 0 | DQ: 0
+Token: ./minishell     | Type: 7  | SQ: 0 | DQ: 0
+PWD=/home/mlavry/Documents/exec
+SHLVL=1
+_=/usr/bin/env
+minishell$ exit
+mlavry@k1r4p3:Documents/exec ‹exec*›$ 
+
+//GERER LE SEGFAULT D'EXPAND UNE VARIABLE QUI N'EXISTE PAS MEME SANS ENV -I
+
+mlavry@k1r4p3:Documents/exec ‹exec*›$ env -i ./minishell
+minishell$ $USER
+[1]    2389900 segmentation fault  env -i ./minishell
+
+//TRES BIZARRE
+
+mlavry@k1r4p3:Documents/exec ‹exec*›$ ./minishell
+minishell$ echo bonjour | $USERbhb
+3
+Token: echo            | Type: 6  | SQ: 0 | DQ: 0
+Token: bonjour         | Type: 7  | SQ: 0 | DQ: 0
+Token: |               | Type: 5  | SQ: 0 | DQ: 0
+bonjour
+minishell$ 
+
+//PROBLEME EXPORT ET QUOTE INEXISTANTE
+
+mlavry@k1r4p3:~$ export ""
+bash: export: `': not a valid identifier

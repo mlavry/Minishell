@@ -77,7 +77,13 @@ void	execshell(t_data *data, t_env **env_list)
 	if (shlvl)
 	{
 		level = ft_atoi(shlvl->value);
-		level++;
+		if (level >= 999)
+		{
+			printf("warning: shell level (1000) too high, resetting to 1\n");
+			level = 1;
+		}
+		else
+			level++;
 		new_val = ft_itoa(level);
 		if (!new_val)
 			malloc_failed(data);

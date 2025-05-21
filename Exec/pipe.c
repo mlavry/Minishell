@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-void	input(t_data *data, int prev_fd, int pipe_fd[2])
+void	input_and_output(t_data *data, int prev_fd, int pipe_fd[2])
 {
 	if (data->cmd->fd_in != STDIN_FILENO)
 	{
@@ -38,7 +38,7 @@ void	input(t_data *data, int prev_fd, int pipe_fd[2])
 
 void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 {
-	input(data, prev_fd, pipe_fd);
+	input_and_output(data, prev_fd, pipe_fd);
 	if (prev_fd != -1)
 		close(prev_fd);
 	if (data->cmd->next)
@@ -79,7 +79,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	pid_t	pid;
 	int		prev_fd;
 
-	prev_fd = -1;
 	while (cmd)
 	{
 		data->cmd = cmd;
@@ -89,9 +88,19 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 		if (pid == -1)
 			handle_error("fork error\n");
 		if (pid == 0)
+		{
+			char *path = getpath(cmd->args[0], data);
+			if (execve(path, cmd->args,convert_env(data->env)) == -1)
+			{
+   	 			printf( "%s: command not found\n", cmd->args[0]); // message clair
+    			exit(127); // comme bash
+			}
 			childprocess(data, prev_fd, pipe_fd);
+		}
 		else
+		{
 			parent_process(&prev_fd, &cmd, pipe_fd);
+		}
 	}
 	while (wait(NULL) > 0)
 		;

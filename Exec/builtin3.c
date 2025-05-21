@@ -122,8 +122,8 @@ void	builtin_echo(t_data *data)
 	while (args[i])
 	{
 		echo(env_list, i, cmd, data);
-		if (cmd->args[i + 1])
-			printf(" ");
+		 if (cmd->args[i + 1])
+			printf(" "); 
 		i++;
 	}
 	if (newline)

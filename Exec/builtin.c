@@ -39,7 +39,7 @@ void	exec_builtin(t_data *data)
 	else if (ft_strcmp(cmd->name, "pwd") == 0)
 		builtin_pwd();
 	else if (ft_strcmp(cmd->name, "env") == 0)
-		builtin_env(env_list);
+		builtin_env(env_list, data);
 	else if (ft_strcmp(cmd->name, "exit") == 0)
 		builtin_exit(data);
 	else if (ft_strcmp(cmd->name, "cd") == 0)
@@ -70,13 +70,22 @@ void	builtin_exit(t_data *data)
 	free_all(data, data->exit_code, true);
 }
 
-void	builtin_env( t_env *env_list)
+void	builtin_env( t_env *env_list, t_data *data)
 {
-	while (env_list)
+	t_cmd	*cmd;
+
+	cmd = data->cmd;
+	if (cmd->args[1])
+		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
+
+	else
 	{
-		if (env_list->value != NULL && env_list->value[0] != '\0')
-			printf("%s=%s\n", env_list->name, env_list->value);
-		env_list = env_list->next;
+		while (env_list)
+		{
+			if (env_list->value != NULL && env_list->value[0] != '\0')
+				printf("%s=%s\n", env_list->name, env_list->value);
+			env_list = env_list->next;
+		}
+		printf("_=/usr/bin/env\n");
 	}
-	printf("_=/usr/bin/env\n");
 }

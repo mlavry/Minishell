@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 18:48:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/22 00:36:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data->token);
+	data->cmd = tokens_to_commands(data->token, data);
 	if (!(data->cmd))
 	{
 		free(data->line);

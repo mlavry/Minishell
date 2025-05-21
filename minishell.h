@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 19:39:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/22 00:57:01 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ int		char_append(char **res, int *len_buf, char c);
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
-void	safe_close(int fd);
+void	close_all_fd(void);
 void	free_env(t_env **env);
 void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);

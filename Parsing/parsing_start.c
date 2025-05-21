@@ -25,7 +25,7 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data->token);
+	data->cmd = tokens_to_commands(data->token, data);
 	if (!(data->cmd))
 	{
 		free(data->line);

@@ -79,7 +79,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	pid_t	pid;
 	int		prev_fd;
 
-	prev_fd = -1;
 	while (cmd)
 	{
 		data->cmd = cmd;
@@ -89,9 +88,19 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 		if (pid == -1)
 			handle_error("fork error\n");
 		if (pid == 0)
+		{
+			char *path = getpath(cmd->args[0], data);
+			if (execve(path, cmd->args,convert_env(data->env)) == -1)
+			{
+   	 			printf( "%s: command not found\n", cmd->args[0]); // message clair
+    			exit(127); // comme bash
+			}
 			childprocess(data, prev_fd, pipe_fd);
+		}
 		else
+		{
 			parent_process(&prev_fd, &cmd, pipe_fd);
+		}
 	}
 	while (wait(NULL) > 0)
 		;

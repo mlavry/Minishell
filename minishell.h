@@ -54,7 +54,6 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	//int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -85,7 +84,7 @@ int		count_tokens(char *line);
 char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_token *tokens);
+t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
 

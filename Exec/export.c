@@ -17,7 +17,7 @@ int	validate_export_name(char *name)
 	int	i;
 
 	i = 1;
-	if (!name || *name == '\0')
+	if (!name )
 		return (0);
 	if (!ft_isalpha(name[0]) && name[0] != '_')
 		return (0);
@@ -34,11 +34,15 @@ char	*extract_name(char *arg)
 {
 	char	*sign;
 
+	/* if (arg[0] == '\0')
+			return (NULL); */
 	if (!arg || *arg == '\0')
 		return (NULL);
 	sign = ft_strchr(arg, '=');
-	if (arg[0] == '=')
-		return (ft_strdup("="));
+	if (arg[0] == '=' || ft_strchr(arg, ' ') != NULL)
+		return (NULL);  // Nom invalide : commence par "=" ou contient des espaces
+	/* if (arg[0] == '=')
+		return (ft_strdup("")); */
 	if (!sign)
 		return (ft_strdup(arg));
 	return (ft_substr(arg, 0, sign - arg));
@@ -52,7 +56,7 @@ char	*extract_value(char *arg)
 	if (!arg || *arg == '\0')
 		return (NULL);
 	if (!sign)
-		return (ft_strdup(""));
+		return (NULL);
 	return (ft_strdup(sign + 1));
 }
 

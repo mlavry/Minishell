@@ -19,7 +19,9 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	current = *env_list;
 	while (current)
 	{
-		if (ft_strcmp(current->name, name) == 0)
+		if (current->value == NULL)
+				return ;
+		if (ft_strcmp(current->name, name) == 0 )
 		{
 			free(current->value);
 			current->value = ft_strdup(value);
@@ -54,6 +56,7 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 		add_env_var(data, env_list, "PWD", newpwd);
 }
 
+
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	char	*existing_value;
@@ -83,22 +86,30 @@ void	increment_and_free(int *i, char *value, char *name)
 void	built_export2(t_data *data, t_env **env_list, char **args)
 {
 	int		i;
-	char	*arg;
 	char	*name;
 	char	*value;
 
 	i = 1;
 	while (args[i])
 	{
-		arg = args[i];
-		name = extract_name(arg);
-		value = extract_value(arg);
+		
+		name = extract_name(args[i]);
+		value = extract_value(args[i]);
+		if (!name)
+		{
+			//if (name && name[0] == '\0')
+				printf("bash: export: '%s': not a valid identifier\n", args[i]);
+			//else
+			//	printf("bash: export: `%s': not a valid identifier\n", args[i]);
+			increment_and_free(&i, value, name);
+			continue ;
+		}
 		if (!validate_export_name(name))
 		{
-			if (name && name[0] == '\0')
-				printf("bash: export: `': not a valid identifier\n");
-			else
-				printf("bash: export: `%s': not a valid identifier\n", arg);
+			//if (name && name[0] == '\0')
+				printf("bash: export: '%s': not a valid identifier\n", args[i]);
+			//else
+			//	printf("bash: export: `%s': not a valid identifier\n", args[i]);
 			increment_and_free(&i, value, name);
 			continue ;
 		}

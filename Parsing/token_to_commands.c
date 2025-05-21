@@ -87,6 +87,22 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 	}
 	return (1);
 }
+int handle_append(t_token **tokens, t_cmd **cur)
+{
+    // Vérifie si le token actuel est ">>" et si le prochain est un argument (nom du fichier)
+    if ((*tokens) && (*tokens)->type == APPEND && (*tokens)->next && (*tokens)->next->type == ARG)
+    {
+        // Ouvre le fichier en mode append
+        (*cur)->fd_out = open((*tokens)->next->str, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if ((*cur)->fd_out < 0)
+		{
+			perror("open");
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
+}
 
 bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 {
@@ -100,10 +116,10 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 		return (handle_input(tokens, cur));
 	if ((*tokens)->type == PIPE)
 		return (handle_pipe(cur));
-/* 	if ((*tokens)->type == HEREDOC)
-        return(handle_heredoc(cur));
+ 	/* if ((*tokens)->type == HEREDOC)
+        return(handle_heredoc(cur)); */
 	if ((*tokens)->type == APPEND)
-        return(handle_append(cur)); */
+        return(handle_append(tokens ,cur)); 
 	return (true);
 }
 

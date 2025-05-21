@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   pipe.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/04/22 16:20:24 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/05/20 17:35:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	input(t_data *data, int prev_fd, int pipe_fd[2])
+void	input_and_output(t_data *data, int prev_fd, int pipe_fd[2])
 {
 	if (data->cmd->fd_in != STDIN_FILENO)
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 19:51:27 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 19:41:20 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 17:45:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,7 @@ void	init_data(t_data *data, int argc, char **argv, char **envp)
 	(void)argv;
 	data->env = NULL;
 	data->cmd = NULL;
-	/* if (!data->cmd)
-		malloc_failed(data);
-	init_cmd(data->cmd); */
 	data->token = NULL;
-	/* if (!data->token)
-		malloc_failed(data);
-	init_token(data->token); */
 	data->line = NULL;
 	data->exit_code = 0;
 }

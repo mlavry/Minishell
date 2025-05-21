@@ -32,6 +32,8 @@ void	close_all_fd(void)
 	int	fd;
 
 	fd = 3;
+	if (fd > 1024)
+		exit(0);
 	while (fd < 1024)
 	{
 		close(fd);

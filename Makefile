@@ -4,10 +4,10 @@ CC = cc
 CFLAGS = -g3 -Wall -Wextra -Werror -I$(SUBDIR) #-fsanitize=address
 
 SRC_EXEC = main.c Exec/pipe.c Exec/builtin.c Exec/builtin2.c Exec/exec.c Exec/export.c Exec/export2.c Exec/getpath.c Exec/envp2.c\
-Exec/builtin3.c Exec/exec2.c
+Exec/builtin3.c Exec/exec2.c Exec/envp.c
 
 SRC_PARSING = Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
-Parsing/free.c envp.c utils.c Parsing/make_commands.c Parsing/token_to_commands.c Parsing/init_struct.c Parsing/exit_code.c\
+Parsing/free.c utils.c utils_2.c Parsing/make_commands.c Parsing/token_to_commands.c Parsing/init_struct.c Parsing/exit_code.c\
 Parsing/expand.c
 
 SRC = $(SRC_EXEC) $(SRC_PARSING)

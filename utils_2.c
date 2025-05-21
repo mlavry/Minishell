@@ -1,36 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_start.c                                    :+:      :+:    :+:   */
+/*   utils_2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 18:48:36 by mlavry           ###   ########.fr       */
+/*   Created: 2025/05/20 17:46:33 by mlavry            #+#    #+#             */
+/*   Updated: 2025/05/20 17:46:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "minishell.h"
 
-bool	parse_line(t_data *data)
+int	is_operator(char c)
 {
-	if (open_quote(data, data->line))
-	{
-		free(data->line);
-		return (false);
-	}
-	replace_dollars(data);
-	if (!tokenize(data, data->line))
-	{
-		free(data->line);
-		return (false);
-	}
-	data->cmd = tokens_to_commands(data->token);
-	if (!(data->cmd))
-	{
-		free(data->line);
-		return (false);
-	}
-	//print_cmds(data->cmd);
-	return (true);
+	if (c == '|' || c == '<' || c == '>')
+		return (1);
+	return (0);
+}
+
+int	is_space(char c)
+{
+	if (c == ' ' || (c >= 9 && c <= 13))
+		return (1);
+	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 19:21:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/22 01:38:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,33 @@ static void	init_var(int pos[3], bool *sq, bool *dq)
 	pos[0] = 0;
 	pos[1] = 0;
 	pos[2] = 0;
+}
+
+static void	check_after_quotes(char *line, char **tokens, int *pos)
+{
+	int	start;
+	while (line[pos[1]] &&
+    	(!is_space(line[pos[1]]) && !is_operator(line[pos[1]])))
+	{
+    	if (line[pos[1]] == '\'' || line[pos[1]] == '"')
+    	{
+        	char lim = line[pos[1]];
+			pos[1]++;
+			start = pos[1];
+        	while (line[pos[1]] && line[pos[1]] != lim)
+            	pos[1]++;
+        	if (line[pos[1]] == lim)
+            	pos[1]++;
+    	}
+    	else
+        	pos[1]++;
+	}
+	// ensuite on ne fait QU’UNE SEULE fusion :
+	char *suffix = ft_substr(line, start, pos[1] - start);
+	char *joined = ft_strjoin(tokens[pos[2] - 1], suffix);
+	free(tokens[pos[2] - 1]);
+	free(suffix);
+	tokens[pos[2] - 1] = joined;
 }
 
 int	handle_splitter(char *line, char **tokens, int *pos)
@@ -65,6 +92,7 @@ int	stock_sq(char *line, char **tokens, bool *sq, int *pos)
 			*sq = false;
 			pos[1]++;
 		}
+		check_after_quotes(line, tokens, pos);
 		pos[0] = pos[1];
 		return (1);
 	}
@@ -90,6 +118,7 @@ int	stock_dq(char *line, char **tokens, bool *dq, int *pos)
 			*dq = false;
 			pos[1]++;
 		}
+		check_after_quotes(line, tokens, pos);
 		pos[0] = pos[1];
 		return (1);
 	}
@@ -104,7 +133,7 @@ char	**line_to_token(char *line)
 	bool	dq;
 
 	init_var(pos, &sq, &dq);
-	tokens = malloc(sizeof(char *) * (count_tokens(line) + 1));
+	tokens = malloc(sizeof(char *) * (2000)); /*count_tokens(line) + 1*/
 	if (!tokens)
 		return (NULL);
 	while (line[pos[1]])

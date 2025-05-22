@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin3.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:18:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/19 22:18:31 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/05/22 18:27:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,10 @@ int	antislash(const char *str, int i)
 void	print_antislash(const char *str)
 {
 	int	i;
-	int	j;
-	int	b_slash;
 
 	i = 0;
-	j = 0;
 	while (str[i])
-	{
-		b_slash = 0;
 		i = antislash(str, i);
-	}
 }
 
 void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)

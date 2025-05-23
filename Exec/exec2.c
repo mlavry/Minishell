@@ -68,7 +68,7 @@ t_env	*find_env_var(t_env *env_list, char *name)
 void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
-	int		level;
+	int		lvl;
 	char	*new_val;
 
 	shlvl = find_env_var(*env_list, "SHLVL");
@@ -76,15 +76,15 @@ void	execshell(t_data *data, t_env **env_list)
 		return ;
 	if (shlvl)
 	{
-		level = ft_atoi(shlvl->value);
-		if (level >= 999)
+		lvl = ft_atoi(shlvl->value);
+		if (lvl >= 999)
 		{
-			printf("warning: shell level (1000) too high, resetting to 1\n");
-			level = 1;
+			printf("warning: shell level (%d) too high, resetting to 1\n", lvl);
+			lvl = 1;
 		}
 		else
-			level++;
-		new_val = ft_itoa(level);
+			lvl++;
+		new_val = ft_itoa(lvl);
 		if (!new_val)
 			malloc_failed(data);
 		free(shlvl->value);

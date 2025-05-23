@@ -32,7 +32,10 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	if (!new_var)
 		malloc_failed(data);
 	new_var->name = ft_strdup(name);
-	new_var->value = ft_strdup(value);
+	if (value)
+		new_var->value = ft_strdup(value);
+	else
+		new_var->value = NULL;
 	if (!new_var->name || !new_var->value)
 	{
 		free_env(&new_var);

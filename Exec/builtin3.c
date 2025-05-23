@@ -58,21 +58,6 @@ void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 {
 	(void)data;
 	(void)env_list;
-	//char	*value;
-	/* if (cmd->args[i][0] == '$')
-	{
-		if (cmd->args[i][1] == '\0')
-			printf("$");
-		else if (cmd->args[i][1] == '?')
-		{
-			printf("%d", data->exit_code);
-			if (cmd->args[i][2] != '\0')
-				printf("%s", &cmd->args[i][2]);
-		}
-		value = getenvp(env_list, cmd->args[i] + 1);
-		if (value)
-			printf("%s", value);
-	} */
 	if (cmd->args[i][0] == '\\')
 	{
 		if (cmd->args[i][1] >= 'a' && cmd->args[i][1] <= 'z')
@@ -122,8 +107,8 @@ void	builtin_echo(t_data *data)
 	while (args[i])
 	{
 		echo(env_list, i, cmd, data);
-		 if (cmd->args[i + 1])
-			printf(" "); 
+		if (cmd->args[i + 1])
+			printf(" ");
 		i++;
 	}
 	if (newline)

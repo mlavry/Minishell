@@ -17,7 +17,7 @@ int	validate_export_name(char *name)
 	int	i;
 
 	i = 1;
-	if (!name )
+	if (!name)
 		return (0);
 	if (!ft_isalpha(name[0]) && name[0] != '_')
 		return (0);
@@ -34,29 +34,37 @@ char	*extract_name(char *arg)
 {
 	char	*sign;
 
-	/* if (arg[0] == '\0')
-			return (NULL); */
+	 if (arg[0] == '\0')
+		return (NULL);
 	if (!arg || *arg == '\0')
 		return (NULL);
 	sign = ft_strchr(arg, '=');
 	if (arg[0] == '=' || ft_strchr(arg, ' ') != NULL)
-		return (NULL);  // Nom invalide : commence par "=" ou contient des espaces
-	/* if (arg[0] == '=')
+		return (NULL);
+	/* if (sign == arg)
 		return (ft_strdup("")); */
+	/*  if (arg[0] == '=')
+		return (ft_strdup(""));  */
 	if (!sign)
 		return (ft_strdup(arg));
 	return (ft_substr(arg, 0, sign - arg));
 }
 
+//ft_strdup("\"=\"")
 char	*extract_value(char *arg)
 {
 	char	*sign;
 
-	sign = ft_strchr(arg, '=');
 	if (!arg || *arg == '\0')
 		return (NULL);
+	sign = ft_strchr(arg, '=');
 	if (!sign)
 		return (NULL);
+	if (*(sign + 1) == '\0')
+	{
+		printf("salu");
+		return (ft_strdup(""));
+	}
 	return (ft_strdup(sign + 1));
 }
 
@@ -87,8 +95,10 @@ void	built_export(t_data *data, t_env *env_list)
 	{
 		if (ft_strcmp(current->name, "_") != 0)
 		{
-			if (current->value == NULL || current->value[0] == '\0')
+			if (current->value == NULL /*  || current->value[0] == '\0'  */)
 				printf("declare -x %s\n", current->name);
+			else if (current->value[0] == '\0')
+				printf("declare -x %s=\"\"\n", current->name);
 			else
 				printf("declare -x %s=\"%s\"\n", current->name, current->value);
 		}
@@ -96,3 +106,4 @@ void	built_export(t_data *data, t_env *env_list)
 	}
 	free_env_list(sortedlist);
 }
+

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/22 19:36:38 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/23 15:33:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,10 +196,15 @@ char *	handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
-	if (line[pos[1]] == '\'')
+	pos[1]++;
+	while (line[pos[1]] == '\'' && line[pos[1] + 1] == '\'')
 		pos[1]++;
 	if (temp)
+	{
 		res = ft_strjoin(old_chain, temp);
+		if (line[pos[1]] == '\'')
+			res = handle_sq_joined(line, res, sq, pos);
+	}
 	else
 		return (old_chain);
 	pos[0] = pos[1];
@@ -225,6 +230,8 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
 	pos[1]++;
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+		pos[1]++;
 	quote_choice(sq, &dq, line[pos[1]]);
 	if (*sq)
 		temp = handle_sq_joined(line, temp, sq, pos);

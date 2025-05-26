@@ -52,13 +52,21 @@
 	return (0);
 } */
 
-bool	empty_line(char *line)
+bool	empty_line(char *line, t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (line[i] && line[i] == ' ')
+	while (line[i] && (line[i] == ' ' || line[i] == ':'))
+	{
 		i++;
+		data->exit_code = 0;
+	}
+	if (line[i] == '!')
+	{
+		i++;
+		data->exit_code = 1;
+	}
 	if (i == (int)ft_strlen(line))
 	{
 		free(line);
@@ -84,7 +92,7 @@ int	main(int argc, char *argv[], char **envp)
 			free_all(&data, 0, true);
 			exit (0);
 		}
-		if (empty_line(data.line))
+		if (empty_line(data.line, &data))
 			continue ;
 		add_history(data.line);
 		if (!parse_line(&data))

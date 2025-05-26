@@ -50,8 +50,13 @@ int	handle_arg(t_cmd *cur, t_token *token)
 	return (1);
 }
 
-int	handle_pipe(t_cmd **cur)
+int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
+	if ((*tokens)->type == PIPE && (!(*tokens)->prev))
+		printf("bash: syntax error near unexpected token `|'\n");	
+	if ((*tokens)->type == PIPE && (!(*tokens)->next))
+		printf("bash: syntax error near unexpected token `|'\n");
+
 	if (!cur || !*cur)
 		return (0);
 	return (1);
@@ -133,7 +138,7 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == INPUT)
 		return (handle_input(tokens, cur, data));
 	if ((*tokens)->type == PIPE)
-		return (handle_pipe(cur));
+		return (handle_pipe(tokens, cur));
  	/* if ((*tokens)->type == HEREDOC)
         return(handle_heredoc(cur)); */
 	if ((*tokens)->type == APPEND)

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/23 15:33:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/26 17:26:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,6 +178,40 @@ char	**line_to_token(char *line)
 	return (0);
 }*/
 
+char *	handle_dq_joined(char *line, char *old_chain, bool *dq, int *pos)
+{
+	char	*temp;
+	char	*res;
+	bool	sq = false;
+
+	temp = NULL;
+	pos[1]++;
+	pos[0] = pos[1];
+	*dq = true;
+	quote_choice(&sq, dq, line[pos[1]]);
+	while (line[pos[1]] && *dq)
+	{
+		pos[1]++;
+		quote_choice(&sq, dq, line[pos[1]]);
+	}
+	if (pos[1] > pos[0])
+		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	pos[1]++;
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+		pos[1]++;
+	if (temp)
+	{
+		res = ft_strjoin(old_chain, temp);
+		if (!is_space(line[pos[1]])
+			&& !is_operator(line[pos[1]]))
+			res = check_next(line, res, pos);
+	}
+	else
+		return (old_chain);
+	pos[0] = pos[1];
+	return (res);
+}
+
 char *	handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 {
 	char	*temp;
@@ -197,13 +231,47 @@ char *	handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
 	pos[1]++;
-	while (line[pos[1]] == '\'' && line[pos[1] + 1] == '\'')
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
 		pos[1]++;
 	if (temp)
 	{
 		res = ft_strjoin(old_chain, temp);
-		if (line[pos[1]] == '\'')
-			res = handle_sq_joined(line, res, sq, pos);
+		if (!is_space(line[pos[1]])
+			&& !is_operator(line[pos[1]]))
+			res = check_next(line, res, pos);
+	}
+	else
+		return (old_chain);
+	pos[0] = pos[1];
+	return (res);
+}
+
+char	*handle_chain_joined(char *line, char *old_chain, int *pos)
+{
+	char	*temp;
+	char	*res;
+	bool	dq = false;
+	bool	sq = false;
+
+	temp = NULL;
+	pos[0] = pos[1];
+	quote_choice(&sq, &dq, line[pos[1]]);
+	while (line[pos[1]] && !sq && !dq && !is_space(line[pos[1]])
+		&& !is_operator(line[pos[1]]))
+	{
+		pos[1]++;
+		quote_choice(&sq, &dq, line[pos[1]]);
+	}
+	if (pos[1] > pos[0])
+		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+		pos[1]++;
+	if (temp)
+	{
+		res = ft_strjoin(old_chain, temp);
+		if (!is_space(line[pos[1]])
+			&& !is_operator(line[pos[1]]))
+			res = check_next(line, res, pos);
 	}
 	else
 		return (old_chain);
@@ -221,7 +289,7 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
-	quote_choice(sq, &dq, line[pos[1]]);
+	//quote_choice(sq, &dq, line[pos[1]]);
 	while (line[pos[1]] && *sq)
 	{
 		pos[1]++;
@@ -232,12 +300,31 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	pos[1]++;
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
 		pos[1]++;
-	quote_choice(sq, &dq, line[pos[1]]);
-	if (*sq)
-		temp = handle_sq_joined(line, temp, sq, pos);
+	if (!is_space(line[pos[1]])
+		&& !is_operator(line[pos[1]]))
+		temp = check_next(line, temp, pos);
 	tokens[pos[2]++] = temp;
 	pos[0] = pos[1];
 	return (1);
+}
+
+char	*check_next(char *line, char *actual_chain, int *pos)
+{
+	bool	dq;
+	bool	sq;
+	char	*res;
+
+	dq = false;
+	sq = false;
+	res = actual_chain;
+	quote_choice(&sq, &dq, line[pos[1]]);
+	if (sq)
+		res = handle_sq_joined(line, actual_chain, &sq, pos);
+	else if (dq)
+		res = handle_dq_joined(line, actual_chain, &dq, pos);
+	else
+		res = handle_chain_joined(line, actual_chain, pos);
+	return (res);
 }
 
 char	**line_to_token(char *line)

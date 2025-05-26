@@ -75,7 +75,9 @@ void	replace_dollars(t_data *data)
 	bool	dq;
 
 	src = data->line;
-	res = NULL;
+	res = ft_strdup("");
+	if (!res)
+		malloc_failed(data);
 	len_buf = 0;
 	sq = false;
 	dq = false;

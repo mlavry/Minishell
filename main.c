@@ -24,34 +24,6 @@
 	}
 }*/
 
-/* int main(int argc, char *argv[], char **envp)
-{
-	char	*line;
-
-	(void) argv;
-	(void) envp;
-    if (argc != 1)
-	{
-        return (0);
-	}
-	while (1)//si on a un probleme avec la ligne actuelle on peut utiliser continue pour passer a la suivante
-	{
-		signal(SIGINT, signal_handler);
-		signal(SIGQUIT, SIG_IGN);
-		line = readline("minishell$ ");
-		if (!line)
-		{
-			ft_putstr_fd("exit\n", 1);
-			break;
-		}
-		if (*line)
-			add_history(line);
-		free(line);
-	}
-	rl_clear_history();
-	return (0);
-} */
-
 bool	empty_line(char *line, t_data *data)
 {
 	int	i;

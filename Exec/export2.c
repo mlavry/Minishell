@@ -12,7 +12,6 @@
 
 #include "../minishell.h"
 
-
 /* void update_env_var(t_env **env_list, char *name, char *value)
 {
     t_env *current = *env_list;
@@ -42,7 +41,7 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	{
 		/* if (current->value == NULL)
 			return ; */
-		if (ft_strcmp(current->name, name) == 0 )
+		if (ft_strcmp(current->name, name) == 0)
 		{
 			free(current->value);
 			current->value = ft_strdup(value);
@@ -113,7 +112,7 @@ int	is_concatenation(char *str)
 	return (*(eq - 1) == '+');
 }
 
-int	loop(t_env *current, char *new_value , char *var_name)
+int	loop(t_env *current, char *new_value, char *var_name)
 {
 	char	*joined;
 
@@ -124,7 +123,6 @@ int	loop(t_env *current, char *new_value , char *var_name)
 			joined = ft_strjoin(current->value, new_value);
 			free(current->value);
 			current->value = joined;
-
 			return (1);
 		}
 		current = current->next;
@@ -141,7 +139,6 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 
 	var_name = NULL;
 	new_value = NULL;
-
 	equal_sign = ft_strchr(str, '=');
 	if (equal_sign && equal_sign > str && *(equal_sign - 1) == '+')
 	{
@@ -162,8 +159,6 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 	char	*value;
 
 	i = 1;
-	printf("DEBUG: input='%s' → name='%s' value='%s'\n", args[1], extract_name(args[1]), extract_value(args[1]));
-
 	while (args[i])
 	{
 		if (is_concatenation(args[i]))
@@ -190,5 +185,3 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 		increment_and_free(&i, value, name);
 	}
 }
-
-

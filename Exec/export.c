@@ -34,7 +34,7 @@ char	*extract_name(char *arg)
 {
 	char	*sign;
 
-	 if (arg[0] == '\0')
+	if (arg[0] == '\0')
 		return (NULL);
 	if (!arg || *arg == '\0')
 		return (NULL);
@@ -106,4 +106,3 @@ void	built_export(t_data *data, t_env *env_list)
 	}
 	free_env_list(sortedlist);
 }
-

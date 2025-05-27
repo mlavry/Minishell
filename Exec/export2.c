@@ -171,13 +171,15 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 		value = extract_value(args[i]);
 		if (!name)
 		{
-			printf("bash: export: '%s': not a valid identifier\n", args[i]);
+			printf("bash: export: `%s': not a valid identifier\n", args[i]);
+			data->exit_code = 1;
 			increment_and_free(&i, value, name);
 			continue ;
 		}
 		if (!validate_export_name(name))
 		{
-			printf("bash: export: '%s': not a valid identifier\n", args[i]);
+			printf("bash: export: `%s': not a valid identifier\n", args[i]);
+			data->exit_code = 1;
 			increment_and_free(&i, value, name);
 			continue ;
 		}

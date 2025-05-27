@@ -108,6 +108,8 @@ int		is_space(char c);
 bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
+int		is_multiple_append(char *str);
+int 	is_multiple_heredoc(char *str);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

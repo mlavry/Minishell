@@ -52,10 +52,10 @@ int	handle_arg(t_cmd *cur, t_token *token)
 
 int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
-	if ((*tokens)->type == PIPE && (!(*tokens)->prev))
-		printf("bash: syntax error near unexpected token `|'\n");
-	if ((*tokens)->type == PIPE && (!(*tokens)->next))
-		printf("bash: syntax error near unexpected token `|'\n");
+ 	if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
+		printf("bash: syntax error near unexpected token `|'\n"); 
+	/* if ((*tokens)->type == PIPE && (!(*tokens)->next))
+		printf("bash: syntax error near unexpected token `|'\n"); */
 	if (!cur || !*cur)
 		return (0);
 	return (1);
@@ -66,7 +66,6 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == OUTPUT
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}
@@ -89,7 +88,6 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == INPUT
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}
@@ -111,7 +109,6 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == APPEND
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}

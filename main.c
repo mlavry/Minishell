@@ -29,10 +29,23 @@ bool	empty_line(char *line, t_data *data)
 	int	i;
 
 	i = 0;
+	if (line[i] == '>' || line[i] == '<')
+    {
+		if (is_multiple_append(&line[i]) || is_multiple_heredoc(&line[i]))
+		{
+			data->exit_code = 2;
+			return true;
+		}
+	} 
 	while (line[i] && (line[i] == ' ' || line[i] == ':'))
 	{
 		i++;
 		data->exit_code = 0;
+	}
+	if (line[i] == '|')
+	{
+			printf("bash: syntax error near unexpected token `|'\n");
+			data->exit_code = 2;
 	}
 	if (line[i] == '!')
 	{
@@ -46,6 +59,7 @@ bool	empty_line(char *line, t_data *data)
 	}
 	return (false);
 }
+
 
 int	main(int argc, char *argv[], char **envp)
 {

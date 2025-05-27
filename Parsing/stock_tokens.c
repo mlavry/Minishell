@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/27 12:02:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/27 16:30:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -310,6 +310,37 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	return (1);
 }
 
+int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
+{
+	char	*temp;
+	bool	sq = false;
+
+	temp = NULL;
+	if (!*dq)
+		return (0);
+	pos[1]++;
+	pos[0] = pos[1];
+	quote_choice(&sq, dq, line[pos[1]]);
+	while (line[pos[1]] && *dq)
+	{
+		pos[1]++;
+		quote_choice(&sq, dq, line[pos[1]]);
+	}
+	if (pos[1] > pos[0])
+		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	else
+		temp = ft_strdup("");
+	pos[1]++;
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+		pos[1] = pos[1] + 2;
+	if (!is_space(line[pos[1]])
+		&& !is_operator(line[pos[1]]))
+		temp = check_next(line, temp, pos);
+	tokens[pos[2]++] = temp;
+	pos[0] = pos[1];
+	return (1);
+}
+
 char	*check_next(char *line, char *actual_chain, int *pos)
 {
 	bool	dq;
@@ -343,7 +374,8 @@ char	**line_to_token(char *line)
 	while (line[pos[1]])
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);
-		if (handle_sq(line, tokens, &sq, pos))
+		if (handle_sq(line, tokens, &sq, pos)
+			|| handle_dq(line, tokens, &dq, pos))
 			continue ;
 		pos[1]++;
 	}

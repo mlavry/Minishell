@@ -115,3 +115,7 @@ Token: echo            | Type: 6  | SQ: 0 | DQ: 0
 'e'ch"o" '' ''""'''salut'""ca''""va ""
 
 ""''
+
+'ls'"alors"""'igue'lui               '"a''' '"'
+
+'ls'"alors"'"""'igue''lui               '"a''' '"'

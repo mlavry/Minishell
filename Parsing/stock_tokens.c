@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/27 16:30:41 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/27 21:04:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,7 +197,8 @@ char *	handle_dq_joined(char *line, char *old_chain, bool *dq, int *pos)
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	if (temp)
 	{
@@ -231,7 +232,8 @@ char *	handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	if (temp)
 	{
@@ -264,7 +266,8 @@ char	*handle_chain_joined(char *line, char *old_chain, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	if (temp)
 	{
@@ -300,7 +303,8 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	else
 		temp = ft_strdup("");
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	if (!is_space(line[pos[1]])
 		&& !is_operator(line[pos[1]]))
@@ -331,12 +335,62 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 	else
 		temp = ft_strdup("");
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	if (!is_space(line[pos[1]])
 		&& !is_operator(line[pos[1]]))
 		temp = check_next(line, temp, pos);
 	tokens[pos[2]++] = temp;
+	pos[0] = pos[1];
+	return (1);
+}
+
+void	handle_operator(char *line, char *temp, int *pos)
+{
+	pos[0] = pos[1];
+	while (line[pos[1]] == line[pos[0]])
+		pos[1]++;
+	temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	pos[0] = pos[1];
+}
+
+int	handle_unquoted(char *line, char **tokens, int *pos)
+{
+	char	*temp;
+	bool	sq;
+	bool	dq;
+
+	temp = NULL;
+	sq = false;
+	dq = false;
+	while (is_space(line[pos[1]]))
+		pos[1]++;
+	pos[0] = pos[1];
+	quote_choice(&sq, &dq, line[pos[1]]);
+	while (line[pos[1]] && !is_space(line[pos[1]]) && !is_operator(line[pos[1]])
+		&& !sq && !dq)
+	{
+		pos[1]++;
+		quote_choice(&sq, &dq, line[pos[1]]);
+	}
+	if (is_operator(line[pos[1]]))
+	{
+		handle_operator(line, temp, pos);
+		return (1);
+	}
+	if (pos[1] > pos[0])
+		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
+		pos[1] = pos[1] + 2;
+	if (temp)
+	{
+		if (!is_space(line[pos[1]])
+			&& !is_operator(line[pos[1]]))
+			temp = check_next(line, temp, pos);
+		tokens[pos[2]++] = temp;
+	}
 	pos[0] = pos[1];
 	return (1);
 }
@@ -374,6 +428,8 @@ char	**line_to_token(char *line)
 	while (line[pos[1]])
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);
+		if (!sq && !dq && handle_unquoted(line, tokens, pos))
+			continue ;
 		if (handle_sq(line, tokens, &sq, pos)
 			|| handle_dq(line, tokens, &dq, pos))
 			continue ;

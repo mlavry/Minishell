@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/27 21:04:00 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 00:40:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,12 +346,12 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 	return (1);
 }
 
-void	handle_operator(char *line, char *temp, int *pos)
+void	handle_operator(char *line, char **temp, int *pos)
 {
 	pos[0] = pos[1];
 	while (line[pos[1]] == line[pos[0]])
 		pos[1]++;
-	temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	*temp = ft_substr(line, pos[0], pos[1] - pos[0]);
 	pos[0] = pos[1];
 }
 
@@ -376,11 +376,14 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (is_operator(line[pos[1]]))
 	{
-		handle_operator(line, temp, pos);
+		handle_operator(line, &temp, pos);
+		tokens[pos[2]++] = temp;
 		return (1);
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	if (!temp)
+		temp = ft_strdup("");
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;

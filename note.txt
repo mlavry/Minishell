@@ -94,28 +94,8 @@ Token: |               | Type: 5  | SQ: 0 | DQ: 0
 bonjour
 minishell$ 
 
-//PROBLEME EXPORT ET QUOTE INEXISTANTE
-
-mlavry@k1r4p3:~$ export ""
-bash: export: `': not a valid identifier
-
-minishell$ 'ls'"alors"""'igue'lui               '"a' '"'
-Token: lsalorsiguelui  | Type: 6  | SQ: 0 | DQ: 0
-Token: "a              | Type: 7  | SQ: 0 | DQ: 0
-Token: "               | Type: 7  | SQ: 0 | DQ: 0
-bash : lsalorsiguelui: command not found
-minishell$ 'ls'"alors"""'igue'lui               '"a''' '"'
-Token: lsalorsiguelui  | Type: 6  | SQ: 0 | DQ: 0
-Token: "a              | Type: 7  | SQ: 0 | DQ: 0
-
-
 minishell$ 'e'ch"o"
 Token: echo            | Type: 6  | SQ: 0 | DQ: 0
 
 'e'ch"o" '' ''""'''salut'""ca''""va ""
 
-""''
-
-'ls'"alors"""'igue'lui               '"a''' '"'
-
-'ls'"alors"'"""'igue''lui               '"a''' '"'

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/27 01:55:49 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/27 12:02:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,8 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	else
+		temp = ft_strdup("");
 	pos[1]++;
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1]))
 		pos[1] = pos[1] + 2;
@@ -327,33 +329,6 @@ char	*check_next(char *line, char *actual_chain, int *pos)
 	return (res);
 }
 
-int	skip_empty_quote(char *line, char **tokens, int *pos)
-{
-	char	c;
-
-	c = line[pos[1]];
-	if (is_quoted(line[pos[1]]) && line[pos[1] + 1] == c)
-	{
-		if ((pos[1] == 0
-			|| is_space(line[pos[1] - 1]) || is_operator(line[pos[1] - 1]))
-			&& (line[pos[1] + 2] == '\0'
-				|| is_space(line[pos[1] + 2]) || is_operator(line[pos[1] + 2])))
-		{
-			tokens[pos[2]++] = ft_strdup("");
-			pos[1] = pos[1] + 2;
-			pos[0] = pos[1];
-			return (1);
-		}
-		else if ((is_space(line[pos[1] - 1]) || is_operator(line[pos[1] - 1])))
-		{
-			pos[1] = pos[1] + 2;
-			pos[0] = pos[1];
-			return (1);
-		}
-	}
-	return (0);
-}
-
 char	**line_to_token(char *line)
 {
 	char	**tokens;
@@ -367,9 +342,6 @@ char	**line_to_token(char *line)
 		return (NULL);
 	while (line[pos[1]])
 	{
-		printf("Carac boucle : %c\n", line[pos[1]]);
-		if (skip_empty_quote(line, tokens, pos))
-			continue ;
 		quote_choice(&sq, &dq, line[pos[1]]);
 		if (handle_sq(line, tokens, &sq, pos))
 			continue ;

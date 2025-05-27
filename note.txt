@@ -94,8 +94,9 @@ Token: |               | Type: 5  | SQ: 0 | DQ: 0
 bonjour
 minishell$ 
 
-minishell$ 'e'ch"o"
-Token: echo            | Type: 6  | SQ: 0 | DQ: 0
+//PENSER A METTRE CHAINE VIDE SI LE $... N'EST PAS CORRECT
 
-'e'ch"o" '' ''""'''salut'""ca''""va ""
+minishell$ $$
+bash : $$: command not found
+
 

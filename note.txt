@@ -112,6 +112,6 @@ Token: "a              | Type: 7  | SQ: 0 | DQ: 0
 minishell$ 'e'ch"o"
 Token: echo            | Type: 6  | SQ: 0 | DQ: 0
 
-minishell$ 'e'ch"o" ''salut "" cava
-Token: echo            | Type: 6  | SQ: 0 | DQ: 0
+'e'ch"o" '' ''""'''salut'""ca''""va ""
 
+""''

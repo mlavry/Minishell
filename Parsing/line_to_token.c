@@ -102,7 +102,7 @@ int	count_tokens(char *line)
 	bool	dq;
 
 	init_var(pos, &sq, &dq);
-	while (line[pos[1]])
+	while ( line[pos[1]])
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);
 		if (is_sq(line, &sq, pos))

@@ -77,7 +77,6 @@ void	builtin_env( t_env *env_list, t_data *data)
 	cmd = data->cmd;
 	if (cmd->args[1])
 		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
-
 	else
 	{
 		while (env_list)

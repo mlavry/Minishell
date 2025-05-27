@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/21 23:53:57 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/20 17:36:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,36 @@ char	*getenvp(t_env *list, char *name)
 	}
 	return (NULL);
 }
+
+/* void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*new_var;
+	t_env	*tmp;
+
+	new_var = malloc(sizeof(t_env));
+	if (!new_var)
+		malloc_failed(data);
+	new_var->name = ft_strdup(name);
+	if (value)
+		new_var->value = ft_strdup(value);
+	else
+		new_var->value = NULL;
+	if (!new_var->name || !new_var->value)
+	{
+		free_env(&new_var);
+		malloc_failed(data);
+	}
+	new_var->next = NULL;
+	if (!*env_list)
+	{
+		*env_list = new_var;
+		return ;
+	}
+	tmp = *env_list;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new_var;
+} */
 
 void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 {
@@ -108,7 +138,7 @@ void	parse_env(char **envp, t_data *data)
 	i = 0;
 	while (envp[i])
 	{
-		equal_pos = ft_strchr(envp[i], '=');
+		equal_pos = strchr(envp[i], '=');
 		if (!equal_pos)
 		{
 			i++;

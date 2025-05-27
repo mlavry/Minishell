@@ -50,8 +50,12 @@ int	handle_arg(t_cmd *cur, t_token *token)
 	return (1);
 }
 
-int	handle_pipe(t_cmd **cur)
+int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
+ 	if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
+		printf("bash: syntax error near unexpected token `|'\n"); 
+	/* if ((*tokens)->type == PIPE && (!(*tokens)->next))
+		printf("bash: syntax error near unexpected token `|'\n"); */
 	if (!cur || !*cur)
 		return (0);
 	return (1);
@@ -59,9 +63,9 @@ int	handle_pipe(t_cmd **cur)
 
 int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if ((*tokens)->type == OUTPUT && (!(*tokens)->next || (*tokens)->next->type != ARG))
+	if ((*tokens)->type == OUTPUT
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}
@@ -81,9 +85,9 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 
 int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if ((*tokens)->type == INPUT && (!(*tokens)->next || (*tokens)->next->type != ARG))
+	if ((*tokens)->type == INPUT
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}
@@ -99,19 +103,20 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 	}
 	return (1);
 }
-int handle_append(t_token **tokens, t_cmd **cur, t_data *data)
+
+int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if ((*tokens)->type == APPEND && (!(*tokens)->next || (*tokens)->next->type != ARG))
+	if ((*tokens)->type == APPEND
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-		printf("bash: syntax error near unexpected token `newline'\n");
 		data->exit_code = 2;
 		return (0);
 	}
-    // Vérifie si le token actuel est ">>" et si le prochain est un argument (nom du fichier)
-    if ((*tokens) && (*tokens)->type == APPEND && (*tokens)->next && (*tokens)->next->type == ARG)
-    {
-        // Ouvre le fichier en mode append
-        (*cur)->fd_out = open((*tokens)->next->str, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if ((*tokens) && (*tokens)->type == APPEND
+		&& (*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		(*cur)->fd_out = open((*tokens)->next->str,
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if ((*cur)->fd_out < 0)
 		{
 			perror("open");
@@ -133,11 +138,11 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == INPUT)
 		return (handle_input(tokens, cur, data));
 	if ((*tokens)->type == PIPE)
-		return (handle_pipe(cur));
- 	/* if ((*tokens)->type == HEREDOC)
+		return (handle_pipe(tokens, cur));
+	/* if ((*tokens)->type == HEREDOC)
         return(handle_heredoc(cur)); */
 	if ((*tokens)->type == APPEND)
-        return(handle_append(tokens ,cur, data)); 
+        return (handle_append(tokens ,cur, data)); 
 	return (true);
 }
 
@@ -148,13 +153,12 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 
 	head = NULL;
 	cur = NULL;
-
-	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT || tokens->type == APPEND))
+/* 	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT || tokens->type == APPEND))
 	{
     	printf("minishell: syntax error near unexpected token `%s'\n", tokens->str);
    	 	data->exit_code = 2;
-    return (0); // empêche l’exécution
-	}
+    	return (0); // empêche l’exécution
+	} */
 	while (tokens)
 	{
 		if (!is_type_token (&tokens, &head, &cur, data))

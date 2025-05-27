@@ -24,41 +24,34 @@
 	}
 }*/
 
-/* int main(int argc, char *argv[], char **envp)
-{
-	char	*line;
-
-	(void) argv;
-	(void) envp;
-    if (argc != 1)
-	{
-        return (0);
-	}
-	while (1)//si on a un probleme avec la ligne actuelle on peut utiliser continue pour passer a la suivante
-	{
-		signal(SIGINT, signal_handler);
-		signal(SIGQUIT, SIG_IGN);
-		line = readline("minishell$ ");
-		if (!line)
-		{
-			ft_putstr_fd("exit\n", 1);
-			break;
-		}
-		if (*line)
-			add_history(line);
-		free(line);
-	}
-	rl_clear_history();
-	return (0);
-} */
-
-bool	empty_line(char *line)
+bool	empty_line(char *line, t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (line[i] && line[i] == ' ')
+	if (line[i] == '>' || line[i] == '<')
+    {
+		if (is_multiple_append(&line[i]) || is_multiple_heredoc(&line[i]))
+		{
+			data->exit_code = 2;
+			return true;
+		}
+	} 
+	while (line[i] && (line[i] == ' ' || line[i] == ':'))
+	{
 		i++;
+		data->exit_code = 0;
+	}
+	if (line[i] == '|')
+	{
+			printf("bash: syntax error near unexpected token `|'\n");
+			data->exit_code = 2;
+	}
+	if (line[i] == '!')
+	{
+		i++;
+		data->exit_code = 1;
+	}
 	if (i == (int)ft_strlen(line))
 	{
 		free(line);
@@ -66,6 +59,7 @@ bool	empty_line(char *line)
 	}
 	return (false);
 }
+
 
 int	main(int argc, char *argv[], char **envp)
 {
@@ -84,7 +78,7 @@ int	main(int argc, char *argv[], char **envp)
 			free_all(&data, 0, true);
 			exit (0);
 		}
-		if (empty_line(data.line))
+		if (empty_line(data.line, &data))
 			continue ;
 		add_history(data.line);
 		if (!parse_line(&data))

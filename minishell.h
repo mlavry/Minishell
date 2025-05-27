@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/26 12:29:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 01:04:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,11 +109,13 @@ int		is_space(char c);
 bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
+int		is_multiple_append(char *str);
+int 	is_multiple_heredoc(char *str);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
-void	close_all_fd(void);
+void	safe_close(int fd);
 void	free_env(t_env **env);
 void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);

@@ -100,3 +100,24 @@ minishell$ $$
 bash : $$: command not found
 
 
+mlavry@k1r4p2:~$ env | grep PWD
+mlavry@k1r4p2:~$ cd Desktop/
+mlavry@k1r4p2:~/Desktop$ env | grep PWD
+mlavry@k1r4p2:~/Desktop$ env | grep PWD
+
+
+Ne pas recreer pwd avec cd
+
+
+minishell$ env | grep PATH
+bash: syntax error near unexpected token `|'
+FT_HOOK_PATHNAME=login-user.d
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+minishell$ ls
+Exec  Libft  main.c  Makefile  minishell  minishell.h  note.txt  Parsing  readline.supp  utils_2.c  utils.c
+
+Ne dois pas marcher
+
+
+Verifier le format de SHLVL (chiffre)

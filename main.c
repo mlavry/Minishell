@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 19:37:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 14:05:12 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,6 @@ bool	empty_line(char *line, t_data *data)
 	{
 		i++;
 		data->exit_code = 0;
-	}
-	if (line[i] == '|')
-	{
-			printf("bash: syntax error near unexpected token `|'\n");
-			data->exit_code = 2;
 	}
 	if (line[i] == '!')
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/06 15:29:21 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 20:58:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@ int	handle_arg(t_cmd *cur, t_token *token)
 	return (1);
 }
 
-int	handle_pipe(t_token **tokens, t_cmd **cur)
+int	handle_pipe(t_cmd **cur)
 {
- 	if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
-		printf("bash: syntax error near unexpected token `|'\n"); 
+ 	/* if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
+		printf("bash: syntax error near unexpected token `|'\n");  */
 	/* if ((*tokens)->type == PIPE && (!(*tokens)->next))
 		printf("bash: syntax error near unexpected token `|'\n"); */
 	if (!cur || !*cur)
@@ -138,7 +138,7 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == INPUT)
 		return (handle_input(tokens, cur, data));
 	if ((*tokens)->type == PIPE)
-		return (handle_pipe(tokens, cur));
+		return (handle_pipe(cur));
 	/* if ((*tokens)->type == HEREDOC)
         return(handle_heredoc(cur)); */
 	if ((*tokens)->type == APPEND)

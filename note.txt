@@ -121,3 +121,7 @@ Ne dois pas marcher
 
 
 Verifier le format de SHLVL (chiffre)
+
+//PROBLEME LE DOLLAR DOIT DISPARAITRE
+
+$''USER

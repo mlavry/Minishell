@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/28 14:05:12 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 14:56:16 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ bool	empty_line(char *line, t_data *data)
 			data->exit_code = 2;
 			return true;
 		}
-	} 
+	}
 	while (line[i] && (line[i] == ' ' || line[i] == ':'))
 	{
 		i++;

@@ -77,7 +77,9 @@ void	execshell(t_data *data, t_env **env_list)
 	if (shlvl)
 	{
 		lvl = ft_atoi(shlvl->value);
-		if (lvl >= 999)
+		if (ft_isalpha(lvl))
+			lvl = 1;
+		else if (lvl >= 999)
 		{
 			printf("warning: shell level (%d) too high, resetting to 1\n", lvl);
 			lvl = 1;

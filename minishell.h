@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 19:39:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 01:04:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,7 @@ int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
+char	*check_next(char *line, char *actual_chain, int *pos);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);

@@ -73,7 +73,7 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 			data->exit_code = 127;
 		}
 		else
-			printf("bash : %s: command not found\n", args[0]);
+			printf("%s: command not found\n", args[0]);
 		free(path);
 		data->exit_code = 127;
 		return ;

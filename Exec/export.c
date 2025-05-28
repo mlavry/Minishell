@@ -39,7 +39,7 @@ char	*extract_name(char *arg)
 	if (!arg || *arg == '\0')
 		return (NULL);
 	sign = ft_strchr(arg, '=');
-	if (arg[0] == '=' || ft_strchr(arg, ' ') != NULL)
+	if (arg[0] == '=') //|| ft_strchr(arg, ' ') != NULL
 		return (NULL);
 	/* if (sign == arg)
 		return (ft_strdup("")); */

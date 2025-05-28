@@ -56,24 +56,22 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	char	newpwd[100];
 	t_env	*old;
 	t_env	*pwd;
+	(void)data;
 
-	getcwd(newpwd, sizeof(newpwd));
+	if (!getcwd(newpwd, sizeof(newpwd)))
+		return ;
 	old = find_env_var(*env_list, "OLDPWD");
 	if (old)
 	{
 		free(old->value);
 		old->value = ft_strdup(oldpath);
 	}
-	else
-		add_env_var(data, env_list, "OLDPWD", oldpath);
 	pwd = find_env_var(*env_list, "PWD");
 	if (pwd)
 	{
 		free(pwd->value);
 		pwd->value = strdup(newpwd);
 	}
-	else
-		add_env_var(data, env_list, "PWD", newpwd);
 }
 
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value)

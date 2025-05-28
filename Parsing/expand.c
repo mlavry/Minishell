@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/20 02:27:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 00:41:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	dollar_var(t_data *data, char **src, char **res, int *len_buf)
 	if (value && !str_append(res, len_buf, value))
 		malloc_failed(data);
 	*src += i;
-	return (true);
+	return (1);
 }
 
 void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
@@ -64,6 +64,17 @@ void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 	if (!char_append(res, len_buf, *(*src)))
 		malloc_failed(data);
 	(*src)++;
+}
+
+void	check_quote_dollars(char **src)
+{
+	int	i;
+
+	i = 1;
+	if (is_quoted((*src)[i]))
+		(*src)++;
+	if (ft_isdigit((*src)[i]))
+		(*src) += 2;
 }
 
 void	replace_dollars(t_data *data)
@@ -84,6 +95,8 @@ void	replace_dollars(t_data *data)
 	while (*src)
 	{
 		quote_choice(&sq, &dq, *src);
+		if (*src == '$' && !dq)
+			check_quote_dollars(&src);
 		if (*src == '$' && !sq)
 		{
 			check_dollars(data, &src, &res, &len_buf);

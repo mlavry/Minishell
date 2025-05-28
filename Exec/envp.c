@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/28 14:47:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 01:47:26 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,15 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 
 	new_var = malloc(sizeof(t_env));
 	if (!new_var)
+	{
+		free(name);
 		malloc_failed(data);
+	}
 	new_var->name = ft_strdup(name);
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || !new_var->value)
 	{
+		free(name);
 		free_env(&new_var);
 		malloc_failed(data);
 	}

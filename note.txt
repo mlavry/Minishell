@@ -75,13 +75,7 @@ PWD=/home/mlavry/Documents/exec
 SHLVL=1
 _=/usr/bin/env
 minishell$ exit
-mlavry@k1r4p3:Documents/exec ‹exec*›$ 
-
-//GERER LE SEGFAULT D'EXPAND UNE VARIABLE QUI N'EXISTE PAS MEME SANS ENV -I
-
-mlavry@k1r4p3:Documents/exec ‹exec*›$ env -i ./minishell
-minishell$ $USER
-[1]    2389900 segmentation fault  env -i ./minishell
+mlavry@k1r4p3:Documents/exec ‹exec*›$
 
 //TRES BIZARRE
 
@@ -97,6 +91,11 @@ minishell$
 
 export ENV=$qu
 
-export avec rien devrait pas mettre de quote vide
-
 tester exit
+
+
+cd probleme tester permission
+
+cd -
+
+cd avec lien symbolique

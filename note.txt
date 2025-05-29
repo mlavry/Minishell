@@ -94,34 +94,13 @@ Token: |               | Type: 5  | SQ: 0 | DQ: 0
 bonjour
 minishell$ 
 
-//PENSER A METTRE CHAINE VIDE SI LE $... N'EST PAS CORRECT
 
-minishell$ $$
-bash : $$: command not found
+export ENV=$qu
 
+ls    
 
-mlavry@k1r4p2:~$ env | grep PWD
-mlavry@k1r4p2:~$ cd Desktop/
-mlavry@k1r4p2:~/Desktop$ env | grep PWD
-mlavry@k1r4p2:~/Desktop$ env | grep PWD
+Probleme lorsque espace apres commande 
 
+segfault bizarre avec tab
 
-Ne pas recreer pwd avec cd
-
-
-minishell$ env | grep PATH
-bash: syntax error near unexpected token `|'
-FT_HOOK_PATHNAME=login-user.d
-XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
-XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
-minishell$ ls
-Exec  Libft  main.c  Makefile  minishell  minishell.h  note.txt  Parsing  readline.supp  utils_2.c  utils.c
-
-Ne dois pas marcher
-
-
-Verifier le format de SHLVL (chiffre)
-
-//PROBLEME LE DOLLAR DOIT DISPARAITRE
-
-$''USER
+export avec rien devrait pas mettre de quote vide

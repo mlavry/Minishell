@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/28 01:46:38 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 15:10:31 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,7 +225,7 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
-	if (!temp)
+	if (!temp && line[pos[1]])
 		temp = ft_strdup("");
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])

@@ -74,23 +74,30 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	}
 }
 
+t_env	*get_env_var_by_name(t_env *env_list, char *name)
+{
+	while (env_list)
+	{
+		if (ft_strcmp(env_list->name, name) == 0)
+			return env_list;  // retourne la variable complète, même si value == NULL
+		env_list = env_list->next;
+	}
+	return (NULL);
+}
+
+
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
-	char	*existing_value;
+	t_env	*existing_value;
 
-	existing_value = getenvp(*env_list, name);
+	existing_value = get_env_var_by_name(*env_list, name);
 	if (existing_value)
 	{
 		if (value != NULL)
 			update_env_var(env_list, name, value);
 	}
 	else
-	{
-		if (value)
-			add_env_var(data, env_list, name, value);
-		else
-			add_env_var(data, env_list, name, "");
-	}
+		add_env_var(data, env_list, name, value);
 }
 
 void	increment_and_free(int *i, char *value, char *name)
@@ -150,11 +157,32 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 	free(new_value);
 }
 
+
+char	*exp_value(char *expand_value, t_env *env_list)
+{
+	char *name;
+	char *value;
+
+	if (!expand_value)
+		return (NULL);
+	if (expand_value[0] == '$')
+	{
+		name = expand_value +1;
+		value = getenvp(env_list, name);
+		if (!value)
+			return (ft_strdup(""));
+		return(ft_strdup(value));
+	}
+	return(ft_strdup(expand_value));
+
+} 
+
 void	built_export2(t_data *data, t_env **env_list, char **args)
 {
 	int		i;
 	char	*name;
 	char	*value;
+	char 	*expand_value;
 
 	i = 1;
 	while (args[i])
@@ -165,8 +193,14 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 			i++;
 			continue ;
 		}
+		expand_value = extract_value(args[i]);
 		name = extract_name(args[i]);
-		value = extract_value(args[i]);
+		//value = exp_value(expand_value, *env_list);
+		if (expand_value)
+			value = exp_value(expand_value, *env_list);
+		else
+			value = NULL;
+		free(expand_value);
 		if (!name)
 		{
 			printf("bash: export: `%s': not a valid identifier\n", args[i]);

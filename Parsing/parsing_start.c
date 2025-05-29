@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/29 14:20:48 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 15:19:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,6 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		return (false);
 	}
-	print_cmds(data->cmd);
+	//print_cmds(data->cmd);
 	return (true);
 }

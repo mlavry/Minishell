@@ -97,10 +97,6 @@ minishell$
 
 export ENV=$qu
 
-ls    
-
-Probleme lorsque espace apres commande 
-
-segfault bizarre avec tab
-
 export avec rien devrait pas mettre de quote vide
+
+tester exit

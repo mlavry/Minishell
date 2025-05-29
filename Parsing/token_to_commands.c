@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/29 14:21:30 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 15:19:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,7 +168,7 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 	return (head);
 }
 
-void print_cmds(t_cmd *c)
+/* void print_cmds(t_cmd *c)
 {
     int idx;
     while (c)
@@ -179,4 +179,4 @@ void print_cmds(t_cmd *c)
         printf("  fd_in = %d, fd_out = %d\n", c->fd_in, c->fd_out);
         c = c->next;
     }
-}
+} */

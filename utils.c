@@ -32,7 +32,7 @@ char	*ft_strcat(char *dest, char *src)
 	dest[i] = '\0';
 	return (dest);
 }
-/* 
+
 char	*ft_strcpy(char *dest, const char *src)
 {
 	int	i;
@@ -45,7 +45,7 @@ char	*ft_strcpy(char *dest, const char *src)
 	}
 	dest[i] = '\0';
 	return (dest);
-} */
+}
 
 int	ft_strcmp(char *s1, char *s2)
 {

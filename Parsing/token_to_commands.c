@@ -50,12 +50,14 @@ int	handle_arg(t_cmd *cur, t_token *token)
 	return (1);
 }
 
-int	handle_pipe(t_cmd **cur)
+int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
- 	/* if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
-		printf("bash: syntax error near unexpected token `|'\n");  */
-	/* if ((*tokens)->type == PIPE && (!(*tokens)->next))
-		printf("bash: syntax error near unexpected token `|'\n"); */
+
+	if ((*tokens)->type == PIPE && (!(*tokens)->next))
+	{
+		printf("minishell: syntax error near unexpected token `|'\n");
+		return (0);
+	}
 	if (!cur || !*cur)
 		return (0);
 	return (1);
@@ -104,10 +106,12 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 	return (1);
 }
 
+
 int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
+
 	if ((*tokens)->type == APPEND
-		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+		&& ( !(*tokens)->prev || !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		data->exit_code = 2;
 		return (0);
@@ -125,7 +129,7 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 		*tokens = (*tokens)->next;
 	}
 	return (1);
-}
+} 
 
 bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 {
@@ -138,7 +142,7 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == INPUT)
 		return (handle_input(tokens, cur, data));
 	if ((*tokens)->type == PIPE)
-		return (handle_pipe(cur));
+		return (handle_pipe(tokens,cur));
 	/* if ((*tokens)->type == HEREDOC)
         return(handle_heredoc(cur)); */
 	if ((*tokens)->type == APPEND)

@@ -46,12 +46,24 @@ void	builtin_cd(char *newpath, t_data *data)
 {
 	const char	*home;
 	char		*expanded_path ;
+	t_env		*old;
 
 	expanded_path = NULL;
 	if (newpath == NULL)
 	{
 		newpath = getenv("HOME");
 		chdir("/home");
+	}
+	if (newpath[0] == '-')
+	{
+		old = find_env_var((data->env), "OLDPWD");
+		if (!old || !old->value)
+		{
+			printf("cd: OLDPWD not set\n");
+			return ;
+		}
+		printf("%s\n", old->value);
+		newpath = old->value;
 	}
 	if (newpath[0] == '~')
 	{

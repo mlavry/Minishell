@@ -100,3 +100,6 @@ export ENV=$qu
 export avec rien devrait pas mettre de quote vide
 
 tester exit
+
+probleem dans cd a verifier quand je tape cd - il affiche ce qui fau mais ls etc fonctionne plus 
+verifier si on entre arg avan append heredoc redir et rien apres message derreur a ajotuer 

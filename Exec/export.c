@@ -50,7 +50,6 @@ char	*extract_name(char *arg)
 	return (ft_substr(arg, 0, sign - arg));
 }
 
-
 char	*extract_value(char *arg)
 {
 	char	*sign;

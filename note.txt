@@ -99,3 +99,5 @@ cd probleme tester permission
 cd -
 
 cd avec lien symbolique
+
+si le pipe est dans des quotes on le prend comme un arg

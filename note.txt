@@ -15,9 +15,13 @@ cd probleme tester permission
 
 cd-
 
-export ENV=$qu
+INT OVERFlOW avec SHLVL doit reset a 1
 
-cd avec lien symbolique
+Probleme lorsque SHLVL est unset il n'apparait pas non plus si on relance un minishell
+
+Lorsque on unset le PATH on peut encore relancer minishell alors que sur bash on ne peut pas relancer bash
+
+export ENV=$qu
 
 --------------------------PARSING-------------------------------
 
@@ -43,3 +47,5 @@ Malloc failed (Error message) :
 Proteger toute la libft :
 
 Pas fait
+
+Signaux

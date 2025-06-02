@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec2.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/19 22:20:49 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/02 17:03:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,22 +74,19 @@ void	execshell(t_data *data, t_env **env_list)
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
 		return ;
-	if (shlvl)
+	lvl = ft_atoi(shlvl->value);
+	if (ft_isalpha(lvl))
+		lvl = 1;
+	else if (lvl >= 999)
 	{
-		lvl = ft_atoi(shlvl->value);
-		if (ft_isalpha(lvl))
-			lvl = 1;
-		else if (lvl >= 999)
-		{
-			printf("warning: shell level (%d) too high, resetting to 1\n", lvl);
-			lvl = 1;
-		}
-		else
-			lvl++;
-		new_val = ft_itoa(lvl);
-		if (!new_val)
-			malloc_failed(data);
-		free(shlvl->value);
-		shlvl->value = new_val;
+		printf("warning: shell level (%d) too high, resetting to 1\n", lvl);
+		lvl = 1;
 	}
+	else
+		lvl++;
+	new_val = ft_itoa(lvl);
+	if (!new_val)
+		malloc_failed(data);
+	free(shlvl->value);
+	shlvl->value = new_val;
 }

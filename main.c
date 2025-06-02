@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 22:11:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/28 14:56:16 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,41 +24,29 @@
 	}
 }*/
 
-/* int main(int argc, char *argv[], char **envp)
-{
-	char	*line;
-
-	(void) argv;
-	(void) envp;
-    if (argc != 1)
-	{
-        return (0);
-	}
-	while (1)//si on a un probleme avec la ligne actuelle on peut utiliser continue pour passer a la suivante
-	{
-		signal(SIGINT, signal_handler);
-		signal(SIGQUIT, SIG_IGN);
-		line = readline("minishell$ ");
-		if (!line)
-		{
-			ft_putstr_fd("exit\n", 1);
-			break;
-		}
-		if (*line)
-			add_history(line);
-		free(line);
-	}
-	rl_clear_history();
-	return (0);
-} */
-
-bool	empty_line(char *line)
+bool	empty_line(char *line, t_data *data)
 {
 	int	i;
 
 	i = 0;
-	while (line[i] && line[i] == ' ')
+	if (line[i] == '>' || line[i] == '<')
+    {
+		if (is_multiple_append(&line[i]) || is_multiple_heredoc(&line[i]))
+		{
+			data->exit_code = 2;
+			return true;
+		}
+	}
+	while (line[i] && (line[i] == ' ' || line[i] == ':'))
+	{
 		i++;
+		data->exit_code = 0;
+	}
+	if (line[i] == '!')
+	{
+		i++;
+		data->exit_code = 1;
+	}
 	if (i == (int)ft_strlen(line))
 	{
 		free(line);
@@ -66,6 +54,7 @@ bool	empty_line(char *line)
 	}
 	return (false);
 }
+
 
 int	main(int argc, char *argv[], char **envp)
 {
@@ -77,31 +66,18 @@ int	main(int argc, char *argv[], char **envp)
 	emptyenv(&data, &data.env);
 	while (1)
 	{
-		//setup signal
 		data.line = readline("minishell$ ");
 		if (!data.line)
 		{
 			ft_putstr_fd("exit\n", 2);
 			free_all(&data, 0, true);
+			exit (0);
 		}
-		if (empty_line(data.line))
+		if (empty_line(data.line, &data))
 			continue ;
 		add_history(data.line);
-		if (!parse_line(&data, data.line))
+		if (!parse_line(&data))
 			continue ;
-		if (data.line[0] == '$')
-		{
-			if (data.line[1] == '?')
-			{
-				printf("%d: command not found\n", data.exit_code);
-				data.exit_code = 127;
-			}
-			char *value = getenvp(data.env, data.line + 1);
-			if (value)
-				printf("bash : %s : command not found\n", value);
-			if (value && access(value, X_OK))
-				printf("bash : %s no such file or directory\n", value);
-		}
 		else
 			executecommand(&data);
 		free_token(&data.token);
@@ -109,4 +85,6 @@ int	main(int argc, char *argv[], char **envp)
 		free(data.line);
 	}
 	free_all(&data, 0, true);
+	clear_history();
+	return (0);
 }

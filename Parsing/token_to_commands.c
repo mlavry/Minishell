@@ -6,183 +6,169 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/06 15:29:21 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 15:19:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens)
+int	handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens)
 {
-    t_cmd   *new;
+	t_cmd	*new;
 
-    new = ft_calloc (1, sizeof(t_cmd));
-    if (!new)
-        return (0);
-    new->name = ft_strdup(tokens->str);
-    if (!new->name)
-    {
-        free(new);
-        return (0);   
-    }
-    new->fd_in = STDIN_FILENO;
-    new->fd_out = STDOUT_FILENO;
-    if (!add_args(&new->args, new->name))
-    {
-        free(new->name);
-        free(new);
-        return (0);
-    }
-    if (!(*head))
-        (*head) = new;
-    else
-        (*cur)->next = new;
-    (*cur) = new;
-    return (1);
+	new = ft_calloc (1, sizeof(t_cmd));
+	if (!new)
+		return (0);
+	new->name = ft_strdup(tokens->str);
+	if (!new->name)
+	{
+		free(new);
+		return (0);
+	}
+	new->fd_in = STDIN_FILENO;
+	new->fd_out = STDOUT_FILENO;
+	if (!add_args(&new->args, new->name))
+	{
+		free(new->name);
+		free(new);
+		return (0);
+	}
+	if (!(*head))
+		(*head) = new;
+	else
+		(*cur)->next = new;
+	(*cur) = new;
+	return (1);
 }
 
-int handle_arg(t_cmd *cur, t_token *token)
+int	handle_arg(t_cmd *cur, t_token *token)
 {
-    if (!cur)
-        return (0);
-    if (!add_args(&cur->args, token->str))
-        return (0);
-    return (1);
+	if (!cur)
+		return (0);
+	if (!add_args(&cur->args, token->str))
+		return (0);
+	return (1);
 }
 
-int handle_pipe(t_cmd **cur)
+int	handle_pipe(t_cmd **cur)
 {
-    if (!cur || !*cur)
-        return (0);
-    return (1);
+ 	/* if ((*tokens)->type == PIPE && ((*tokens)->prev) == NULL)
+		printf("bash: syntax error near unexpected token `|'\n");  */
+	/* if ((*tokens)->type == PIPE && (!(*tokens)->next))
+		printf("bash: syntax error near unexpected token `|'\n"); */
+	if (!cur || !*cur)
+		return (0);
+	return (1);
 }
 
-
-
-/* void handle_input(t_token *tokens, t_cmd *cur)
+int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 {
-     // Si le token suivant est un mot, on a le fichier cible pour la redirection
-     if (tokens->next && tokens->next->type == ARG )
-     {
-         // Ouvre le fichier pour la redirection
-         cur->fd_in = open(tokens->next->str, O_RDONLY);
-         if (cur->fd_in < 0)
-         {
-             perror("open");
-             return ;
-         }
-         // On saute le token du fichier, car il est déjà pris en compte
-         tokens = tokens->next;
-     }
-
-
+	if ((*tokens)->type == OUTPUT
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+	{
+		data->exit_code = 2;
+		return (0);
+	}
+	if ((*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		(*cur)->fd_out = open((*tokens)->next->str,
+				O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		if ((*cur)->fd_out < 0)
+		{
+			perror("open");
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
 }
 
-void    handle_output(t_token *tokens, t_cmd *cur)
+int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 {
-     // Si le token suivant est un mot, on a le fichier cible pour la redirection
-     if (tokens->next && tokens->next->type == ARG )
-     {
-         // Ouvre le fichier pour la redirection
-         cur->fd_out = open(tokens->next->str, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-         if (cur->fd_out < 0)
-         {
-             perror("open");
-             return ;
-         }
-         // On saute le token du fichier, car il est déjà pris en compte
-         tokens = tokens->next;
-     }
-} */
-
-
-t_cmd   *tokens_to_commands(t_token *tokens)
-{
-    t_cmd   *head;
-    t_cmd   *cur;
-
-    head = NULL;
-    cur = NULL;
-    while (tokens)
-    {
-        if (tokens->type == CMD)
-        {
-            if (!handle_cmd(&head, &cur, tokens))
-                return (NULL);
-        }
-        if (tokens->type == ARG)
-        {
-            if (!handle_arg(cur, tokens))
-                return (NULL);
-        }
-        if (tokens->type == OUTPUT)
-        {
-             // Si le token suivant est un mot, on a le fichier cible pour la redirection
-            if (tokens->next && tokens->next->type == ARG )
-            {
-         // Ouvre le fichier pour la redirection
-                 cur->fd_out = open(tokens->next->str, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-                 if (cur->fd_out < 0)
-                 {
-                     perror("open");
-                     return NULL;
-                 }
-         // On saute le token du fichier, car il est déjà pris en compte
-         tokens = tokens->next;
-     }  
-        }
-        if (tokens->type == INPUT)
-        {
-            // Si le token suivant est un mot, on a le fichier cible pour la redirection
-             if (tokens->next && tokens->next->type == ARG )
-             {
-         // Ouvre le fichier pour la redirection
-                cur->fd_in = open(tokens->next->str, O_RDONLY);
-                if (cur->fd_in < 0)
-                {
-                    perror("open");
-                    return NULL;
-                }
-         // On saute le token du fichier, car il est déjà pris en compte
-             tokens = tokens->next;
-             }  
-        }
-
-        if (tokens->type == PIPE)
-        {
-            if (!handle_pipe(&cur))
-                return (NULL);
-        }
-        tokens = tokens->next;
-    }
-    return (head);
+	if ((*tokens)->type == INPUT
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+	{
+		data->exit_code = 2;
+		return (0);
+	}
+	if ((*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY);
+		if ((*cur)->fd_in < 0)
+		{
+			perror("open");
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
 }
 
-/*static t_token *new_token(char *s, int type)
+int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
-    t_token *t = malloc(sizeof *t);
-    if (!t) return NULL;
-    t->str  = strdup(s);
-    t->type = type;
-    t->sq = t->dq = false;
-    t->next = t->prev = NULL;
-    return t;
+	if ((*tokens)->type == APPEND
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+	{
+		data->exit_code = 2;
+		return (0);
+	}
+    if ((*tokens) && (*tokens)->type == APPEND
+		&& (*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		(*cur)->fd_out = open((*tokens)->next->str,
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if ((*cur)->fd_out < 0)
+		{
+			perror("open");
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
 }
 
-static t_token *chain_tokens(char *arr[], int types[], int n)
+bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 {
-    t_token *head = NULL, *cur = NULL;
-    for (int i = 0; i < n; i++)
-    {
-        t_token *t = new_token(arr[i], types[i]);
-        if (!head) head = t;
-        else        cur->next = t, t->prev = cur;
-        cur = t;
-    }
-    return head;
-}*/
+	if ((*tokens)->type == CMD)
+		return (handle_cmd(head, cur, *tokens));
+	if ((*tokens)->type == ARG)
+		return (handle_arg(*cur, *tokens));
+	if ((*tokens)->type == OUTPUT)
+		return (handle_output(tokens, cur, data));
+	if ((*tokens)->type == INPUT)
+		return (handle_input(tokens, cur, data));
+	if ((*tokens)->type == PIPE)
+		return (handle_pipe(cur));
+	/* if ((*tokens)->type == HEREDOC)
+        return(handle_heredoc(cur)); */
+	if ((*tokens)->type == APPEND)
+        return (handle_append(tokens ,cur, data)); 
+	return (true);
+}
 
-void print_cmds(t_cmd *c)
+t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
+{
+	t_cmd	*head;
+	t_cmd	*cur;
+
+	head = NULL;
+	cur = NULL;
+/* 	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT || tokens->type == APPEND))
+	{
+    	printf("minishell: syntax error near unexpected token `%s'\n", tokens->str);
+   	 	data->exit_code = 2;
+    	return (0); // empêche l’exécution
+	} */
+	while (tokens)
+	{
+		if (!is_type_token (&tokens, &head, &cur, data))
+			return (NULL);
+		tokens = tokens->next;
+	}
+	return (head);
+}
+
+/* void print_cmds(t_cmd *c)
 {
     int idx;
     while (c)
@@ -193,49 +179,4 @@ void print_cmds(t_cmd *c)
         printf("  fd_in = %d, fd_out = %d\n", c->fd_in, c->fd_out);
         c = c->next;
     }
-}
-
-/*int main(void)
-{
-    // --- TEST 1 : ls -l ---    
-    {
-        char *words[] = {"ls","-l"};
-        int   typs[] = {CMD, ARG};
-        t_token *tok = chain_tokens(words, typs, 2);
-        t_cmd   *cmd = tokens_to_commands(tok);
-        printf("\nTest 1: \"ls -l\"\n");
-        print_cmds(cmd);
-    }
-
-    // --- TEST 2 : echo hello world ---
-    {
-        char *words[] = {"echo","hello","world"};
-        int   typs[] = {CMD, ARG, ARG};
-        t_token *tok = chain_tokens(words, typs, 3);
-        t_cmd   *cmd = tokens_to_commands(tok);
-        printf("\nTest 2: \"echo hello world\"\n");
-        print_cmds(cmd);
-    }
-
-    // --- TEST 3 : ps aux | grep root ---
-    {
-        char *words[] = {"ps","aux","|","grep","root"};
-        int   typs[] = {CMD, ARG, PIPE, CMD, ARG};
-        t_token *tok = chain_tokens(words, typs, 5);
-        t_cmd   *cmd = tokens_to_commands(tok);
-        printf("\nTest 3: \"ps aux | grep root\"\n");
-        print_cmds(cmd);
-    }
-
-    // --- TEST 4 : env | sort | uniq ---
-    {
-        char *words[] = {"env","|","sort","|","uniq"};
-        int   typs[] = {CMD, PIPE, CMD, PIPE, CMD};
-        t_token *tok = chain_tokens(words, typs, 5);
-        t_cmd   *cmd = tokens_to_commands(tok);
-        printf("\nTest 4: \"env | sort | uniq\"\n");
-        print_cmds(cmd);
-    }
-
-    return 0;
-}*/
+} */

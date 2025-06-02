@@ -6,26 +6,24 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 21:38:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/02 16:46:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*getenvp(t_env *list, char *name)
 {
-
 	while (list)
 	{
 		if (ft_strcmp(list->name, name) == 0)
 			return (list->value);
 		list = list->next;
-
 	}
 	return (NULL);
 }
 
-void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+/* void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*new_var;
 	t_env	*tmp;
@@ -34,9 +32,43 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	if (!new_var)
 		malloc_failed(data);
 	new_var->name = ft_strdup(name);
+	if (value)
+		new_var->value = ft_strdup(value);
+	else
+		new_var->value = NULL;
+	if (!new_var->name || !new_var->value)
+	{
+		free_env(&new_var);
+		malloc_failed(data);
+	}
+	new_var->next = NULL;
+	if (!*env_list)
+	{
+		*env_list = new_var;
+		return ;
+	}
+	tmp = *env_list;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new_var;
+} */
+
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*new_var;
+	t_env	*tmp;
+
+	new_var = malloc(sizeof(t_env));
+	if (!new_var)
+	{
+		free(name);
+		malloc_failed(data);
+	}
+	new_var->name = ft_strdup(name);
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || !new_var->value)
 	{
+		free(name);
 		free_env(&new_var);
 		malloc_failed(data);
 	}

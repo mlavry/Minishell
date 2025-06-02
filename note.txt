@@ -1,12 +1,51 @@
+------------------------EXEC-------------------------
 
-Test a gerer : echo '"'$USER'"'
+Ne doit rien afficher :
 
-Remplacer free_env_List par free_env
+mlavry@k1r4p3:Documents/exec ‹exec*›$ ./minishell
+minishell$ echo bonjour | $USERbhb
+3
+Token: echo            | Type: 6  | SQ: 0 | DQ: 0
+Token: bonjour         | Type: 7  | SQ: 0 | DQ: 0
+Token: |               | Type: 5  | SQ: 0 | DQ: 0
+bonjour
+minishell$ 
 
-Proteger toute la libft
+cd probleme tester permission
 
-Expand
+cd-
 
-Test avc des quotes 
+INT OVERFlOW avec SHLVL doit reset a 1
+
+Probleme lorsque SHLVL est unset il n'apparait pas non plus si on relance un minishell
+
+Lorsque on unset le PATH on peut encore relancer minishell alors que sur bash on ne peut pas relancer bash
+
+export ENV=$qu
+
+--------------------------PARSING-------------------------------
+
+Securiser le code :
+
+depuis le debut
+
+Error syntax :
+
+Si le pipe est dans des quotes on le prend comme un arg
+
+mlavry@k1r4p1:~ $ bash             
+mlavry@k1r4p1:~$ ls '|' wc -l
+ls: cannot access '|': No such file or directory
+ls: cannot access 'wc': No such file or directory
+mlavry@k1r4p1:~$ ls | wc -l
+12
+
+Malloc failed (Error message) :
+
+"Cannot allocate memory\n" cest le mesage derreur quqnd malloc echoue
+
+Proteger toute la libft :
+
+Pas fait
 
 Signaux

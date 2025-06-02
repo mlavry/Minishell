@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 21:50:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 00:49:30 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <stdbool.h>
+# include <limits.h>
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
@@ -54,7 +55,6 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	//int				g_exit;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -75,7 +75,7 @@ typedef struct s_data
 }				t_data;
 
 //------------------------Parsing functions---------------------
-bool	parse_line(t_data *data, char *line);
+bool	parse_line(t_data *data);
 int		open_quote(t_data *data, char *line);
 int		tokenize(t_data *data, char *line);
 int		is_quoted(char c);
@@ -85,8 +85,10 @@ int		count_tokens(char *line);
 char	**line_to_token(char *line);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_token *tokens);
+t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
+void	replace_dollars(t_data *data);
+char	*check_next(char *line, char *actual_chain, int *pos);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -101,11 +103,16 @@ t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
 int		ft_strcmp(char *s1, char *s2);
-char	*ft_strcpy(char *dest, char *src);
+char	*ft_strcpy(char *dest, const char *src);
 char	*ft_strcat(char *dest, char *src);
 int		is_operator(char c);
 int		is_space(char c);
 bool	is_redir(int type);
+int		str_append(char **res, int *len_buf, const char *add);
+int		char_append(char **res, int *len_buf, char c);
+int		is_multiple_append(char *str);
+int		is_multiple_heredoc(char *str);
+int		is_numeric(const char *str);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
@@ -120,7 +127,7 @@ void	malloc_failed(t_data *data);
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
 void	exec_builtin(t_data *data);
-void	builtin_env(t_env *env_list);
+void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);
 void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
@@ -131,13 +138,14 @@ char	*extract_name(char *arg);
 char	*extract_value(char *arg);
 t_env	*copyenvlist(t_data *data, t_env *env_list);
 void	built_export(t_data *data, t_env *env_list);
+void	built_export2(t_data *data, t_env **env_list, char **args);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
-void	exec_pipe(t_cmd *cmd,t_env *env_list, t_data *data);
+void	exec_pipe(t_cmd *cmd, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

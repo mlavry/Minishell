@@ -22,7 +22,18 @@ char	*get_absolute_path(char *cmd)
 	return (NULL);
 }
 
-char	*find_cmd_path(char *cmd)
+/* char	*get_env_value(t_env *env_list, char *name)
+{
+	while (env_list)
+	{
+		if (ft_strcmp(env_list->name, name) == 0)
+			return (env_list->value);
+		env_list = env_list->next;
+	}
+	return (NULL);
+} */
+
+char	*find_cmd_path(char *cmd, t_env *env_list)
 {
 	char	*path;
 	char	**token;
@@ -30,7 +41,7 @@ char	*find_cmd_path(char *cmd)
 	int		i;
 
 	i = 0;
-	path = getenv("PATH");
+	path = getenvp(env_list, "PATH");
 	if (!path)
 		return (free(path), NULL);
 	token = ft_split(path, ':');
@@ -51,39 +62,23 @@ char	*find_cmd_path(char *cmd)
 	return (NULL);
 }
 
-char	*getpath(char *cmd,  t_data *data)
+char	*getpath(char *cmd, t_data *data)
 {
 	char	*fullpath;
 
 	fullpath = get_absolute_path(cmd);
 	if (fullpath)
 		return (fullpath);
+
+	fullpath = find_cmd_path(cmd, data->env);
+	if (!fullpath)
+		data->exit_code = 127;
+
+	return (fullpath);
+	/* fullpath = get_absolute_path(cmd);
+	if (fullpath)
+		return (fullpath);
 	else
 		data->exit_code = 127;
-	return (free(fullpath), find_cmd_path(cmd));
+	return (free(fullpath), find_cmd_path(cmd)); */
 }
-/* 
-void	exit_status(t_cmd *cmd)
-{
-
-	if (cmd->g_exit == 0)
-		printf("0: command not found\n");
-	else if (cmd->g_exit == 127)
-		printf("127: command not found\n");
-	else if (cmd->g_exit == )
-
-} */
-
-/* 
-void error_message(t_cmd *cmd, const char *info)
-{
-    if (cmd->g_exit == 127)
-        printf("bash: %s: command not found\n", info);
-    else if (cmd->g_exit == 126)
-        printf("bash: %s: Permission denied\n", info);
-    else if (cmd->g_exit == 2)
-        printf("bash: syntax error near unexpected token `%s'\n", info);
-    else if (cmd->g_exit == 1)
-        printf("bash: %s\n", info); // erreur générique, message déjà préparé
-    // Tu peux étendre ici selon les codes que tu utilises
-} */

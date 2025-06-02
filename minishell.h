@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/02 23:45:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 00:49:30 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <stdbool.h>
+# include <limits.h>
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"

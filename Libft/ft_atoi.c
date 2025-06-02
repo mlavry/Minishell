@@ -6,51 +6,37 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 10:46:15 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/02 23:18:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 00:49:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 //#include <stdio.h>
-#include <limits.h>
-
-static int	ft_parse_digits(const char *nptr, int i, int sign)
-{
-	long	result;
-	int		digit;
-
-	result = 0;
-	while (nptr[i] >= '0' && nptr[i] <= '9')
-	{
-		digit = nptr[i] - '0';
-		if (result > (LONG_MAX - digit) / 10)
-			return (0);
-		result = result * 10 + digit;
-		i++;
-	}
-	result *= sign;
-	if (result > INT_MAX || result < INT_MIN)
-		return (0);
-	return ((int)result);
-}
 
 int	ft_atoi(const char *nptr)
 {
 	int	i;
+	int	result;
 	int	sign;
 
-	if (!nptr)
-		return (0);
 	i = 0;
-	sign = 1;
+	result = 0;
+	sign = 0;
 	while (nptr[i] == ' ' || (nptr[i] >= 9 && nptr[i] <= 13))
 		i++;
 	if (nptr[i] == '+' || nptr[i] == '-')
 	{
 		if (nptr[i] == '-')
-			sign = -1;
+			sign++;
 		i++;
 	}
-	return (ft_parse_digits(nptr, i, sign));
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+	{
+		result = result * 10 + (nptr[i] - '0');
+		i++;
+	}
+	if (sign % 2 != 0)
+		result = -result;
+	return (result);
 }
 
 /* int	main(void)

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 00:30:53 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 01:02:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,31 @@ t_env	*find_env_var(t_env *env_list, char *name)
 	return (NULL);
 }
 
+int	ft_atoi_safe(const char *str, int *out)
+{
+	int				i = 0, sign = 1, digit;
+	long long		res = 0;
+
+	if (!str || !*str)
+		return (0);
+	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+		if (str[i++] == '-')
+			sign = -1;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		digit = str[i++] - '0';
+		res = res * 10 + digit;
+		if (sign == 1 && res > INT_MAX)
+			return (0);
+		if (sign == -1 && -res < INT_MIN)
+			return (0);
+	}
+	*out = res * sign;
+	return (1);
+}
+
 void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
@@ -75,10 +100,9 @@ void	execshell(t_data *data, t_env **env_list)
 	if (!shlvl)
 		return ;
 	lvl = 1;
-	if (is_numeric(shlvl->value) && ft_strcmp(shlvl->value, "0") != 0)
+	if (is_numeric(shlvl->value) && ft_atoi_safe(shlvl->value, &lvl))
 	{
-		lvl = ft_atoi(shlvl->value);
-		if (lvl >= 999 || lvl == 0)
+		if (lvl >= 999)
 		{
 			lvl++;
 			printf("warning: shell level (%d) too high, resetting to 1\n", lvl);

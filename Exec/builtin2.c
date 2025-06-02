@@ -29,7 +29,8 @@ void	emptyenv(t_data *data, t_env **env_list)
 
 void	built_path(char *newpath, t_data *data)
 {
-	char	path[1024];
+	char		cwd[1024];
+	struct stat	sb;
 
 	if (access(newpath, F_OK) != 0)
 	{
@@ -37,12 +38,24 @@ void	built_path(char *newpath, t_data *data)
 		data->exit_code = 1;
 		return ;
 	}
-	getcwd(path, sizeof(path));
+	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
+	{
+		printf("bash: cd: %s: Not a directory\n", newpath);
+		data->exit_code = 1;
+		return ;
+	}
+	if (access(newpath, X_OK) != 0)
+	{
+		printf("bash: cd: %s: Permission denied\n", newpath);
+		data->exit_code = 126;
+		return ;
+	}
+	getcwd(cwd, sizeof(cwd));
 	chdir(newpath);
-	updatepwd(data, &data->env, path);
+	updatepwd(data, &data->env, cwd);
 }
 
-void	builtin_cd(char *newpath, t_data *data)
+/* void	builtin_cd(char *newpath, t_data *data)
 {
 	const char	*home;
 	char		*expanded_path ;
@@ -78,6 +91,65 @@ void	builtin_cd(char *newpath, t_data *data)
 	}
 	built_path(newpath, data);
 	free(expanded_path);
+} */
+
+
+
+
+void	builtin_cd(char *newpath, t_data *data)
+{
+	const char	*home;
+	char		*expanded_path = NULL;
+	t_env		*old;
+	bool		must_free = false;
+
+	if (newpath == NULL)
+	{
+		home = getenv("HOME");
+		if (!home)
+		{
+			printf("cd: HOME not set\n");
+			data->exit_code = 1;
+			return ;
+		}
+		newpath = (char *)home;
+	}
+	else if (newpath[0] == '-')
+	{
+		old = find_env_var(data->env, "OLDPWD");
+		if (!old || !old->value)
+		{
+			printf("cd: OLDPWD not set\n");
+			data->exit_code = 1;
+			return ;
+		}
+		printf("%s\n", old->value);
+		newpath = ft_strdup(old->value);
+		if (!newpath)
+			malloc_failed(data);
+		must_free = true;
+	}
+	else if (newpath[0] == '~')
+	{
+		home = getenv("HOME");
+		if (!home)
+		{
+			printf("cd: HOME not set\n");
+			data->exit_code = 1;
+			return ;
+		}
+		expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+		if (!expanded_path)
+			malloc_failed(data);
+		ft_strcpy(expanded_path, home);
+		ft_strcat(expanded_path, newpath + 1);
+		newpath = expanded_path;
+		must_free = true;
+	}
+
+	built_path(newpath, data);
+	if (must_free)
+		free(newpath);
 }
 
 void	unset(t_env **env_list, char *name )

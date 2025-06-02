@@ -73,7 +73,10 @@ void	execshell(t_data *data, t_env **env_list)
 
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
+	{
+		add_env_var(data, env_list, "SHLVL", "1");
 		return ;
+	}
 	if (shlvl)
 	{
 		lvl = ft_atoi(shlvl->value);

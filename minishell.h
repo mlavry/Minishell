@@ -29,6 +29,7 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 # include <stdbool.h>
+# include <limits.h>
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
@@ -145,6 +146,7 @@ void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);
 
+bool	is_a_directory(char *path, char **args, t_data *data);
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);
 

@@ -95,11 +95,11 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 				printf("minishell: %s: command not found\n", cmd->args[0]);
 				exit(127);
 			}
-			/* if (execve(path, cmd->args,convert_env(data->env)) == -1)
+		/* 	if (execve(path, cmd->args,convert_env(data->env)) == -1)
 			{
    	 			printf("%s: command not found\n", cmd->args[0]);
     			exit(127);
-			}  */
+			}   */
 			childprocess(data, prev_fd, pipe_fd);
 		}
 		else

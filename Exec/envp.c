@@ -23,6 +23,37 @@ char	*getenvp(t_env *list, char *name)
 	return (NULL);
 }
 
+/* void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*new_var;
+	t_env	*tmp;
+
+	new_var = malloc(sizeof(t_env));
+	if (!new_var)
+	{
+		free(name);
+		malloc_failed(data);
+	}
+	new_var->name = ft_strdup(name);
+	new_var->value = ft_strdup(value);
+	if (!new_var->name || !new_var->value)
+	{
+		free(name);
+		free_env(&new_var);
+		malloc_failed(data);
+	}
+	new_var->next = NULL;
+	if (!*env_list)
+	{
+		*env_list = new_var;
+		return ;
+	}
+	tmp = *env_list;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new_var;
+} */
+
 void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*new_var;
@@ -52,7 +83,7 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new_var;
-}
+} 
 
 void	copy_env(t_env *tmp, int count, char **envp)
 {
@@ -62,6 +93,11 @@ void	copy_env(t_env *tmp, int count, char **envp)
 	i = 0;
 	while (i < count)
 	{
+		if (tmp->value == NULL)
+		{
+			tmp = tmp->next;
+			continue ; // ne pas inclure cette variable dans envp
+		}
 		len = ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2;
 		envp[i] = malloc(len);
 		if (!envp[i])
@@ -87,7 +123,8 @@ char	**convert_env(t_env *env_list)
 	count = 0;
 	while (tmp)
 	{
-		count++;
+		if (tmp->value != NULL)
+			count++;
 		tmp = tmp->next;
 	}
 	envp = malloc((count + 1) * sizeof(char *));

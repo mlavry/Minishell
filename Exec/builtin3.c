@@ -42,14 +42,14 @@ int	antislash(const char *str, int i)
 void	print_antislash(const char *str)
 {
 	int	i;
-	int	j;
-	int	b_slash;
+	//int	j;
+	//int	b_slash;
 
 	i = 0;
-	j = 0;
+	//j = 0;
 	while (str[i])
 	{
-		b_slash = 0;
+		//b_slash = 0;
 		i = antislash(str, i);
 	}
 }

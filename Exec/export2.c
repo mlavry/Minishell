@@ -51,7 +51,7 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	}
 }
 
-void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
+/* void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 {
 	char	newpwd[100];
 	t_env	*old;
@@ -59,7 +59,17 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	(void)data;
 
 	if (!getcwd(newpwd, sizeof(newpwd)))
+	{
+		perror("cd: error retrieving current directory");
+		data->exit_code = 1;
+		old = find_env_var(*env_list, "OLDPWD");
+		if (old)
+		{
+			free(old->value);
+			old->value = ft_strdup(oldpath);
+		}
 		return ;
+	}
 	old = find_env_var(*env_list, "OLDPWD");
 	if (old)
 	{
@@ -70,9 +80,45 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	if (pwd)
 	{
 		free(pwd->value);
-		pwd->value = strdup(newpwd);
+		pwd->value = ft_strdup(newpwd);
 	}
+} */
+void updatepwd(t_data *data, t_env **env_list, char *oldpath)
+{
+    char *newpwd;
+    t_env *old;
+    t_env *pwd;
+
+    newpwd = getcwd(NULL, 0);
+    if (!newpwd)
+    {
+        perror("cd: error retrieving current directory");
+        data->exit_code = 1;
+        old = find_env_var(*env_list, "OLDPWD");
+        if (old)
+        {
+            free(old->value);
+            old->value = ft_strdup(oldpath);
+        }
+        return;
+    }
+
+    old = find_env_var(*env_list, "OLDPWD");
+    if (old)
+    {
+        free(old->value);
+        old->value = ft_strdup(oldpath);
+    }
+    pwd = find_env_var(*env_list, "PWD");
+    if (pwd)
+    {
+        free(pwd->value);
+        pwd->value = strdup(newpwd);
+    }
+    free(newpwd);
 }
+
+
 
 t_env	*get_env_var_by_name(t_env *env_list, char *name)
 {
@@ -85,6 +131,27 @@ t_env	*get_env_var_by_name(t_env *env_list, char *name)
 	return (NULL);
 }
 
+
+/* 
+void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+	char	*existing_value;
+
+	existing_value = getenvp(*env_list, name);
+	if (existing_value)
+	{
+		if (value != NULL)
+			update_env_var(env_list, name, value);
+	}
+	else
+	{
+		if (value)
+			add_env_var(data, env_list, name, value);
+		else
+			add_env_var(data, env_list, name, NULL);
+
+	}
+} */
 
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
@@ -158,7 +225,7 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 }
 
 
-char	*exp_value(char *expand_value, t_env *env_list)
+/* char	*exp_value(char *expand_value, t_env *env_list)
 {
 	char *name;
 	char *value;
@@ -175,14 +242,14 @@ char	*exp_value(char *expand_value, t_env *env_list)
 	}
 	return(ft_strdup(expand_value));
 
-} 
+}  */
 
 void	built_export2(t_data *data, t_env **env_list, char **args)
 {
 	int		i;
 	char	*name;
 	char	*value;
-	char 	*expand_value;
+	//char 	*expand_value;
 
 	i = 1;
 	while (args[i])
@@ -193,14 +260,15 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 			i++;
 			continue ;
 		}
-		expand_value = extract_value(args[i]);
+		//expand_value = extract_value(args[i]);
 		name = extract_name(args[i]);
+		value = extract_value(args[i]);
 		//value = exp_value(expand_value, *env_list);
-		if (expand_value)
+	/* 	if (expand_value)
 			value = exp_value(expand_value, *env_list);
 		else
 			value = NULL;
-		free(expand_value);
+		free(expand_value); */
 		if (!name)
 		{
 			printf("bash: export: `%s': not a valid identifier\n", args[i]);

@@ -57,6 +57,23 @@ bool	is_a_directory(char *path, char **args, t_data *data)
 	return (false);
 }
 
+bool	have_no_permission(char *cmd_path, t_data *data)
+{
+	if (access(cmd_path, F_OK) != 0)
+	{
+		printf("minishell: %s: No such file or directory\n", cmd_path);
+		data->exit_code = 127;
+		return true;
+	}
+	if (access(cmd_path, X_OK) != 0)
+	{
+		printf("minishell: %s: Permission denied\n", cmd_path);
+		data->exit_code = 126;
+		return true;
+	}
+	return false;
+}
+
 void	exec_extern_command(char **args, t_env *env, t_data *data)
 {
 	pid_t		pid;
@@ -64,7 +81,10 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	char		*path;
 
 	status = 0;
-	path = getpath(args[0], data);
+	if (ft_strchr(args[0], '/'))
+		path = ft_strdup(args[0]);
+	else
+		path = getpath(args[0], data);
 	if (!path)
 	{
 		if (ft_strcmp(args[0], "\\n") == 0)
@@ -79,6 +99,8 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		return ;
 	}
 	if (is_a_directory(path, args, data))
+		return ;
+	if (have_no_permission(path, data))
 		return ;
 	pid = fork();
 	if (pid == -1)

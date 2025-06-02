@@ -1,83 +1,6 @@
+------------------------EXEC-------------------------
 
-Test a gerer : 
-echo '"'$USER'"'
-$? | echo bonjour
-
-Proteger toute la libft
-
-Signaux
-
-
-
-mpanic
-
-
-Truc erreur 
-
-mlavry@k1r4p12:Documents/Minishell ‹main*›$ bash
-mlavry@k1r4p12:~/Documents/Minishell$ $? | echo bonjour
-bonjour
-0: command not found
-mlavry@k1r4p12:~/Documents/Minishell$ vjhADVB | echo bonjour
-bonjour
-vjhADVB: command not found
-mlavry@k1r4p12:~/Documents/Minishell$ 
-exit
-
-Marche pas
-
-mlavry@k1r4p1:~ $ bash             
-mlavry@k1r4p1:~$ ls '|' wc -l
-ls: cannot access '|': No such file or directory
-ls: cannot access 'wc': No such file or directory
-mlavry@k1r4p1:~$ ls | wc -l
-12
-
-
-mlavry@k1r1p11:~$ echo '"'$USER'"'
-"mlavry"
-mlavry@k1r1p11:~$ echo '"' $USER '"'
-" mlavry "
-
-
-//PROBLEME MALLOC ERROR
-
-"Cannot allocate memory\n" cest le mesage derreur quqnd malloc echoue et le code erreur cest 12
-
-
-//PROBLEME EXPORT 
-
-export a un probleme si on export un SHLVL superieur a 999 et qu'on relance un minishell
-
-//POUR RESOUDRE PARSING 
-
-regarder apres la quote fermante si il y a un espace
-
-
-
-//NE PAS AFFICHER L'ENV SI IL Y A QUELQUE CHOSE DERRIERE 
-
-mlavry@k1r4p3:Documents/exec ‹exec*›$ env -i ./minishell
-minishell$ env -i ./minishell
-3
-Token: env             | Type: 6  | SQ: 0 | DQ: 0
-Token: -i              | Type: 7  | SQ: 0 | DQ: 0
-Token: ./minishell     | Type: 7  | SQ: 0 | DQ: 0
-PWD=/home/mlavry/Documents/exec
-SHLVL=1
-_=/usr/bin/env
-minishell$ env -i ./minishell
-3
-Token: env             | Type: 6  | SQ: 0 | DQ: 0
-Token: -i              | Type: 7  | SQ: 0 | DQ: 0
-Token: ./minishell     | Type: 7  | SQ: 0 | DQ: 0
-PWD=/home/mlavry/Documents/exec
-SHLVL=1
-_=/usr/bin/env
-minishell$ exit
-mlavry@k1r4p3:Documents/exec ‹exec*›$
-
-//TRES BIZARRE
+Ne doit rien afficher :
 
 mlavry@k1r4p3:Documents/exec ‹exec*›$ ./minishell
 minishell$ echo bonjour | $USERbhb
@@ -88,16 +11,35 @@ Token: |               | Type: 5  | SQ: 0 | DQ: 0
 bonjour
 minishell$ 
 
+cd probleme tester permission
+
+cd-
 
 export ENV=$qu
 
-tester exit
-
-
-cd probleme tester permission
-
-cd -
-
 cd avec lien symbolique
 
-si le pipe est dans des quotes on le prend comme un arg
+--------------------------PARSING-------------------------------
+
+Securiser le code :
+
+depuis le debut
+
+Error syntax :
+
+Si le pipe est dans des quotes on le prend comme un arg
+
+mlavry@k1r4p1:~ $ bash             
+mlavry@k1r4p1:~$ ls '|' wc -l
+ls: cannot access '|': No such file or directory
+ls: cannot access 'wc': No such file or directory
+mlavry@k1r4p1:~$ ls | wc -l
+12
+
+Malloc failed (Error message) :
+
+"Cannot allocate memory\n" cest le mesage derreur quqnd malloc echoue
+
+Proteger toute la libft :
+
+Pas fait

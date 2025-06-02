@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/28 01:04:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/02 23:45:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,8 @@ bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
 int		is_multiple_append(char *str);
-int 	is_multiple_heredoc(char *str);
+int		is_multiple_heredoc(char *str);
+int		is_numeric(const char *str);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

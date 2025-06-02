@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 10:46:15 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/02 18:45:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/02 23:18:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,13 @@ int	ft_atoi(const char *nptr)
 {
 	char str1[] = " -1234ab567";
 	char str2[] = "  569999999999999+7b8";
-	char *str3 = NULL;
+	char *str3 = "0";
 
 	int num1 = ft_atoi(str1);
 	int num2 = ft_atoi(str2);
 	int num3 = ft_atoi(str3);
-	int num4 = ft_atoi("2147483648");
-	int num5 = ft_atoi("2147483648");
+	int num4 = ft_atoi("00001");
+	int num5 = ft_atoi("214748364");
 
 	printf("num1 = %d\n", num1);
 	printf("num2 = %d\n", num2);

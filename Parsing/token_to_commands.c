@@ -129,8 +129,7 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 		*tokens = (*tokens)->next;
 	}
 	return (1);
-} 
-
+}
 bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 {
 	if ((*tokens)->type == CMD)
@@ -143,12 +142,49 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 		return (handle_input(tokens, cur, data));
 	if ((*tokens)->type == PIPE)
 		return (handle_pipe(tokens,cur));
-	/* if ((*tokens)->type == HEREDOC)
-        return(handle_heredoc(cur)); */
+/* 	if ((*tokens)->type == HEREDOC)
+        return(handle_heredoc()); */
 	if ((*tokens)->type == APPEND)
         return (handle_append(tokens ,cur, data)); 
 	return (true);
 }
+
+
+/* bool check_token_syntax(t_token *tokens, t_data *data)
+{
+    while (tokens)
+    {
+        // Vérifie si le token est un pipe
+        if (tokens->type == PIPE)
+        {
+			 if (!tokens->prev || !tokens->next)
+   			 {
+        		printf("minishell: syntax error near unexpected token `|'\n");
+        		data->exit_code = 2;
+        		return false;
+    		}
+            // Si le token précédent est une redirection, c'est une erreur
+            if (tokens->prev && (tokens->prev->type == OUTPUT || tokens->prev->type == HEREDOC || tokens->prev->type == APPEND || tokens->prev->type == INPUT))
+            {
+                printf("minishell: syntax error near unexpected token `%s'\n", tokens->str);
+                data->exit_code = 2;
+                return false;
+            }
+        }
+
+        // Vérifie si le token est une redirection sans fichier suivant
+        if ((tokens->type == OUTPUT || tokens->type == APPEND || tokens->type == INPUT) && (!tokens->next || tokens->next->type != ARG))
+        {
+            printf("minishell: syntax error near unexpected token `%s'\n", tokens->next ? tokens->next->str : "newline");
+            data->exit_code = 2;
+            return false;
+        }
+
+        tokens = tokens->next;
+    }
+    return true;
+} */
+
 
 t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 {
@@ -163,6 +199,8 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
    	 	data->exit_code = 2;
     	return (0); // empêche l’exécution
 	} */
+	/* if (!check_token_syntax(tokens, data))
+			return (NULL);  */
 	while (tokens)
 	{
 		if (!is_type_token (&tokens, &head, &cur, data))

@@ -126,13 +126,13 @@ void	builtin_env( t_env *env_list, t_data *data)
 	t_cmd	*cmd;
 
 	cmd = data->cmd;
-	if (cmd->args[1])
+	if (cmd->args[1] && ft_strcmp(cmd->args[1], "env") != 0)
 		printf("env: ‘%s’: No such file or directory\n", cmd->args[1]);
 	else
 	{
 		while (env_list)
 		{
-			if (env_list->value != NULL && env_list->value[0] != '\0')
+			if (env_list->value != NULL)
 				printf("%s=%s\n", env_list->name, env_list->value);
 			env_list = env_list->next;
 		}

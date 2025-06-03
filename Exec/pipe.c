@@ -47,7 +47,12 @@ void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 		close(pipe_fd[1]);
 	}
 	if (isbuiltin(data))
-		exec_builtin(data);
+	{
+		if (ft_strcmp(data->cmd->args[0], "exit") == 0)
+			exit(0);
+		else
+			exec_builtin(data);
+	}
 	else
 		exec_extern_command(data->cmd->args, data->env, data);
 	exit(EXIT_SUCCESS);
@@ -89,11 +94,14 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			handle_error("fork error\n");
 		if (pid == 0)
 		{
-			char *path = getpath(cmd->args[0], data);
-			if (!path)
+			if (!isbuiltin(data))
 			{
-				printf("minishell: %s: command not found\n", cmd->args[0]);
-				exit(127);
+				char *path = getpath(cmd->args[0], data);
+				if (!path)
+				{
+					printf("minishell: %s: command not found\n", cmd->args[0]);
+					exit(127);
+				}
 			}
 		/* 	if (execve(path, cmd->args,convert_env(data->env)) == -1)
 			{

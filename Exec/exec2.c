@@ -43,7 +43,12 @@ void	executecommand(t_data *data)
 	if (data->cmd->next)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
-		exec_builtin_redirection(data);
+	{
+		if (!ft_strcmp(data->cmd->args[0], "exit"))
+			exit (0);
+		else
+			exec_builtin_redirection(data);
+	}
 	else
 	{
 		exec_extern_command(data->cmd->args, data->env, data);

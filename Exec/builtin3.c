@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:18:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/30 13:19:38 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:33:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 {
 	(void)data;
 	(void)env_list;
-	if( cmd->args[i][0] == ';')
-		return;
+	if ( cmd->args[i][0] == ';')
+		return ;
 	if (cmd->args[i][0] == '\\')
 	{
 		if (cmd->args[i][1] >= 'a' && cmd->args[i][1] <= 'z')

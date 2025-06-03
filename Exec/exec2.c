@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 15:42:12 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 21:02:04 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,12 @@ void	executecommand(t_data *data)
 	if (data->cmd->next)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
-		exec_builtin_redirection(data);
+	{
+		if (!ft_strcmp(data->cmd->args[0], "exit"))
+			exit (0);
+		else
+			exec_builtin_redirection(data);
+	}
 	else
 	{
 		exec_extern_command(data->cmd->args, data->env, data);
@@ -103,9 +108,12 @@ void	execshell(t_data *data, t_env **env_list)
 
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
+	{
+		add_env_var(data, env_list, "SHLVL", "1");
 		return ;
+	}
 	lvl = 1;
-	if (is_numeric(shlvl->value) && ft_atoi_safe(shlvl->value, &lvl))
+	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, &lvl))
 	{
 		if (lvl >= 999)
 		{

@@ -50,7 +50,6 @@ char	*extract_name(char *arg)
 	return (ft_substr(arg, 0, sign - arg));
 }
 
-//ft_strdup("\"=\"")
 char	*extract_value(char *arg)
 {
 	char	*sign;
@@ -61,10 +60,7 @@ char	*extract_value(char *arg)
 	if (!sign)
 		return (NULL);
 	if (*(sign + 1) == '\0')
-	{
-		printf("salu");
 		return (ft_strdup(""));
-	}
 	return (ft_strdup(sign + 1));
 }
 
@@ -97,8 +93,8 @@ void	built_export(t_data *data, t_env *env_list)
 		{
 			if (current->value == NULL /*  || current->value[0] == '\0'  */)
 				printf("declare -x %s\n", current->name);
-			else if (current->value[0] == '\0')
-				printf("declare -x %s=\"\"\n", current->name);
+			//else if (current->value[0] == '\0')
+			//	printf("declare -x %s=\"\"\n", current->name);
 			else
 				printf("declare -x %s=\"%s\"\n", current->name, current->value);
 		}

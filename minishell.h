@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 00:49:30 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:52:12 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
 int		is_multiple_append(char *str);
 int		is_multiple_heredoc(char *str);
-int		is_numeric(const char *str);
+int		ft_isnumeric(const char *str);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
@@ -146,6 +146,7 @@ void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);
+bool	is_a_directory(char *path, char **args, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

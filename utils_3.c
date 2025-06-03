@@ -6,13 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 15:36:23 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:28:18 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	is_numeric(const char *str)
+int	ft_isnumeric(const char *str)
 {
 	int	i;
 

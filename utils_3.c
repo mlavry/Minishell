@@ -1,42 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_bzero.c                                         :+:      :+:    :+:   */
+/*   utils_3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/15 15:42:21 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/02 16:36:42 by mlavry           ###   ########.fr       */
+/*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
+/*   Updated: 2025/06/03 20:28:18 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-//#include <stdio.h>
-#include "libft.h"
+#include "../minishell.h"
 
-void	ft_bzero(void *s, size_t n)
+int	ft_isnumeric(const char *str)
 {
-	unsigned char	*ptr;
+	int	i;
 
-	if (!s && n > 0)
-		return ;
-	ptr = (unsigned char *)s;
-	while (n)
+	i = 0;
+	if (!str || !*str)
+		return (0);
+	while (is_space(str[i]))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	while (str[i])
 	{
-		*ptr = 0;
-		n--;
-		ptr++;
-	}
-}
-
-/*int main (void)
-{
-	char buffer[5] = "1234";
-	int i = 0;
-	ft_bzero(buffer, sizeof(buffer));
-	while (i < 5)
-	{
-		printf("%d", buffer[i]);
+		if (!ft_isdigit(str[i]) && !is_space(str[i]))
+			return (0);
 		i++;
 	}
-	return (0);
-}*/
+	return (1);
+}

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:30:42 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:32:01 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,9 +93,6 @@ void	built_path(char *newpath, t_data *data)
 	free(expanded_path);
 } */
 
-
-
-
 void	builtin_cd(char *newpath, t_data *data)
 {
 	const char	*home;
@@ -146,7 +143,6 @@ void	builtin_cd(char *newpath, t_data *data)
 		newpath = expanded_path;
 		must_free = true;
 	}
-
 	built_path(newpath, data);
 	if (must_free)
 		free(newpath);

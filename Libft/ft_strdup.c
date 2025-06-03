@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mlavry <taaikiazerolier@gmail.com>         +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 18:24:22 by mlavry            #+#    #+#             */
-/*   Updated: 2024/10/23 14:21:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/02 16:56:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,35 +36,6 @@ char	*ft_strdup(const char *s)
 	dest[i] = '\0';
 	return (dest);
 }
-
-/* char	*ft_strcpy(char *dest, const char *src)
-{
-	int	i;
-
-	i = 0;
-	while (src[i] != '\0')
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char *ft_strdup(const char *s)
-{
-    char *copy;
-
-    if (!s)
-        return (NULL);
-
-    copy = malloc(ft_strlen(s) + 1);
-    if (!copy)
-        return (NULL);
-    ft_strcpy(copy, s); // ou équivalent
-    return (copy);
-} */
-
 
 /*int main(void)
 {

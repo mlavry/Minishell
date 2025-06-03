@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/29 01:47:26 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:37:30 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new_var;
-} 
+}
 
 void	copy_env(t_env *tmp, int count, char **envp)
 {
@@ -123,8 +123,7 @@ char	**convert_env(t_env *env_list)
 	count = 0;
 	while (tmp)
 	{
-		if (tmp->value != NULL)
-			count++;
+		count++;
 		tmp = tmp->next;
 	}
 	envp = malloc((count + 1) * sizeof(char *));

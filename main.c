@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/28 14:56:16 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:50:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,18 +24,17 @@
 	}
 }*/
 
-
 bool	empty_line(char *line, t_data *data)
 {
 	int	i;
 
 	i = 0;
- 	if (line[i] == '>' || line[i] == '<')
-	{
+	if (line[i] == '>' || line[i] == '<')
+    {
 		if (is_multiple_append(&line[i]) || is_multiple_heredoc(&line[i]))
 		{
 			data->exit_code = 2;
-			return (true);
+			return true;
 		}
 	}
 	while (line[i] && (line[i] == ' ' || line[i] == ':'))
@@ -49,7 +48,6 @@ bool	empty_line(char *line, t_data *data)
 		data->exit_code = 2;
 		return (true);
 	}
-
 	if (line[i] == '!')
 	{
 		i++;

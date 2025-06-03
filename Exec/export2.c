@@ -102,7 +102,6 @@ void updatepwd(t_data *data, t_env **env_list, char *oldpath)
         }
         return;
     }
-
     old = find_env_var(*env_list, "OLDPWD");
     if (old)
     {
@@ -118,8 +117,6 @@ void updatepwd(t_data *data, t_env **env_list, char *oldpath)
     free(newpwd);
 }
 
-
-
 t_env	*get_env_var_by_name(t_env *env_list, char *name)
 {
 	while (env_list)
@@ -130,7 +127,6 @@ t_env	*get_env_var_by_name(t_env *env_list, char *name)
 	}
 	return (NULL);
 }
-
 
 /* 
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
@@ -223,7 +219,6 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 	free(var_name);
 	free(new_value);
 }
-
 
 /* char	*exp_value(char *expand_value, t_env *env_list)
 {

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 16:07:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 23:58:02 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,15 +66,22 @@ void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 	(*src)++;
 }
 
-void	check_quote_dollars(char **src)
+int	check_quote_dollars(char **src)
 {
 	int	i;
 
 	i = 1;
 	if (is_quoted((*src)[i]))
+	{
 		(*src)++;
+		return (1);
+	}
 	if (ft_isdigit((*src)[i]))
+	{
 		(*src) += 2;
+		return (1);
+	}
+	return (0);
 }
 
 void	replace_dollars(t_data *data)
@@ -96,7 +103,10 @@ void	replace_dollars(t_data *data)
 	{
 		quote_choice(&sq, &dq, *src);
 		if (*src == '$' && !dq)
-			check_quote_dollars(&src);
+		{
+			if (check_quote_dollars(&src))
+				continue ;
+		}
 		if (*src == '$' && !sq)
 		{
 			check_dollars(data, &src, &res, &len_buf);

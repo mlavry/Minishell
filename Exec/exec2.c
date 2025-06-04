@@ -100,6 +100,24 @@ int	ft_atoi_safe(const char *str, int *out)
 	return (1);
 }
 
+void shlvl_verification(t_env *shlvl, int *lvl)
+{
+	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, lvl))
+	{
+		if (*lvl >= 999)
+		{
+			(*lvl)++;
+			printf("warning: shell level (%d)", *lvl);
+			printf(" too high, resetting to 1\n");
+			*lvl = 1;
+		}
+		else if (*lvl < 0)
+			*lvl = 0;
+		else
+			(*lvl)++;
+	}
+}
+
 void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
@@ -113,19 +131,7 @@ void	execshell(t_data *data, t_env **env_list)
 		return ;
 	}
 	lvl = 1;
-	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, &lvl))
-	{
-		if (lvl >= 999)
-		{
-			lvl++;
-			printf("warning: shell level (%d) too high, resetting to 1\n", lvl);
-			lvl = 1;
-		}
-		else if (lvl < 0)
-			lvl = 0;
-		else
-			lvl++;
-	}
+	shlvl_verification(shlvl, &lvl);
 	new_val = ft_itoa(lvl);
 	if (!new_val)
 		malloc_failed(data);

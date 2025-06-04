@@ -22,17 +22,6 @@ char	*get_absolute_path(char *cmd)
 	return (NULL);
 }
 
-/* char	*get_env_value(t_env *env_list, char *name)
-{
-	while (env_list)
-	{
-		if (ft_strcmp(env_list->name, name) == 0)
-			return (env_list->value);
-		env_list = env_list->next;
-	}
-	return (NULL);
-} */
-
 char	*find_cmd_path(char *cmd, t_env *env_list)
 {
 	char	*path;
@@ -75,10 +64,4 @@ char	*getpath(char *cmd, t_data *data)
 		data->exit_code = 127;
 
 	return (fullpath);
-	/* fullpath = get_absolute_path(cmd);
-	if (fullpath)
-		return (fullpath);
-	else
-		data->exit_code = 127;
-	return (free(fullpath), find_cmd_path(cmd)); */
 }

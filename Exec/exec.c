@@ -52,8 +52,7 @@ bool	is_a_directory(char *path, char **args, t_data *data)
 		printf("minishell: command not found\n");
 		data->exit_code = 127;
 		free(path);
-		return (true);
-
+		return true;
 	}
 
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))

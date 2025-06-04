@@ -35,9 +35,31 @@ void	input_and_output(t_data *data, int prev_fd, int pipe_fd[2])
 		close(pipe_fd[1]);
 	}
 }
+void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
+{
+	if (data)
+		data->exit_code = exit_code;
+	ft_putstr_fd("minishell: ", 2);
+	if (cmd)
+	{
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": ", 2);
+	}
+	ft_putstr_fd(msg, 2);
+	exit(exit_code);
+}
 
 void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 {
+
+	 if (!isbuiltin(data))
+	{
+		if (!getpath(data->cmd->args[0], data))
+		//char *path = getpath(data->cmd->args[0], data);
+		//if (!path)
+			handle_command_error(data->cmd->args[0], "command not found\n",
+			127, data);
+	} 
 	input_and_output(data, prev_fd, pipe_fd);
 	if (prev_fd != -1)
 		close(prev_fd);
@@ -58,8 +80,10 @@ void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 	exit(EXIT_SUCCESS);
 }
 
-void	parent_process(int *prev_fd, t_cmd **cmd, int *pipe_fd)
+void	parent_process(int *prev_fd, t_cmd **cmd, int *pipe_fd, t_data *data)
 {
+	int	status;
+
 	if (*prev_fd != -1)
 		close(*prev_fd);
 	if ((*cmd)->next)
@@ -70,6 +94,14 @@ void	parent_process(int *prev_fd, t_cmd **cmd, int *pipe_fd)
 	else
 		*prev_fd = -1;
 	*cmd = (*cmd)->next;
+
+	while (wait(&status) > 0)
+	{
+		if (WIFEXITED(status))
+			data->exit_code = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			data->exit_code = 128 + WTERMSIG(status);
+	}
 }
 
 void	handle_error(char *message)
@@ -77,6 +109,7 @@ void	handle_error(char *message)
 	ft_putstr_fd(message, 2);
 	exit(EXIT_FAILURE);
 }
+
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
 {
@@ -94,15 +127,13 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			handle_error("fork error\n");
 		if (pid == 0)
 		{
-			if (!isbuiltin(data))
+			/* if (!isbuiltin(data))
 			{
 				char *path = getpath(cmd->args[0], data);
 				if (!path)
-				{
-					printf("minishell: %s: command not found\n", cmd->args[0]);
-					exit(127);
-				}
-			}
+					handle_command_error(cmd->args[0], "command not found\n",
+						127, data);
+			} */
 		/* 	if (execve(path, cmd->args,convert_env(data->env)) == -1)
 			{
    	 			printf("%s: command not found\n", cmd->args[0]);
@@ -111,9 +142,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			childprocess(data, prev_fd, pipe_fd);
 		}
 		else
-		{
-			parent_process(&prev_fd, &cmd, pipe_fd);
-		}
+			parent_process(&prev_fd, &cmd, pipe_fd, data);
 	}
 	while (wait(NULL) > 0)
 		;

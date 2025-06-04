@@ -52,7 +52,8 @@ int	handle_arg(t_cmd *cur, t_token *token)
 
 int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
-
+	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+		return (0);
 	if ((*tokens)->type == PIPE && (!(*tokens)->next))
 	{
 		printf("minishell: syntax error near unexpected token `|'\n");
@@ -65,6 +66,8 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 
 int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 {
+	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+		return (0);
 	if ((*tokens)->type == OUTPUT
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
@@ -87,6 +90,8 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 
 int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 {
+	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+		return (0);
 	if ((*tokens)->type == INPUT
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
@@ -109,7 +114,8 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 
 int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
-
+	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+		return (0);
 	if ((*tokens)->type == APPEND
 		&& ( !(*tokens)->prev || !(*tokens)->next || (*tokens)->next->type != ARG))
 	{

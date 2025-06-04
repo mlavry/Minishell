@@ -14,10 +14,7 @@ minishell$
 minishell$ >>'la'
 bash: syntax error near unexpected token `>>'
 
-cd probleme tester permission
-
 export ENV=$qu
-
 --------------------------PARSING-------------------------------
 
 Securiser le code :

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 14:37:25 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/29 15:10:31 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,6 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 	bool	dq = false;
 
 	temp = NULL;
-	printf("SQ\n");
 	if (!*sq)
 		return (0);
 	pos[1]++;
@@ -170,7 +169,6 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 	bool	sq = false;
 
 	temp = NULL;
-	printf("DQ\n");
 	if (!*dq)
 		return (0);
 	pos[1]++;
@@ -221,7 +219,6 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	temp = NULL;
 	sq = false;
 	dq = false;
-	printf("Unquote\n");
 	while (is_space(line[pos[1]]))
 		pos[1]++;
 	pos[0] = pos[1];
@@ -297,7 +294,6 @@ char	**line_to_token(char *line)
 		return (NULL);
 	while (line[pos[1]])
 	{
-		printf("%c\n", line[pos[1]]);
 		quote_choice(&sq, &dq, line[pos[1]]);
 		if (!sq && !dq && handle_unquoted(line, tokens, pos))
 			continue ;

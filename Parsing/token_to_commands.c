@@ -92,7 +92,7 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 {
 	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
 		return (0);
-	if ((*tokens)->type == INPUT
+	if (tokens && ((*tokens)->type == INPUT)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		data->exit_code = 2;

@@ -28,6 +28,16 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 {
+/* 	if (data->cmd->fd_in != -1 && data->cmd->fd_in != STDIN_FILENO)
+	{
+		dup2(data->cmd->fd_in, STDIN_FILENO);
+		close(data->cmd->fd_in);
+	}
+	if (data->cmd->fd_out != -1 && data->cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(data->cmd->fd_out, STDOUT_FILENO);
+		close(data->cmd->fd_out);
+	} */
 	if (data->cmd->fd_in != STDIN_FILENO)
 	{
 		dup2(data->cmd->fd_in, STDIN_FILENO);
@@ -89,6 +99,12 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	char		*path;
 
 	status = 0;
+	/* if (!args || !args[0])
+	{
+		printf("minishell: command not found\n");
+		data->exit_code = 127;
+		return ;
+	} */
 	if (ft_strchr(args[0], '/'))
 		path = ft_strdup(args[0]);
 	else
@@ -107,7 +123,10 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		return ;
 	}
 	if (is_a_directory(path, args, data))
+	{
+		free(path);
 		return ;
+	}
 	if (have_no_permission(path, data))
 		return ;
 	pid = fork();

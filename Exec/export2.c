@@ -117,19 +117,9 @@ void updatepwd(t_data *data, t_env **env_list, char *oldpath)
     free(newpwd);
 }
 
-t_env	*get_env_var_by_name(t_env *env_list, char *name)
-{
-	while (env_list)
-	{
-		if (ft_strcmp(env_list->name, name) == 0)
-			return env_list;  // retourne la variable complète, même si value == NULL
-		env_list = env_list->next;
-	}
-	return (NULL);
-}
 
-/* 
-void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+
+/* void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	char	*existing_value;
 
@@ -147,9 +137,9 @@ void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 			add_env_var(data, env_list, name, NULL);
 
 	}
-} */
+}  */
 
-void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+/* void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*existing_value;
 
@@ -161,7 +151,26 @@ void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 	}
 	else
 		add_env_var(data, env_list, name, value);
+} */
+
+void existing_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+   char *existing_value = getenvp(*env_list, name);
+    if (existing_value)
+    {
+        if (value == NULL)
+            value = ft_strdup(""); // valeur vide mais non NULL
+        update_env_var(env_list, name, value);
+    }
+    else
+    {
+        if (value == NULL)
+            value = ft_strdup(NULL);
+        add_env_var(data, env_list, name, value);
+    }
 }
+
+
 
 void	increment_and_free(int *i, char *value, char *name)
 {

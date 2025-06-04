@@ -85,7 +85,7 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	tmp->next = new_var;
 }
 
-void	copy_env(t_env *tmp, int count, char **envp)
+/* void	copy_env(t_env *tmp, int count, char **envp)
 {
 	int		i;
 	size_t	len;
@@ -111,7 +111,32 @@ void	copy_env(t_env *tmp, int count, char **envp)
 		tmp = tmp->next;
 		i++;
 	}
+} */
+void	copy_env(t_env *tmp, char **envp)
+{
+	int		i = 0;
+	size_t	len;
+
+	while (tmp)
+	{
+		if (tmp->value != NULL)
+		{
+			len = ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2;
+			envp[i] = malloc(len);
+			if (!envp[i])
+			{
+				perror("malloc");
+				exit(EXIT_FAILURE);
+			}
+			ft_strcpy(envp[i], tmp->name);
+			ft_strcat(envp[i], "=");
+			ft_strcat(envp[i], tmp->value);
+			i++;
+		}
+		tmp = tmp->next;
+	}
 }
+
 
 char	**convert_env(t_env *env_list)
 {
@@ -123,7 +148,8 @@ char	**convert_env(t_env *env_list)
 	count = 0;
 	while (tmp)
 	{
-		count++;
+		//if (tmp->value != NULL)
+			count++;
 		tmp = tmp->next;
 	}
 	envp = malloc((count + 1) * sizeof(char *));
@@ -133,7 +159,7 @@ char	**convert_env(t_env *env_list)
 		exit(EXIT_FAILURE);
 	}
 	tmp = env_list;
-	copy_env(tmp, count, envp);
+	copy_env(env_list, envp);
 	envp[count] = NULL;
 	return (envp);
 }

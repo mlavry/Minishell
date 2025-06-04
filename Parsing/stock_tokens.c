@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/29 15:10:31 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/04 21:27:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,6 +231,8 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (is_operator(line[pos[1]]))
 	{
+		if (pos[1] > pos[0])
+			tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0]);
 		handle_operator(line, &temp, pos);
 		tokens[pos[2]++] = temp;
 		return (1);
@@ -242,6 +244,7 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 		pos[1]++;
 		if (check_operators(line, tokens, pos))
 		{
+			quote_choice(&sq, &dq, line[pos[1]]);
 			pos[1]++;
 			return (1);
 		}

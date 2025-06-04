@@ -52,11 +52,11 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
 {
 
-	 if (!isbuiltin(data))
+	if (!isbuiltin(data))
 	{
-		if (!getpath(data->cmd->args[0], data))
-		//char *path = getpath(data->cmd->args[0], data);
-		//if (!path)
+		//if (!getpath(data->cmd->args[0], data))
+		char *path = getpath(data->cmd->args[0], data);
+		if (!path)
 			handle_command_error(data->cmd->args[0], "command not found\n",
 			127, data);
 	} 
@@ -127,13 +127,13 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			handle_error("fork error\n");
 		if (pid == 0)
 		{
-			/* if (!isbuiltin(data))
+			if (!isbuiltin(data))
 			{
 				char *path = getpath(cmd->args[0], data);
 				if (!path)
 					handle_command_error(cmd->args[0], "command not found\n",
 						127, data);
-			} */
+			} 
 		/* 	if (execve(path, cmd->args,convert_env(data->env)) == -1)
 			{
    	 			printf("%s: command not found\n", cmd->args[0]);

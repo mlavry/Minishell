@@ -34,7 +34,7 @@ void	built_path(char *newpath, t_data *data)
 
 	if (access(newpath, F_OK) != 0)
 	{
-		printf("bash: cd: %s: No such file or directory\n", newpath);
+		printf("cd: %s: No such file or directory\n", newpath);
 		data->exit_code = 1;
 		return ;
 	}

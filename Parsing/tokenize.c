@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 00:00:06 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/04 01:11:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,12 @@ int	get_token_type(char *str)
 		return (ARG);
 }
 
+void	check_operators_type(t_data *data, t_token *new)
+{
+	printf("%s\n", new->str);
+	printf("%s\n", data->line);
+}
+
 void	add_token(t_token **head, char *value)
 {
 	t_token	*new;
@@ -41,6 +47,8 @@ void	add_token(t_token **head, char *value)
 	new->dq = false;
 	//stock_and_delete_quote(new);
 	new->type = get_token_type(new->str);
+/* 	if (new->type >= 1 && new->type <= 5)
+		check_operators_type(data, new); */
 	new->next = NULL;
 	if (!*head)
 		*head = new;
@@ -67,13 +75,13 @@ void	parse_token(t_data *data, char **tokens)
 	}
 	data->token = token_list;
 	mark_commands(data);
-/* 	t_token *tmp = token_list;
+	t_token *tmp = token_list;
  	while (tmp)
 	{
 		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
 			tmp->str, tmp->type, tmp->sq, tmp->dq);
 		tmp = tmp->next;
-	} */
+	}
 }
 
 int	tokenize(t_data *data, char *line)

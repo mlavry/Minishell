@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 20:52:12 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/04 01:09:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ int		char_append(char **res, int *len_buf, char c);
 int		is_multiple_append(char *str);
 int		is_multiple_heredoc(char *str);
 int		ft_isnumeric(const char *str);
+int		check_operators(char *line, char **tokens, int *pos);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

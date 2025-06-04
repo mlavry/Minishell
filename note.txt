@@ -49,3 +49,11 @@ Proteger toute la libft :
 Pas fait
 
 Signaux
+
+mlavry@k1r4p3:~$ echo Bonjour || ls
+Bonjour
+mlavry@k1r4p3:~$ echo Bonjour ||| ls
+bash: syntax error near unexpected token `|'
+
+minishell$ >>'la'
+bash: syntax error near unexpected token `>>'

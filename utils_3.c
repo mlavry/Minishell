@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 20:28:18 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/04 01:29:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,4 +30,18 @@ int	ft_isnumeric(const char *str)
 		i++;
 	}
 	return (1);
+}
+
+int	check_operators(char *line, char **tokens, int *pos)
+{
+	while (is_operator(line[pos[1]]))
+		pos[1]++;
+	if (is_quoted(line[pos[1]]) && (!line[pos[1] + 1]
+			|| is_space(line[pos[1] + 1])))
+	{
+		tokens[pos[2]++] = ft_substr(line, pos[0] - 1, pos[1] - pos[0] + 2);
+		pos[0] = pos[1];
+		return (1);
+	}
+	return (0);
 }

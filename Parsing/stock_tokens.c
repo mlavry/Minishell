@@ -135,6 +135,12 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*sq) = false;
+		return (1);
+	}
 	quote_choice(sq, &dq, line[pos[1]]);
 	while (line[pos[1]] && *sq)
 	{
@@ -167,6 +173,12 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*dq) = false;
+		return (1);
+	}
 	quote_choice(&sq, dq, line[pos[1]]);
 	while (line[pos[1]] && *dq)
 	{
@@ -225,6 +237,15 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+	if (is_quoted(line[pos[1]]) && is_operator(line[pos[1] + 1]))
+	{
+		pos[1]++;
+		if (check_operators(line, tokens, pos))
+		{
+			pos[1]++;
+			return (1);
+		}
+	}
 	if (!temp && line[pos[1]])
 		temp = ft_strdup("");
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])

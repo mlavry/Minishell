@@ -11,18 +11,10 @@ Token: |               | Type: 5  | SQ: 0 | DQ: 0
 bonjour
 minishell$ 
 
-cd probleme tester permission
-
-cd-
-
-INT OVERFlOW avec SHLVL doit reset a 1
-
-Probleme lorsque SHLVL est unset il n'apparait pas non plus si on relance un minishell
-
-Lorsque on unset le PATH on peut encore relancer minishell alors que sur bash on ne peut pas relancer bash
+minishell$ >>'la'
+bash: syntax error near unexpected token `>>'
 
 export ENV=$qu
-
 --------------------------PARSING-------------------------------
 
 Securiser le code :
@@ -49,3 +41,17 @@ Proteger toute la libft :
 Pas fait
 
 Signaux
+
+mlavry@k1r4p3:~$ echo Bonjour || ls
+Bonjour
+mlavry@k1r4p3:~$ echo Bonjour ||| ls
+bash: syntax error near unexpected token `|'
+
+minishell$ ls '|'
+l
+Unquote
+ 
+Unquote
+Token: ls              | Type: 6  | SQ: 0 | DQ: 0
+Token:  '|'            | Type: 7  | SQ: 0 | DQ: 0
+ls: cannot access ' '\''|'\''': No such file or directory

@@ -31,3 +31,17 @@ int	ft_isnumeric(const char *str)
 	}
 	return (1);
 }
+
+int	check_operators(char *line, char **tokens, int *pos)
+{
+	while (is_operator(line[pos[1]]))
+		pos[1]++;
+	if (is_quoted(line[pos[1]]) && (!line[pos[1] + 1]
+			|| is_space(line[pos[1] + 1])))
+	{
+		tokens[pos[2]++] = ft_substr(line, pos[0] - 1, pos[1] - pos[0] + 2);
+		pos[0] = pos[1];
+		return (1);
+	}
+	return (0);
+}

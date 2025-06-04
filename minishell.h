@@ -113,6 +113,7 @@ int		char_append(char **res, int *len_buf, char c);
 int		is_multiple_append(char *str);
 int		is_multiple_heredoc(char *str);
 int		ft_isnumeric(const char *str);
+int		check_operators(char *line, char **tokens, int *pos);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

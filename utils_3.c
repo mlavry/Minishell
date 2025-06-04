@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 21:12:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/04 21:31:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ int	ft_isnumeric(const char *str)
 
 int	check_operators(char *line, char **tokens, int *pos)
 {
- 	char	quote_actual;
+	char	quote_actual;
 	int		old_pos;
 
 	old_pos = pos[1] - 1;

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/29 15:19:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/05 13:28:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ bool	parse_line(t_data *data)
 		return (false);
 	}
 	replace_dollars(data);
-	if (!tokenize(data, data->line))
+	if (!tokenize(data))
 	{
 		free(data->line);
 		return (false);

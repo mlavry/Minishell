@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 21:27:49 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/05 13:27:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,7 +284,7 @@ char	*check_next(char *line, char *actual_chain, int *pos)
 	return (res);
 }
 
-char	**line_to_token(char *line)
+char	**line_to_token(t_data *data)
 {
 	char	**tokens;
 	int		pos[3];
@@ -295,13 +295,13 @@ char	**line_to_token(char *line)
 	tokens = malloc(sizeof(char *) * 2000);
 	if (!tokens)
 		return (NULL);
-	while (line[pos[1]])
+	while (data->line[pos[1]])
 	{
-		quote_choice(&sq, &dq, line[pos[1]]);
-		if (!sq && !dq && handle_unquoted(line, tokens, pos))
+		quote_choice(&sq, &dq, data->line[pos[1]]);
+		if (!sq && !dq && handle_unquoted(data->line, tokens, pos))
 			continue ;
-		if (handle_sq(line, tokens, &sq, pos)
-			|| handle_dq(line, tokens, &dq, pos))
+		if (handle_sq(data->line, tokens, &sq, pos)
+			|| handle_dq(data->line, tokens, &dq, pos))
 			continue ;
 		pos[1]++;
 	}

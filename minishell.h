@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 20:52:12 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/05 13:28:54 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,7 @@ typedef struct s_token
 {
 	char			*str;
 	int				type;
-	bool			sq;
-	bool			dq;
+	bool			qu;
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
@@ -77,12 +76,12 @@ typedef struct s_data
 //------------------------Parsing functions---------------------
 bool	parse_line(t_data *data);
 int		open_quote(t_data *data, char *line);
-int		tokenize(t_data *data, char *line);
+int		tokenize(t_data *data);
 int		is_quoted(char c);
 void	stock_and_delete_quote(t_token *token);
 void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
-char	**line_to_token(char *line);
+char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);

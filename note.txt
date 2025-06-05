@@ -55,3 +55,12 @@ Unquote
 Token: ls              | Type: 6  | SQ: 0 | DQ: 0
 Token:  '|'            | Type: 7  | SQ: 0 | DQ: 0
 ls: cannot access ' '\''|'\''': No such file or directory
+
+----------------HERDEDOCS--------------------
+
+bash-3.2$ cat << ''yo
+> $USER
+> yo
+$USER
+
+a partir du moment ou il y a une quote on n'expand pas 

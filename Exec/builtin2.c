@@ -55,44 +55,6 @@ void	built_path(char *newpath, t_data *data)
 	updatepwd(data, &data->env, cwd);
 }
 
-/* void	builtin_cd(char *newpath, t_data *data)
-{
-	const char	*home;
-	char		*expanded_path ;
-	t_env		*old;
-
-	expanded_path = NULL;
-	if (newpath == NULL)
-	{
-		newpath = getenv("HOME");
-		chdir("/home");
-	}
-	if (newpath[0] == '-')
-	{
-		old = find_env_var((data->env), "OLDPWD");
-		if (!old || !old->value)
-		{
-			printf("cd: OLDPWD not set\n");
-			return ;
-		}
-		printf("%s\n", old->value);
-		newpath = old->value;
-	}
-	if (newpath[0] == '~')
-	{
-		home = getenv("HOME");
-		if (home)
-		{
-			expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
-			ft_strcpy(expanded_path, home);
-			ft_strcat(expanded_path, newpath + 1);
-			newpath = expanded_path;
-		}
-	}
-	built_path(newpath, data);
-	free(expanded_path);
-} */
-
 void	builtin_cd(char *newpath, t_data *data)
 {
 	const char	*home;

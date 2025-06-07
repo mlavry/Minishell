@@ -52,7 +52,7 @@ void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 {
 	(void)data;
 	(void)env_list;
-	if ( cmd->args[i][0] == ';')
+	if (cmd->args[i][0] == ';')
 		return ;
 	if (cmd->args[i][0] == '\\')
 	{

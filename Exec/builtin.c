@@ -87,38 +87,31 @@ int	is_numeric(const char *str)
 
 void	builtin_exit(t_data *data)
 {
-	char **args = data->cmd->args;
+	int	exit_code;
 
 	printf("exit\n");
-	if (args[1])
+	if (data->cmd->args[1])
 	{
-		if (!is_numeric(args[1]))
+		if (!is_numeric(data->cmd->args[1]))
 		{
-			// argument non numérique
-			printf("bash: exit: %s: numeric argument required\n", args[1]);
-			free_all(data, 255, true); // quitter avec code 255
+			printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
+			free_all(data, 255, true);
 		}
-		else if (args[2])
+		else if (data->cmd->args[2])
 		{
-			// trop d'arguments
 			printf("bash: exit: too many arguments\n");
 			data->exit_code = 1;
-			return;
 		}
 		else
 		{
-			// argument unique numérique → quitter avec ce code
-			int exit_code = ft_atoi(args[1]) % 256;
+			exit_code = ft_atoi(data->cmd->args[1]) % 256;
 			if (exit_code < 0)
 				exit_code += 256;
 			free_all(data, exit_code, true);
 		}
 	}
 	else
-	{
-		// pas d'arguments → quitter avec le code courant
 		free_all(data, data->exit_code, true);
-	}
 }
 
 void	builtin_env( t_env *env_list, t_data *data)

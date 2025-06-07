@@ -12,6 +12,18 @@
 
 #include "../minishell.h"
 
+void	set_token_prev_links(t_token *tokens)
+{
+	t_token *prev = NULL;
+	while (tokens)
+	{
+		tokens->prev = prev;
+		prev = tokens;
+		tokens = tokens->next;
+	}
+}
+
+
 bool	parse_line(t_data *data)
 {
 	if (open_quote(data, data->line))
@@ -25,6 +37,7 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		return (false);
 	}
+	set_token_prev_links(data->token);
 	data->cmd = tokens_to_commands(data->token, data);
 	if (!(data->cmd))
 	{

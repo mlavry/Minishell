@@ -36,8 +36,8 @@ bool	empty_line(char *line, t_data *data)
 			data->exit_code = 2;
 			return true;
 		}
-	} */
-	while (line[i] && (line[i] == ' ' || line[i] == ':'))
+	}  */
+	while (line[i] && (line[i] == ' ' || line[i] == ':' || line[i] == '.'))
 	{
 		i++;
 		data->exit_code = 0;

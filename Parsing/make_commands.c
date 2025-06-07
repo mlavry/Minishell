@@ -15,7 +15,7 @@
 bool	is_redir(int type)
 {
 	return (type == HEREDOC || type == INPUT
-		|| type == OUTPUT || type == APPEND);
+		|| type == OUTPUT || type == APPEND );
 }
 
 void	mark_commands(t_data *data)

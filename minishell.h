@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
+# ifndef MINISHELL_H
 # define MINISHELL_H
 
 # include "Libft/libft.h"
@@ -30,6 +30,8 @@
 # include <termios.h>
 # include <stdbool.h>
 # include <limits.h>
+# include "Gnl/get_next_line.h"
+
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
@@ -127,6 +129,7 @@ void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
+int	is_fork_builtin(char *cmd);
 void	exec_builtin(t_data *data);
 void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);

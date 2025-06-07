@@ -62,9 +62,8 @@ bool	is_a_directory(char *path, char **args, t_data *data)
 		printf("minishell: command not found\n");
 		data->exit_code = 127;
 		free(path);
-		return true;
+		return (true);
 	}
-
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
 		printf("bash: %s: Is a directory\n", args[0]);
@@ -81,15 +80,15 @@ bool	have_no_permission(char *cmd_path, t_data *data)
 	{
 		printf("minishell: %s: No such file or directory\n", cmd_path);
 		data->exit_code = 127;
-		return true;
+		return (true);
 	}
 	if (access(cmd_path, X_OK) != 0)
 	{
 		printf("minishell: %s: Permission denied\n", cmd_path);
 		data->exit_code = 126;
-		return true;
+		return (true);
 	}
-	return false;
+	return (false);
 }
 
 void	exec_extern_command(char **args, t_env *env, t_data *data)
@@ -99,12 +98,11 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	char		*path;
 
 	status = 0;
-	/* if (!args || !args[0])
+	if (!args || !args[0])
 	{
-		printf("minishell: command not found\n");
-		data->exit_code = 127;
+		data->exit_code = 0;
 		return ;
-	} */
+	}
 	if (ft_strchr(args[0], '/'))
 		path = ft_strdup(args[0]);
 	else

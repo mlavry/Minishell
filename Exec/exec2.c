@@ -40,18 +40,24 @@ void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
 		return ;
+	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
+	{
+		data->exit_code = 1;
+		return ;
+	}
 	if (data->cmd->next)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
 	{
 		if (!ft_strcmp(data->cmd->args[0], "exit"))
-			exit (0);
+			builtin_exit(data);
 		else
 			exec_builtin_redirection(data);
 	}
+	else if (data->cmd->args && data->cmd->args[0])
+		exec_extern_command(data->cmd->args, data->env, data);
 	else
 	{
-		exec_extern_command(data->cmd->args, data->env, data);
 		if (data->cmd->fd_in != STDIN_FILENO)
 			close(data->cmd->fd_in);
 		if (data->cmd->fd_out != STDOUT_FILENO)
@@ -100,7 +106,7 @@ int	ft_atoi_safe(const char *str, int *out)
 	return (1);
 }
 
-void shlvl_verification(t_env *shlvl, int *lvl)
+void	shlvl_verification(t_env *shlvl, int *lvl)
 {
 	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, lvl))
 	{

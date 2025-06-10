@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/05 13:27:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/10 23:54:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -239,7 +239,8 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (pos[1] > pos[0])
 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
-	if (is_quoted(line[pos[1]]) && is_operator(line[pos[1] + 1]))
+	if (is_quoted(line[pos[1]]) && is_operator(line[pos[1] + 1])
+		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
 	{
 		pos[1]++;
 		if (check_operators(line, tokens, pos))
@@ -248,6 +249,7 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 			pos[1]++;
 			return (1);
 		}
+		pos[1]--;
 	}
 	if (!temp && line[pos[1]])
 		temp = ft_strdup("");

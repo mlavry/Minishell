@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 21:31:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/10 23:36:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,15 @@ int	check_operators(char *line, char **tokens, int *pos)
 	char	quote_actual;
 	int		old_pos;
 
-	old_pos = pos[1] - 1;
+	pos[0] = pos[1] - 1;
+	old_pos = pos[1];
 	quote_actual = line[pos[1] - 1];
 	while (is_operator(line[pos[1]]))
 		pos[1]++;
 	if (line[pos[1]] == quote_actual && (!line[pos[1] + 1]
 			|| is_space(line[pos[1] + 1])))
 	{
-		tokens[pos[2]++] = ft_substr(line, pos[0] - 1, pos[1] - pos[0] + 2);
+		tokens[pos[2]++] = ft_substr(line, pos[0], pos[1] - pos[0] + 2);
 		pos[0] = pos[1];
 		return (1);
 	}

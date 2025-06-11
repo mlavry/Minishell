@@ -42,7 +42,7 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 {
 	if (data)
 		data->exit_code = exit_code;
-	ft_putstr_fd("minishell: ", 2);
+	//ft_putstr_fd("minishell: ", 2);
 	if (cmd)
 	{
 		ft_putstr_fd(cmd, 2);
@@ -112,30 +112,10 @@ void	handle_error(char *message)
 	ft_putstr_fd(message, 2);
 	exit(EXIT_FAILURE);
 }
-void	exec_pipe(t_cmd *cmd, t_data *data)
+
+void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
-	int		pipe_fd[2];
-	pid_t	pid;
-	int		prev_fd = -1;
-
-	while (cmd)
-	{
-		if (cmd->next && pipe(pipe_fd) == -1)
-		{
-			perror("pipe");
-			exit(1);
-		}
-
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			exit(1);
-		}
-
-		if (pid == 0)
-		{
-			data->cmd = cmd;
+		data->cmd = cmd;
 			if (cmd->fd_in == -1 || cmd->fd_out == -1)
 					exit(1);  // redirection échouée, on quitte proprement
 
@@ -187,6 +167,124 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			execve(path, cmd->args, convert_env(data->env));
 			perror("execve");
 			exit(127);
+
+}
+void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
+{
+	if (*prev_fd != -1)
+			close(*prev_fd);
+		if (cmd->next)
+		{
+			close(pipe_fd[1]);
+			*prev_fd = pipe_fd[0];
+		}
+}
+
+void	exec_pipe(t_cmd *cmd, t_data *data)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+	int		prev_fd;
+
+	while (cmd)
+	{
+		if (cmd->next && pipe(pipe_fd) == -1)
+		{
+			perror("pipe");
+			exit(1);
+		}
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("fork");
+			exit(1);
+		}
+		if (pid == 0)
+			children(cmd, data, prev_fd, pipe_fd);
+		parent(cmd, pipe_fd, &prev_fd);
+		cmd = cmd->next;
+	}
+	while (wait(NULL) > 0)
+		;
+}
+
+/* 
+void	exec_pipe(t_cmd *cmd, t_data *data)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+	int		prev_fd = -1;
+
+	while (cmd)
+	{
+		if (cmd->next && pipe(pipe_fd) == -1)
+		{
+			perror("pipe");
+			exit(1);
+		}
+
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("fork");
+			exit(1);
+		}
+
+		if (pid == 0)
+		{
+			children(cmd, data, prev_fd, pipe_fd);
+		 	data->cmd = cmd;
+			if (cmd->fd_in == -1 || cmd->fd_out == -1)
+					exit(1);  // redirection échouée, on quitte proprement
+
+			// STDIN ← prev_fd ou redirection
+			if (cmd->fd_in != STDIN_FILENO)
+			{
+				dup2(cmd->fd_in, STDIN_FILENO);
+				close(cmd->fd_in);
+			}
+			else if (prev_fd != -1)
+			{
+				dup2(prev_fd, STDIN_FILENO);
+				close(prev_fd);
+			}
+
+			// STDOUT ← redirection > result OU pipe
+			if (cmd->fd_out != STDOUT_FILENO)
+			{
+				dup2(cmd->fd_out, STDOUT_FILENO);
+				close(cmd->fd_out);
+			}
+			else if (cmd->next)
+			{
+				dup2(pipe_fd[1], STDOUT_FILENO);
+			}
+
+			// 🔒 Ferme les extrémités inutiles
+			if (cmd->next)
+				close(pipe_fd[0]);
+			if (cmd->next || cmd->fd_out == STDOUT_FILENO)
+				close(pipe_fd[1]);
+			if (prev_fd != -1)
+				close(prev_fd);
+
+			// Exécution de la commande
+			if (!cmd->args || !cmd->args[0])
+				exit(0);
+
+			if (isbuiltin(data))
+			{
+				exec_builtin(data);
+				exit(0);
+			}
+
+			char *path = getpath(cmd->args[0], data);
+			if (!path)
+				handle_command_error(cmd->args[0], "command not found\n", 127, data);
+
+			execve(path, cmd->args, convert_env(data->env));
+			perror("execve");
+			exit(127); 
 		}
 
 		// 🧑 Parent
@@ -202,83 +300,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 
 	while (wait(NULL) > 0)
 		;
-}
-
-
-/* void	exec_pipe(t_cmd *cmd, t_data *data)
-{
-	//t_cmd *cmd = data->cmd;
-	(void)data;
-	int pipe_fd[2];
-	int prev_fd = -1;
-	pid_t pid;
-
-	while (cmd)
-	{
-		if (cmd->next)
-			pipe(pipe_fd);
-
-		pid = fork();
-		if (pid == 0)
-		{
-		 	if (isbuiltin(data))
-			{
-				exec_builtin(data);  // ta fonction pour gérer cd, etc.
-				exit(0);
-			} 
-			if (prev_fd != -1)
-			{
-				dup2(prev_fd, STDIN_FILENO);
-				close(prev_fd);
-			}
-			if (cmd->next)
-			{
-				dup2(pipe_fd[1], STDOUT_FILENO);
-				close(pipe_fd[0]);
-				close(pipe_fd[1]);
-			}
-			data->cmd = cmd;
-			if (!cmd->args || !cmd->args[0])
-				exit(0);
-			if (cmd->args && isbuiltin(data))
-			{
-				// 🔁 pour les builtins forkables uniquement !
-				if (is_fork_builtin(cmd->args[0]))
-				{ 
-					exec_builtin(data);
-					exit(0);
-				 }
-				fprintf(stderr, "minishell: %s: builtin not allowed in pipe\n", cmd->args[0]);
-				exit(1); 
-			}
-
-			char *path = getpath(cmd->args[0], data);
-				if (!path)
-					handle_command_error(cmd->args[0], "command not found\n",
-						127, data); 
-			if (execve(path, cmd->args,convert_env(data->env)) == -1)
-			{
-   	 			printf("%s: command not found\n", cmd->args[0]);
-    			exit(127);
-			}   	
-			//execvp(cmd->args[0], cmd->args); // juste pour test
-			//perror("execvp");
-			//exit(1);
-		}
-
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (cmd->next)
-		{
-			close(pipe_fd[1]);
-			prev_fd = pipe_fd[0];
-		}
-		cmd = cmd->next;
-	}
-
-	while (wait(NULL) > 0);
-}   */
-
+} */
  
 /* 
 void	exec_pipe(t_cmd *cmd, t_data *data)

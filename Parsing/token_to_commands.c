@@ -52,7 +52,7 @@ int	handle_arg(t_cmd *cur, t_token *token)
 
 int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
-	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+	if (!cur || !*cur)
 		return (0);
 	if ((*tokens)->type == PIPE && (!(*tokens)->next))
 	{
@@ -63,29 +63,29 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 	if (!cur || !*cur)
 		return (0);
 	return (1);
-} 
+}
 
 
 int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+	if (!cur || !*cur)
 		return (0);
 	if ((*tokens)->type == OUTPUT
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
 		data->exit_code = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
-    		close((*cur)->fd_out);
-
+			close((*cur)->fd_out);
 		(*cur)->fd_out = open((*tokens)->next->str,
 				O_CREAT | O_WRONLY | O_TRUNC, 0644);
 		if ((*cur)->fd_out < 0)
 		{
-			perror("open");
+			printf("%s: No such file or directory\n", (*tokens)->next->str);
 			return (0);
 		}
 		*tokens = (*tokens)->next;
@@ -95,22 +95,23 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 
 int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+	if (!cur || !*cur)
 		return (0);
 	if (tokens && ((*tokens)->type == INPUT)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
 		data->exit_code = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_in != STDIN_FILENO)
-    		close((*cur)->fd_in);
+			close((*cur)->fd_in);
 		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY);
 		if ((*cur)->fd_in < 0)
 		{
-			perror("open");
+			printf("%s: No such file or directory\n", (*tokens)->next->str);
 			return (0);
 		}
 		*tokens = (*tokens)->next;
@@ -121,20 +122,20 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 
 int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
-	if (!cur || !*cur) // <-- AJOUT POUR ÉVITER LE CRASH
+	if (!cur || !*cur)
 		return (0);
-	if ((*tokens)->type == APPEND
-		&& ( !(*tokens)->prev || !(*tokens)->next || (*tokens)->next->type != ARG))
+	if ((*tokens)->type == APPEND && (!(*tokens)->prev
+			|| !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
+    	ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
 		data->exit_code = 2;
 		return (0);
 	}
-    if ((*tokens) && (*tokens)->type == APPEND
+	if ((*tokens) && (*tokens)->type == APPEND
 		&& (*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
 			close((*cur)->fd_out);
-
 		(*cur)->fd_out = open((*tokens)->next->str,
 				O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if ((*cur)->fd_out < 0)
@@ -155,9 +156,10 @@ int handle_heredoc(t_token **tokens, t_cmd *cur, t_data *data)
 
 	char *delimiter = (*tokens)->next->str;
 	char *line;
-	char tmp_filename[64];
-
-	sprintf(tmp_filename, "/tmp/heredoc_%d.tmp", rand());
+	char *newline;
+	char *rand_str = ft_itoa(rand());
+	char *tmp_filename = ft_strjoin("/tmp/heredoc_%d.tmp", rand_str);
+	free(rand_str);
 	int tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (tmp_fd == -1)
 		return perror("open tmp"), 0;
@@ -167,32 +169,25 @@ int handle_heredoc(t_token **tokens, t_cmd *cur, t_data *data)
 		write(1, "> ", 2);
 		line = get_next_line(0);
 		if (!line)
-			break;
-
-		// Supprime le \n pour comparer proprement
-		line[strcspn(line, "\n")] = 0;
-
-		if (strcmp(line, delimiter) == 0)
+			break ;
+		newline = ft_strchr(line, '\n');
+		if (newline)
+			*newline = '\0';
+		if (ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
 			break;
 		}
-
-		write(tmp_fd, line, strlen(line));
-		write(tmp_fd, "\n", 1); // réécris le \n
+		write(tmp_fd, line, ft_strlen(line));
+		write(tmp_fd, "\n", 1);
 		free(line);
 	}
-
 	close(tmp_fd);
-
-	// Redirige vers ce fichier
 	if (cur->fd_in != STDIN_FILENO)
 		close(cur->fd_in);
 	cur->fd_in = open(tmp_filename, O_RDONLY);
 	if (cur->fd_in == -1)
 		return perror("open heredoc read"), 0;
-
-	// NE PAS avancer les tokens ici
 	return 1;
 }
 
@@ -260,8 +255,6 @@ bool is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 			return true;
 		}
 	}
-
-
 	if (tok->type == CMD)
 	{
 		bool ok = handle_cmd(head, cur, tok);
@@ -286,24 +279,18 @@ bool is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 	// ✅ Gérer plusieurs heredocs consécutifs
 	if (tok->type == HEREDOC)
 	{
+		if (tok->type == HEREDOC && (!tok->next || tok->next->type != ARG))
+		{
+    		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+    		data->exit_code = 2;
+    		return false; // ✨ très important
+		}
+
 		if (!handle_heredoc(tokens, *cur, data))
 			return false;
 		*tokens = (*tokens)->next->next; // HEREDOC + ARG
 		return true;
 	}
-
-/* 	while (*tokens && (*tokens)->type == HEREDOC)
-	{
-		if (!handle_heredoc(tokens, *cur, data))
-			return false;
-
-		// Avance de 2 tokens (HEREDOC + ARG)
-		if (*tokens && (*tokens)->next)
-			*tokens = (*tokens)->next->next;
-		else
-			break;
-	} */
-
 	return true;
 }
 
@@ -416,26 +403,26 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 	t_cmd	*head;
 	t_cmd	*cur;
 
-
 	head = NULL;
 	cur = NULL;
-  	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
- 		|| tokens->type == APPEND || tokens->type == HEREDOC))
+	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
+			|| tokens->type == APPEND || tokens->type == HEREDOC))
 	{
-    	cur = ft_calloc(1,sizeof(t_cmd));
+		cur = ft_calloc(1, sizeof(t_cmd));
 		if (!cur)
-			return NULL;
+			return (NULL);
 		cur->fd_in = STDIN_FILENO;
 		cur->fd_out = STDOUT_FILENO;
 		cur->name = ft_strdup("");
 		head = cur;
-	}  
+	}
 	while (tokens)
 	{
 		if (!is_type_token (&tokens, &head, &cur, data))
-			break ;
-			//return (NULL);
-		//tokens = tokens->next;
+		{
+			free_cmd(&head);
+			return NULL;
+		}
 	}
 	return (head);
 }

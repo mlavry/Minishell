@@ -55,57 +55,73 @@ void	built_path(char *newpath, t_data *data)
 	updatepwd(data, &data->env, cwd);
 }
 
-void	builtin_cd(char *newpath, t_data *data)
+static char	*handle_cd_null(t_data *data)
 {
 	const char	*home;
-	char		*expanded_path = NULL;
-	t_env		*old;
-	bool		must_free = false;
 
+	home = getenv("HOME");
+	if (!home)
+	{
+		printf("cd: HOME not set\n");
+		data->exit_code = 1;
+		return (NULL);
+	}
+	return ((char *)home);
+}
+static char *handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
+{
+	t_env *old;
+
+	old = find_env_var(data->env, "OLDPWD");
+	if (!old || !old->value)
+	{
+		printf("cd: OLDPWD not set\n");
+		data->exit_code = 1;
+		return (NULL);
+	}
+	printf("%s\n", old->value);
+	newpath = ft_strdup(old->value);
+	if (!newpath)
+		malloc_failed(data);
+	*must_free = true;
+	return (newpath);
+}
+
+static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
+{
+	const char	*home;
+	char		*expanded_path;
+
+	home = getenv("HOME");
+	if (!home)
+	{
+		printf("cd: HOME not set\n");
+		data->exit_code = 1;
+		return (NULL);
+	}
+	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+	if (!expanded_path)
+		malloc_failed(data);
+	ft_strcpy(expanded_path, home);
+	ft_strcat(expanded_path, newpath + 1);
+	newpath = expanded_path;
+	*must_free = true;
+	return (expanded_path);
+}
+
+void	builtin_cd(char *newpath, t_data *data)
+{
+	bool		must_free;
+
+	must_free = false;
 	if (newpath == NULL)
-	{
-		home = getenv("HOME");
-		if (!home)
-		{
-			printf("cd: HOME not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		newpath = (char *)home;
-	}
+		newpath = handle_cd_null(data);
 	else if (newpath[0] == '-')
-	{
-		old = find_env_var(data->env, "OLDPWD");
-		if (!old || !old->value)
-		{
-			printf("cd: OLDPWD not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		printf("%s\n", old->value);
-		newpath = ft_strdup(old->value);
-		if (!newpath)
-			malloc_failed(data);
-		must_free = true;
-	}
+		newpath = handle_cd_oldpwd(data, &must_free, newpath);
 	else if (newpath[0] == '~')
-	{
-		home = getenv("HOME");
-		if (!home)
-		{
-			printf("cd: HOME not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
-		if (!expanded_path)
-			malloc_failed(data);
-		ft_strcpy(expanded_path, home);
-		ft_strcat(expanded_path, newpath + 1);
-		newpath = expanded_path;
-		must_free = true;
-	}
-	built_path(newpath, data);
+		newpath = handle_cd_home(newpath, data, &must_free);
+	if (newpath)
+		built_path(newpath, data);
 	if (must_free)
 		free(newpath);
 }

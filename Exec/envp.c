@@ -53,10 +53,10 @@ char	*getenvp(t_env *list, char *name)
 	tmp->next = new_var;
 } */
 
-void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+
+t_env	*create_env_var(t_data *data, char *name, char *value)
 {
 	t_env	*new_var;
-	t_env	*tmp;
 
 	new_var = malloc(sizeof(t_env));
 	if (!new_var)
@@ -73,6 +73,16 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 		malloc_failed(data);
 	}
 	new_var->next = NULL;
+	return (new_var);
+}
+
+
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*new_var;
+	t_env	*tmp;
+
+	new_var = create_env_var(data, name, value);
 	if (!*env_list)
 	{
 		*env_list = new_var;

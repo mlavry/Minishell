@@ -74,7 +74,19 @@ Je ne comprend pas d'pu vient ce probleme
 
 Ne pas expand le delimiteur 
 
+'\n' dans le cas ou on ctrl + D dans heredoc
 
 Stock comme un pipe
 
 "|"| a
+
+minishell$ "e"'c''h'"o" ';x;;;d' salut"salut"cava
+Token: echo            | Type: 6  | QU: 0
+Token: ;x;;;d          | Type: 7  | QU: 0
+Token: salutsalutcava  | Type: 7  | QU: 0
+ salutsalutcava
+minishell$ "e"'c''h'"o" 'x;;;d' salut"salut"cava
+Token: echo            | Type: 6  | QU: 0
+Token: x;;;d           | Type: 7  | QU: 0
+Token: salutsalutcava  | Type: 7  | QU: 0
+x;;;d salutsalutcava

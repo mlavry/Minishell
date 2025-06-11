@@ -73,3 +73,8 @@ Je ne comprend pas d'pu vient ce probleme
 ----------------HERDEDOCS--------------------
 
 Ne pas expand le delimiteur 
+
+
+Stock comme un pipe
+
+"|"| a

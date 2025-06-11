@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 16:07:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/11 20:04:03 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	replace_dollars(t_data *data)
 	while (*src)
 	{
 		quote_choice(&sq, &dq, *src);
-		if (*src == '$' && !dq)
+		if (*src == '$' && !dq && !sq)
 		{
 			if (check_quote_dollars(&src))
 				continue ;

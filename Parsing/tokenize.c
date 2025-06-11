@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/11 03:14:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/11 21:30:01 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,27 @@ int	get_token_type(char *str)
 		return (ARG);
 }
 
-/* static void	check_value(t_token *token)
+static void	check_value(t_token *token)
 {
-	
-} */
+	int		i;
+	char	type_quote;
+	char	*res;
+
+	i = 1;
+	if (is_quoted(token->str[0]) && is_operator(token->str[1]))
+	{
+		type_quote = token->str[0];
+		while (is_operator(token->str[i]))
+			i++;
+		if (token->str[i] == type_quote && !(token->str[i + 1]))
+		{
+			res = ft_substr(token->str, 1, i - 1);
+			free(token->str);
+			token->str = res;
+			token->type = ARG;
+		}
+	}
+}
 
 void	add_token(t_token **head, char *value)
 {
@@ -43,8 +60,8 @@ void	add_token(t_token **head, char *value)
 		return ;
 	new->str = ft_strdup(value);
 	new->qu = false;
-	//stock_and_delete_quote(new);
 	new->type = get_token_type(new->str);
+	check_value(new);
 	new->next = NULL;
 	if (!*head)
 		*head = new;

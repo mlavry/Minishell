@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/05 13:44:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/11 03:14:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@ int	get_token_type(char *str)
 	else
 		return (ARG);
 }
+
+/* static void	check_value(t_token *token)
+{
+	
+} */
 
 void	add_token(t_token **head, char *value)
 {

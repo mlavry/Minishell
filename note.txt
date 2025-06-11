@@ -21,6 +21,8 @@ CAS BIZARRE VENANT DE EXEC
 Lorsque l'on rentre uniquement une quote vide ou plusieurs tel que : ''
 on obtient un crash innatendu qui semble venir d'un free de exec
 
+./minishell | ./minishell ne semble pas fonctionner
+
 --------------------------PARSING-------------------------------
 
 Securiser le code :
@@ -62,11 +64,12 @@ token vide avamt | : ''"" |
 
 Je ne sais pas si je devrais renvoyer ca 
 
+minishell$ '|"''|'
+Token: '|'             | Type: 6  | QU: 0
+'|': command not found
+
+Je ne comprend pas d'pu vient ce probleme
+
 ----------------HERDEDOCS--------------------
 
-bash-3.2$ cat << ''yo
-> $USER
-> yo
-$USER
-
-a partir du moment ou il y a une quote on n'expand pas 
+Ne pas expand le delimiteur 

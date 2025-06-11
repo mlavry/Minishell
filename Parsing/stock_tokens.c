@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/11 18:21:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/11 19:19:53 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,7 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos)
-		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
 		(*sq) = false;
@@ -157,8 +156,8 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos)
-		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
+	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
 		(*sq) = false;
@@ -183,8 +182,7 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos)
-		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
 		(*dq) = false;
@@ -205,8 +203,8 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos)
-		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
+	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
 		(*dq) = false;
@@ -277,8 +275,8 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos)
-		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1]))
+	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);
 		pos[1]++;

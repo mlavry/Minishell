@@ -1,0 +1,9 @@
+{
+	"makefile.launchConfigurations": [
+		{
+			"cwd": "/home/mlavry/Documents/Minishell",
+			"binaryPath": "/home/mlavry/Documents/Minishell/minishell",
+			"binaryArgs": []
+		}
+	]
+}

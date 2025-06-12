@@ -40,18 +40,24 @@ void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
 		return ;
+	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
+	{
+		data->exit_code = 1;
+		return ;
+	}
 	if (data->cmd->next)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
 	{
 		if (!ft_strcmp(data->cmd->args[0], "exit"))
-			exit (0);
+			builtin_exit(data);
 		else
 			exec_builtin_redirection(data);
 	}
+	else if (data->cmd->args && data->cmd->args[0])
+		exec_extern_command(data->cmd->args, data->env, data);
 	else
 	{
-		exec_extern_command(data->cmd->args, data->env, data);
 		if (data->cmd->fd_in != STDIN_FILENO)
 			close(data->cmd->fd_in);
 		if (data->cmd->fd_out != STDOUT_FILENO)
@@ -84,23 +90,22 @@ int	ft_atoi_safe(const char *str, int *out)
 		return (0);
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
-	if (str[i] == '+' || str[i] == '-')
-		if (str[i++] == '-')
-			sign = -1;
+	if (str[i++] == '-')
+		sign = -1;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		digit = str[i++] - '0';
 		res = res * 10 + digit;
 		if (sign == 1 && res > INT_MAX)
 			return (0);
-		if (sign == -1 && -res < INT_MIN)
+		if (sign == -1 && (-res) < INT_MIN)
 			return (0);
 	}
 	*out = res * sign;
 	return (1);
 }
 
-void shlvl_verification(t_env *shlvl, int *lvl)
+void	shlvl_verification(t_env *shlvl, int *lvl)
 {
 	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, lvl))
 	{

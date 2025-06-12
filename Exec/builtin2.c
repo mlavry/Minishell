@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 20:32:01 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 02:34:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,95 +55,74 @@ void	built_path(char *newpath, t_data *data)
 	updatepwd(data, &data->env, cwd);
 }
 
-/* void	builtin_cd(char *newpath, t_data *data)
+static char	*handle_cd_null(t_data *data)
 {
 	const char	*home;
-	char		*expanded_path ;
-	t_env		*old;
 
-	expanded_path = NULL;
-	if (newpath == NULL)
+	home = getenv("HOME");
+	if (!home)
 	{
-		newpath = getenv("HOME");
-		chdir("/home");
+		printf("cd: HOME not set\n");
+		data->exit_code = 1;
+		return (NULL);
 	}
-	if (newpath[0] == '-')
+	return ((char *)home);
+}
+
+static char *handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
+{
+	t_env *old;
+
+	old = find_env_var(data->env, "OLDPWD");
+	if (!old || !old->value)
 	{
-		old = find_env_var((data->env), "OLDPWD");
-		if (!old || !old->value)
-		{
-			printf("cd: OLDPWD not set\n");
-			return ;
-		}
-		printf("%s\n", old->value);
-		newpath = old->value;
+		printf("cd: OLDPWD not set\n");
+		data->exit_code = 1;
+		return (NULL);
 	}
-	if (newpath[0] == '~')
+	printf("%s\n", old->value);
+	newpath = ft_strdup(old->value);
+	if (!newpath)
+		malloc_failed(data);
+	*must_free = true;
+	return (newpath);
+}
+
+static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
+{
+	const char	*home;
+	char		*expanded_path;
+
+	home = getenv("HOME");
+	if (!home)
 	{
-		home = getenv("HOME");
-		if (home)
-		{
-			expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
-			ft_strcpy(expanded_path, home);
-			ft_strcat(expanded_path, newpath + 1);
-			newpath = expanded_path;
-		}
+		printf("cd: HOME not set\n");
+		data->exit_code = 1;
+		return (NULL);
 	}
-	built_path(newpath, data);
-	free(expanded_path);
-} */
+	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+	if (!expanded_path)
+		malloc_failed(data);
+	ft_strcpy(expanded_path, home);
+	ft_strcat(expanded_path, newpath + 1);
+	newpath = expanded_path;
+	*must_free = true;
+	return (expanded_path);
+}
 
 void	builtin_cd(char *newpath, t_data *data)
 {
-	const char	*home;
-	char		*expanded_path = NULL;
-	t_env		*old;
-	bool		must_free = false;
+	bool		must_free;
 
+	must_free = false;
 	if (newpath == NULL)
-	{
-		home = getenv("HOME");
-		if (!home)
-		{
-			printf("cd: HOME not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		newpath = (char *)home;
-	}
+		newpath = handle_cd_null(data);
 	else if (newpath[0] == '-')
-	{
-		old = find_env_var(data->env, "OLDPWD");
-		if (!old || !old->value)
-		{
-			printf("cd: OLDPWD not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		printf("%s\n", old->value);
-		newpath = ft_strdup(old->value);
-		if (!newpath)
-			malloc_failed(data);
-		must_free = true;
-	}
+		newpath = handle_cd_oldpwd(data, &must_free, newpath);
 	else if (newpath[0] == '~')
-	{
-		home = getenv("HOME");
-		if (!home)
-		{
-			printf("cd: HOME not set\n");
-			data->exit_code = 1;
-			return ;
-		}
-		expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
-		if (!expanded_path)
-			malloc_failed(data);
-		ft_strcpy(expanded_path, home);
-		ft_strcat(expanded_path, newpath + 1);
-		newpath = expanded_path;
-		must_free = true;
-	}
-	built_path(newpath, data);
+		newpath = handle_cd_home(newpath, data, &must_free);
+	if (newpath)
+		built_path(newpath, data);
 	if (must_free)
 		free(newpath);
 }

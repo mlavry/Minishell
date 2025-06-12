@@ -39,7 +39,7 @@ char	*extract_name(char *arg)
 	if (!arg || *arg == '\0')
 		return (NULL);
 	sign = ft_strchr(arg, '=');
-	if (arg[0] == '=') //|| ft_strchr(arg, ' ') != NULL
+	if (arg[0] == '=')
 		return (NULL);
 	/* if (sign == arg)
 		return (ft_strdup("")); */
@@ -91,10 +91,8 @@ void	built_export(t_data *data, t_env *env_list)
 	{
 		if (ft_strcmp(current->name, "_") != 0)
 		{
-			if (current->value == NULL /*  || current->value[0] == '\0'  */)
+			if (current->value == NULL)
 				printf("declare -x %s\n", current->name);
-			//else if (current->value[0] == '\0')
-			//	printf("declare -x %s=\"\"\n", current->name);
 			else
 				printf("declare -x %s=\"%s\"\n", current->name, current->value);
 		}

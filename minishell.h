@@ -6,11 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/05 13:28:54 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 02:55:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
+# ifndef MINISHELL_H
 # define MINISHELL_H
 
 # include "Libft/libft.h"
@@ -30,6 +30,8 @@
 # include <termios.h>
 # include <stdbool.h>
 # include <limits.h>
+# include "Gnl/get_next_line.h"
+
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
@@ -43,7 +45,6 @@ typedef struct s_token
 {
 	char			*str;
 	int				type;
-	bool			qu;
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
@@ -126,6 +127,7 @@ void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
+int	is_fork_builtin(char *cmd);
 void	exec_builtin(t_data *data);
 void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/04 20:03:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 02:55:16 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,28 @@ int	get_token_type(char *str)
 		return (ARG);
 }
 
+static void	check_value(t_token *token)
+{
+	int		i;
+	char	type_quote;
+	char	*res;
+
+	i = 1;
+	if (is_quoted(token->str[0]) && is_operator(token->str[1]))
+	{
+		type_quote = token->str[0];
+		while (is_operator(token->str[i]))
+			i++;
+		if (token->str[i] == type_quote && !(token->str[i + 1]))
+		{
+			res = ft_substr(token->str, 1, i - 1);
+			free(token->str);
+			token->str = res;
+			token->type = ARG;
+		}
+	}
+}
+
 void	add_token(t_token **head, char *value)
 {
 	t_token	*new;
@@ -37,10 +59,8 @@ void	add_token(t_token **head, char *value)
 	if (!new)
 		return ;
 	new->str = ft_strdup(value);
-	new->sq = false;
-	new->dq = false;
-	//stock_and_delete_quote(new);
 	new->type = get_token_type(new->str);
+	check_value(new);
 	new->next = NULL;
 	if (!*head)
 		*head = new;
@@ -67,20 +87,20 @@ void	parse_token(t_data *data, char **tokens)
 	}
 	data->token = token_list;
 	mark_commands(data);
-/* 	t_token *tmp = token_list;
+	t_token *tmp = token_list;
  	while (tmp)
 	{
-		printf("Token: %-15s | Type: %-2d | SQ: %d | DQ: %d\n", 
-			tmp->str, tmp->type, tmp->sq, tmp->dq);
+		printf("Token: %-15s | Type: %-2d\n",
+			tmp->str, tmp->type);
 		tmp = tmp->next;
-	} */
+	}
 }
 
-int	tokenize(t_data *data, char *line)
+int	tokenize(t_data *data)
 {
 	char	**token;
 
-	token = line_to_token(line);
+	token = line_to_token(data);
 	if (!token)
 	{
 		data->exit_code = 2;

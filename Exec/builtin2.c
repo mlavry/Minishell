@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 20:32:01 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 02:34:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ static char	*handle_cd_null(t_data *data)
 	}
 	return ((char *)home);
 }
+
 static char *handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 {
 	t_env *old;

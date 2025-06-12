@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/29 15:19:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 03:14:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,9 +243,9 @@ bool is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
 
 	if (!tok)
 		return false;
-	if (tok->type == ARG)
+	if (tok && tok->type == ARG)
 	{
-		if (tok->prev &&
+		if (tok && tok->prev && tok->prev->type &&
 			(tok->prev->type == OUTPUT ||
 			tok->prev->type == INPUT ||
 			tok->prev->type == APPEND ||

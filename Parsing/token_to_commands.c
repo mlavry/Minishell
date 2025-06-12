@@ -12,114 +12,6 @@
 
 #include "../minishell.h"
 
-int	handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens)
-{
-	t_cmd	*new;
-
-	new = ft_calloc (1, sizeof(t_cmd));
-	if (!new)
-		return (0);
-	new->name = ft_strdup(tokens->str);
-	if (!new->name)
-	{
-		free(new);
-		return (0);
-	}
-	new->fd_in = STDIN_FILENO;
-	new->fd_out = STDOUT_FILENO;
-	if (!add_args(&new->args, new->name))
-	{
-		free(new->name);
-		free(new);
-		return (0);
-	}
-	if (!(*head))
-		(*head) = new;
-	else
-		(*cur)->next = new;
-	(*cur) = new;
-	return (1);
-}
-
-int	handle_arg(t_cmd *cur, t_token *token)
-{
-	if (!cur)
-		return (0);
-	if (!add_args(&cur->args, token->str))
-		return (0);
-	return (1);
-}
-
-int	handle_pipe(t_token **tokens, t_cmd **cur)
-{
-	if (!cur || !*cur)
-		return (0);
-	if ((*tokens)->type == PIPE && (!(*tokens)->next))
-	{
-		printf("minishell: syntax error near unexpected token `|'\n");
-		return (0);
-	}
-	*tokens = (*tokens)->next;
-	if (!cur || !*cur)
-		return (0);
-	return (1);
-}
-
-
-int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
-{
-	if (!cur || !*cur)
-		return (0);
-	if ((*tokens)->type == OUTPUT
-		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
-		return (0);
-	}
-	if ((*tokens)->next && (*tokens)->next->type == ARG)
-	{
-		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
-			close((*cur)->fd_out);
-		(*cur)->fd_out = open((*tokens)->next->str,
-				O_CREAT | O_WRONLY | O_TRUNC, 0644);
-		if ((*cur)->fd_out < 0)
-		{
-			printf("%s: No such file or directory\n", (*tokens)->next->str);
-			return (0);
-		}
-		*tokens = (*tokens)->next;
-	}
-	return (1);
-}
-
-int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
-{
-	if (!cur || !*cur)
-		return (0);
-	if (tokens && ((*tokens)->type == INPUT)
-		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
-		return (0);
-	}
-	if ((*tokens)->next && (*tokens)->next->type == ARG)
-	{
-		if ((*cur)->fd_in != STDIN_FILENO)
-			close((*cur)->fd_in);
-		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY);
-		if ((*cur)->fd_in < 0)
-		{
-			printf("%s: No such file or directory\n", (*tokens)->next->str);
-			return (0);
-		}
-		*tokens = (*tokens)->next;
-	}
-	return (1);
-}
-
-
 int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 {
 	if (!cur || !*cur)
@@ -127,7 +19,7 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 	if ((*tokens)->type == APPEND && (!(*tokens)->prev
 			|| !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
-    	ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
 		data->exit_code = 2;
 		return (0);
 	}
@@ -148,21 +40,22 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 	return (1);
 }
 
-int handle_heredoc(t_token **tokens, t_cmd *cur, t_data *data)
+char	*heredoc_tmp(void)
 {
-	(void)data;
-	if (!tokens || !*tokens || !(*tokens)->next)
-		return 0;
+	static int	i = 0;
+	char		*num;
+	char		*filename;
 
-	char *delimiter = (*tokens)->next->str;
-	char *line;
-	char *newline;
-	char *rand_str = ft_itoa(rand());
-	char *tmp_filename = ft_strjoin("/tmp/heredoc_%d.tmp", rand_str);
-	free(rand_str);
-	int tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (tmp_fd == -1)
-		return perror("open tmp"), 0;
+	num = ft_itoa(i++);
+	filename = ft_strjoin("/tmp/heredoc_%d.tmp", num);
+	free(num);
+	return (filename);
+}
+
+int	write_heredoc(char *delimiter, int tmp_fd)
+{
+	char	*line;
+	char	*newline;
 
 	while (1)
 	{
@@ -176,191 +69,38 @@ int handle_heredoc(t_token **tokens, t_cmd *cur, t_data *data)
 		if (ft_strcmp(line, delimiter) == 0)
 		{
 			free(line);
-			break;
+			break ;
 		}
 		write(tmp_fd, line, ft_strlen(line));
 		write(tmp_fd, "\n", 1);
 		free(line);
 	}
+	return (1);
+}
+
+int	handle_heredoc(t_token **tokens, t_cmd *cur)
+{
+	char	*delimiter;
+	char	*tmp_filename;
+	int		tmp_fd;
+
+	delimiter = (*tokens)->next->str;
+	tmp_filename = heredoc_tmp();
+	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	if (tmp_fd == -1)
+		return (perror("open tmp"), 0);
+	if (!tokens || !*tokens || !(*tokens)->next)
+		return (0);
+	write_heredoc(delimiter, tmp_fd);
 	close(tmp_fd);
 	if (cur->fd_in != STDIN_FILENO)
 		close(cur->fd_in);
 	cur->fd_in = open(tmp_filename, O_RDONLY);
 	if (cur->fd_in == -1)
-		return perror("open heredoc read"), 0;
-	return 1;
-}
-
-
-/* 
-int	handle_heredoc(t_token **tokens, t_cmd **cur, t_data *data)
-{
-	char	*delimiter;
-	int		pipefd[2];
-	char	*line;
-
-	if (!cur || !*cur || !tokens || !*tokens) // <-- AJOUT POUR ÉVITER LE CRASH
-		return (0);
-	if ((*tokens)->type == HEREDOC
-		&& ( !(*tokens)->prev || !(*tokens)->next || (*tokens)->next->type != ARG))
-	{
-		data->exit_code = 2;
-		return (0);
-	}
-	delimiter = (*tokens)->next->str;
-//	if ((*cur)->fd_in != STDIN_FILENO)
-	//	close((*cur)->fd_in);
-	if (pipe(pipefd) == -1)
-	{
-    	perror("pipe");
-    	return 0;
-	}
-	while(1)
-	{
-		write(1, "> ", 2);
-		line = get_next_line(0);
-		if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter)+1) == 0 
-			 || ft_strcmp(line, ft_strcat(ft_strdup(delimiter), "\n")) == 0 )
-		{
-			free(line);
-			break;
-		}
-		write(pipefd[1], line, ft_strlen(line));
-		free(line);
-	}
-	close(pipefd[1]);
-	(*cur)->fd_in = pipefd[0];
-	*tokens = (*tokens)->next;
+		return (perror("open heredoc read"), 0);
+	free(tmp_filename);
 	return (1);
-} */
-
-
-
-
-bool is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
-{
-	t_token *tok = *tokens;
-
-	if (!tok)
-		return false;
-	if (tok && tok->type == ARG)
-	{
-		if (tok && tok->prev && tok->prev->type &&
-			(tok->prev->type == OUTPUT ||
-			tok->prev->type == INPUT ||
-			tok->prev->type == APPEND ||
-			tok->prev->type == HEREDOC))
-		{
-			*tokens = tok->next;
-			return true;
-		}
-	}
-	if (tok->type == CMD)
-	{
-		bool ok = handle_cmd(head, cur, tok);
-		*tokens = tok->next;
-		return ok;
-	}
-	if (tok->type == ARG)
-	{
-		bool ok = handle_arg(*cur, tok);
-		*tokens = tok->next;
-		return ok;
-	}
-	if (tok->type == OUTPUT)
-		return handle_output(tokens, cur, data);
-	if (tok->type == INPUT)
-		return handle_input(tokens, cur, data);
-	if (tok->type == PIPE)
-		return handle_pipe(tokens, cur);
-	if (tok->type == APPEND)
-		return handle_append(tokens, cur, data);
-
-	// ✅ Gérer plusieurs heredocs consécutifs
-	if (tok->type == HEREDOC)
-	{
-		if (tok->type == HEREDOC && (!tok->next || tok->next->type != ARG))
-		{
-    		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
-    		data->exit_code = 2;
-    		return false; // ✨ très important
-		}
-
-		if (!handle_heredoc(tokens, *cur, data))
-			return false;
-		*tokens = (*tokens)->next->next; // HEREDOC + ARG
-		return true;
-	}
-	return true;
 }
-
-
-
-
-
-
-/* 
-bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
-{
-	if ((*tokens)->type == CMD)
-		return (handle_cmd(head, cur, *tokens));
-	if ((*tokens)->type == ARG)
-		return (handle_arg(*cur, *tokens));
-	if ((*tokens)->type == OUTPUT)
-		return (handle_output(tokens, cur, data));
-	if ((*tokens)->type == INPUT)
-		return (handle_input(tokens, cur, data));
-	if ((*tokens)->type == PIPE)
-		return (handle_pipe(tokens,cur));
- 	while ((*tokens)->type == HEREDOC)
-	{
-       if( !handle_heredoc(tokens, cur, data))
-			return false;
-   		if (*tokens)
-        	*tokens = (*tokens)->next;
-		else
-			break;
-	}
-	if ((*tokens)->type == GREAT || (*tokens)->type == DGREAT)
-		return(handle_output_redirect(tokens,cur, data));
-	if ((*tokens)->type == APPEND)
-        return (handle_append(tokens ,cur, data)); 
-	return (true);
-}  */
-/* bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
-{
-	t_token *tok = data->token;
-	while (tok)
-	{
-		if (tok->type == HEREDOC)
-		{
-			if (!handle_heredoc(&tok, &data->cmd, data))
-				break;
-		}
-		else if (tok->type == GREAT || tok->type == DGREAT)
-		{
-			if (!handle_output_redirect(&tok, &data->cmd, data))
-				break;
-		}
-		else if (tok->type == CMD)
-		{
-			handle_cmd(head, cur, *tokens);
-			tok = tok->next;
-		}
-		else if (tok->type == ARG)
-		{
-			handle_arg(*cur, *tokens);
-			tok = tok->next;
-		}
-		else
-			tok = tok->next;
-	}
-	return true;
-} */
-
-
-
-
 
 /* bool check_token_syntax(t_token *tokens, t_data *data)
 {
@@ -397,6 +137,31 @@ bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
     return true;
 } */
 
+static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
+{
+	t_token	*tok;
+
+	tok = *tokens;
+	if (!tok)
+		return (false);
+	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+		return (true);
+	if (tok->type == CMD)
+		return (handle_cmd_type(tok, head, cur, tokens));
+	if (tok->type == ARG)
+		return (handle_arg_type(tok, *cur, tokens));
+	if (tok->type == OUTPUT)
+		return (handle_output(tokens, cur, data));
+	if (tok->type == INPUT)
+		return (handle_input(tokens, cur, data));
+	if (tok->type == PIPE)
+		return (handle_pipe(tokens, cur));
+	if (tok->type == APPEND)
+		return (handle_append(tokens, cur, data));
+	if (tok->type == HEREDOC)
+		return (handle_heredoc_type(tok, tokens, *cur, data));
+	return (true);
+}
 
 t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 {
@@ -421,7 +186,7 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 		if (!is_type_token (&tokens, &head, &cur, data))
 		{
 			free_cmd(&head);
-			return NULL;
+			return (NULL);
 		}
 	}
 	return (head);

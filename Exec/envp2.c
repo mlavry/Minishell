@@ -12,6 +12,17 @@
 
 #include "../minishell.h"
 
+char	*getenvp(t_env *list, char *name)
+{
+	while (list)
+	{
+		if (ft_strcmp(list->name, name) == 0)
+			return (list->value);
+		list = list->next;
+	}
+	return (NULL);
+}
+
 void	swap_env(t_env *a, t_env *b)
 {
 	char	*tmp;

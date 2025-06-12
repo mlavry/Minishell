@@ -54,3 +54,17 @@ int	check_operators(char *line, char **tokens, int *pos)
 	pos[0] = pos[1];
 	return (0);
 }
+
+void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
+{
+	if (data)
+		data->exit_code = exit_code;
+	//ft_putstr_fd("minishell: ", 2);
+	if (cmd)
+	{
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": ", 2);
+	}
+	ft_putstr_fd(msg, 2);
+	exit(exit_code);
+}

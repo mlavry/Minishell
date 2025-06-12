@@ -41,10 +41,6 @@ char	*extract_name(char *arg)
 	sign = ft_strchr(arg, '=');
 	if (arg[0] == '=')
 		return (NULL);
-	/* if (sign == arg)
-		return (ft_strdup("")); */
-	/*  if (arg[0] == '=')
-		return (ft_strdup(""));  */
 	if (!sign)
 		return (ft_strdup(arg));
 	return (ft_substr(arg, 0, sign - arg));

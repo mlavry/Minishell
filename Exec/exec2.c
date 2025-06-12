@@ -12,6 +12,27 @@
 
 #include "../minishell.h"
 
+bool	is_a_directory(char *path, char **args, t_data *data)
+{
+	struct stat	sb;
+
+	if (!args[0] || args[0][0] == '\0')
+	{
+		printf("minishell: command not found\n");
+		data->exit_code = 127;
+		free(path);
+		return (true);
+	}
+	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		printf("bash: %s: Is a directory\n", args[0]);
+		free(path);
+		data->exit_code = 126;
+		return (true);
+	}
+	return (false);
+}
+
 void	exec_builtin_redirection(t_data *data)
 {
 	int	saved_in;
@@ -76,70 +97,3 @@ t_env	*find_env_var(t_env *env_list, char *name)
 	return (NULL);
 }
 
-int	ft_atoi_safe(const char *str, int *out)
-{
-	int			i;
-	int			sign;
-	int			digit;
-	long long	res;
-
-	i = 0;
-	sign = 1;
-	res = 0;
-	if (!str || !*str)
-		return (0);
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-		i++;
-	if (str[i++] == '-')
-		sign = -1;
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		digit = str[i++] - '0';
-		res = res * 10 + digit;
-		if (sign == 1 && res > INT_MAX)
-			return (0);
-		if (sign == -1 && (-res) < INT_MIN)
-			return (0);
-	}
-	*out = res * sign;
-	return (1);
-}
-
-void	shlvl_verification(t_env *shlvl, int *lvl)
-{
-	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, lvl))
-	{
-		if (*lvl >= 999)
-		{
-			(*lvl)++;
-			printf("warning: shell level (%d)", *lvl);
-			printf(" too high, resetting to 1\n");
-			*lvl = 1;
-		}
-		else if (*lvl < 0)
-			*lvl = 0;
-		else
-			(*lvl)++;
-	}
-}
-
-void	execshell(t_data *data, t_env **env_list)
-{
-	t_env	*shlvl;
-	int		lvl;
-	char	*new_val;
-
-	shlvl = find_env_var(*env_list, "SHLVL");
-	if (!shlvl)
-	{
-		add_env_var(data, env_list, "SHLVL", "1");
-		return ;
-	}
-	lvl = 1;
-	shlvl_verification(shlvl, &lvl);
-	new_val = ft_itoa(lvl);
-	if (!new_val)
-		malloc_failed(data);
-	free(shlvl->value);
-	shlvl->value = new_val;
-}

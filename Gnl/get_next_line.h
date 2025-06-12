@@ -20,7 +20,7 @@
 # include <unistd.h>
 # include <stdlib.h> 
 # include <fcntl.h> 
-#include "libft.h"
+# include "libft.h"
 
 char	*get_next_line(int fd);
 char	*ft_strchr(const char *s, int c);

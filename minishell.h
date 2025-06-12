@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# ifndef MINISHELL_H
+#ifndef MINISHELL_H
 # define MINISHELL_H
 
 # include "Libft/libft.h"
@@ -31,7 +31,6 @@
 # include <stdbool.h>
 # include <limits.h>
 # include "Gnl/get_next_line.h"
-
 
 # define INPUT 1 //"<"
 # define HEREDOC 2 //"<<"
@@ -86,6 +85,21 @@ char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur, t_data *data);
+bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
+bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
+bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
+int		handle_output(t_token **tokens, t_cmd **cur, t_data *data);
+int		handle_input(t_token **tokens, t_cmd **cur, t_data *data);
+int		handle_pipe(t_token **tokens, t_cmd **cur);
+int		handle_heredoc(t_token **tokens, t_cmd *cur);
+int	handle_append(t_token **tokens, t_cmd **cur, t_data *data);
+int	handle_arg(t_cmd *cur, t_token *token);
+int	handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
+
+
+
+//bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
 char	*check_next(char *line, char *actual_chain, int *pos);
@@ -114,6 +128,7 @@ int		is_multiple_append(char *str);
 int		is_multiple_heredoc(char *str);
 int		ft_isnumeric(const char *str);
 int		check_operators(char *line, char **tokens, int *pos);
+int		ft_atoi_safe(const char *str, int *out);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
@@ -127,7 +142,7 @@ void	malloc_failed(t_data *data);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
-int	is_fork_builtin(char *cmd);
+//int		is_fork_builtin(char *cmd);
 void	exec_builtin(t_data *data);
 void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);
@@ -135,6 +150,7 @@ void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
 void	builtin_exit(t_data *data);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
+void	existing_value(t_data *data, t_env **env_list, char *name, char *value);
 int		validate_export_name(char *name);
 char	*extract_name(char *arg);
 char	*extract_value(char *arg);

@@ -12,172 +12,76 @@
 
 #include "../minishell.h"
 
-/* void	input_and_output(t_data *data, int prev_fd, int pipe_fd[2])
+void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
-	if (data->cmd->fd_in != STDIN_FILENO)
+		// STDIN ← prev_fd ou redirection
+	if (cmd->fd_in != STDIN_FILENO)
 	{
-		dup2(data->cmd->fd_in, STDIN_FILENO);
-		close(data->cmd->fd_in);
+		dup2(cmd->fd_in, STDIN_FILENO);
+		close(cmd->fd_in);
 	}
 	else if (prev_fd != -1)
 	{
 		dup2(prev_fd, STDIN_FILENO);
 		close(prev_fd);
 	}
-	if (data->cmd->fd_out != STDOUT_FILENO)
+	// STDOUT ← redirection > result OU pipe
+	if (cmd->fd_out != STDOUT_FILENO)
 	{
-		dup2(data->cmd->fd_out, STDOUT_FILENO);
-		close(data->cmd->fd_out);
+		dup2(cmd->fd_out, STDOUT_FILENO);
+		close(cmd->fd_out);
 	}
-	else if (data->cmd->next)
+	else if (cmd->next)
 	{
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		//close(pipe_fd[1]);
-	}
-	close(pipe_fd[1]);
-	if (data->cmd->next)
-		close(pipe_fd[0]);
-} */
-void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
-{
-	if (data)
-		data->exit_code = exit_code;
-	//ft_putstr_fd("minishell: ", 2);
-	if (cmd)
-	{
-		ft_putstr_fd(cmd, 2);
-		ft_putstr_fd(": ", 2);
-	}
-	ft_putstr_fd(msg, 2);
-	exit(exit_code);
-}
-
-/* void	childprocess(t_data *data, int prev_fd, int pipe_fd[2])
-{
-
-	if (!isbuiltin(data))
-	{
-		//if (!getpath(data->cmd->args[0], data))
-		char *path = getpath(data->cmd->args[0], data);
-		if (!path)
-			handle_command_error(data->cmd->args[0], "command not found\n",
-			127, data);
-	} 
-	input_and_output(data, prev_fd, pipe_fd);
- 	if (prev_fd != -1)
-		close(prev_fd); 
-	if (data->cmd->next)
-	{
-		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 	}
+	// 🔒 Ferme les extrémités inutiles
+	if (cmd->next)
+		close(pipe_fd[0]);
+/* 	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
+		close(pipe_fd[1]);
+	if (prev_fd != -1)
+		close(prev_fd); */
+}
+
+void	exec_command(t_cmd *cmd, t_data *data)
+{
+	char	*path;
+		// Exécution de la commande
+	if (!cmd->args || !cmd->args[0])
+		exit(0);
 	if (isbuiltin(data))
 	{
-		if (ft_strcmp(data->cmd->args[0], "exit") == 0)
-			exit(0);
-		else
-			exec_builtin(data);
+		exec_builtin(data);
+		exit(0);
 	}
-	else
-		exec_extern_command(data->cmd->args, data->env, data);
-	exit(EXIT_SUCCESS);
-} */
+	path = getpath(cmd->args[0], data);
+	if (!path)
+		handle_command_error(cmd->args[0], "command not found\n", 127, data);
+	execve(path, cmd->args, convert_env(data->env));
+	perror("execve");
+	exit(127);
+}
 
-/* void	parent_process(int *prev_fd, t_cmd **cmd, int *pipe_fd, t_data *data)
+void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
-	int	status;
+	data->cmd = cmd;
+/* 	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement */
+	setup_outandin(cmd, prev_fd, pipe_fd);
+	exec_command(cmd, data);
+}
 
+void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
+{
 	if (*prev_fd != -1)
 		close(*prev_fd);
-	if ((*cmd)->next)
+	if (cmd->next)
 	{
 		close(pipe_fd[1]);
 		*prev_fd = pipe_fd[0];
 	}
-	else
-		*prev_fd = -1;
-	*cmd = (*cmd)->next;
-
-	while (wait(&status) > 0)
-	{
-		if (WIFEXITED(status))
-			data->exit_code = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			data->exit_code = 128 + WTERMSIG(status);
-	}
-} */
-
-void	handle_error(char *message)
-{
-	ft_putstr_fd(message, 2);
-	exit(EXIT_FAILURE);
-}
-
-void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
-{
-		data->cmd = cmd;
-			if (cmd->fd_in == -1 || cmd->fd_out == -1)
-					exit(1);  // redirection échouée, on quitte proprement
-
-			// STDIN ← prev_fd ou redirection
-			if (cmd->fd_in != STDIN_FILENO)
-			{
-				dup2(cmd->fd_in, STDIN_FILENO);
-				close(cmd->fd_in);
-			}
-			else if (prev_fd != -1)
-			{
-				dup2(prev_fd, STDIN_FILENO);
-				close(prev_fd);
-			}
-
-			// STDOUT ← redirection > result OU pipe
-			if (cmd->fd_out != STDOUT_FILENO)
-			{
-				dup2(cmd->fd_out, STDOUT_FILENO);
-				close(cmd->fd_out);
-			}
-			else if (cmd->next)
-			{
-				dup2(pipe_fd[1], STDOUT_FILENO);
-			}
-
-			// 🔒 Ferme les extrémités inutiles
-			if (cmd->next)
-				close(pipe_fd[0]);
-			if (cmd->next || cmd->fd_out == STDOUT_FILENO)
-				close(pipe_fd[1]);
-			if (prev_fd != -1)
-				close(prev_fd);
-
-			// Exécution de la commande
-			if (!cmd->args || !cmd->args[0])
-				exit(0);
-
-			if (isbuiltin(data))
-			{
-				exec_builtin(data);
-				exit(0);
-			}
-
-			char *path = getpath(cmd->args[0], data);
-			if (!path)
-				handle_command_error(cmd->args[0], "command not found\n", 127, data);
-
-			execve(path, cmd->args, convert_env(data->env));
-			perror("execve");
-			exit(127);
-
-}
-void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
-{
-	if (*prev_fd != -1)
-			close(*prev_fd);
-		if (cmd->next)
-		{
-			close(pipe_fd[1]);
-			*prev_fd = pipe_fd[0];
-		}
 }
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
@@ -186,6 +90,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	pid_t	pid;
 	int		prev_fd;
 
+	prev_fd = -1;
 	while (cmd)
 	{
 		if (cmd->next && pipe(pipe_fd) == -1)
@@ -207,138 +112,3 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	while (wait(NULL) > 0)
 		;
 }
-
-/* 
-void	exec_pipe(t_cmd *cmd, t_data *data)
-{
-	int		pipe_fd[2];
-	pid_t	pid;
-	int		prev_fd = -1;
-
-	while (cmd)
-	{
-		if (cmd->next && pipe(pipe_fd) == -1)
-		{
-			perror("pipe");
-			exit(1);
-		}
-
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			exit(1);
-		}
-
-		if (pid == 0)
-		{
-			children(cmd, data, prev_fd, pipe_fd);
-		 	data->cmd = cmd;
-			if (cmd->fd_in == -1 || cmd->fd_out == -1)
-					exit(1);  // redirection échouée, on quitte proprement
-
-			// STDIN ← prev_fd ou redirection
-			if (cmd->fd_in != STDIN_FILENO)
-			{
-				dup2(cmd->fd_in, STDIN_FILENO);
-				close(cmd->fd_in);
-			}
-			else if (prev_fd != -1)
-			{
-				dup2(prev_fd, STDIN_FILENO);
-				close(prev_fd);
-			}
-
-			// STDOUT ← redirection > result OU pipe
-			if (cmd->fd_out != STDOUT_FILENO)
-			{
-				dup2(cmd->fd_out, STDOUT_FILENO);
-				close(cmd->fd_out);
-			}
-			else if (cmd->next)
-			{
-				dup2(pipe_fd[1], STDOUT_FILENO);
-			}
-
-			// 🔒 Ferme les extrémités inutiles
-			if (cmd->next)
-				close(pipe_fd[0]);
-			if (cmd->next || cmd->fd_out == STDOUT_FILENO)
-				close(pipe_fd[1]);
-			if (prev_fd != -1)
-				close(prev_fd);
-
-			// Exécution de la commande
-			if (!cmd->args || !cmd->args[0])
-				exit(0);
-
-			if (isbuiltin(data))
-			{
-				exec_builtin(data);
-				exit(0);
-			}
-
-			char *path = getpath(cmd->args[0], data);
-			if (!path)
-				handle_command_error(cmd->args[0], "command not found\n", 127, data);
-
-			execve(path, cmd->args, convert_env(data->env));
-			perror("execve");
-			exit(127); 
-		}
-
-		// 🧑 Parent
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (cmd->next)
-		{
-			close(pipe_fd[1]);
-			prev_fd = pipe_fd[0];
-		}
-		cmd = cmd->next;
-	}
-
-	while (wait(NULL) > 0)
-		;
-} */
- 
-/* 
-void	exec_pipe(t_cmd *cmd, t_data *data)
-{
-	int		pipe_fd[2];
-	pid_t	pid;
-	int		prev_fd;
-
-	while (cmd)
-	{
-		printf("🧵 PIPE exec: cmd='%s'\n", cmd->args ? cmd->args[0] : "(null)");
-
-		data->cmd = cmd;
-		if (cmd->next && pipe(pipe_fd) == -1)
-			perror("pipe");
-			//handle_error("pipe failed\n");
-		pid = fork();
-		if (pid == -1)
-			handle_error("fork error\n");
-		if (pid == 0)
-		{
-			if (!isbuiltin(data))
-			{
-				char *path = getpath(cmd->args[0], data);
-				if (!path)
-					handle_command_error(cmd->args[0], "command not found\n",
-						127, data);
-			} 
-		 	if (execve(path, cmd->args,convert_env(data->env)) == -1)
-			{
-   	 			printf("%s: command not found\n", cmd->args[0]);
-    			exit(127);
-			}    
-			childprocess(data, prev_fd, pipe_fd);
-		}
-		else
-			parent_process(&prev_fd, &cmd, pipe_fd, data);
-	}
-	while (wait(NULL) > 0)
-		;
-}  */

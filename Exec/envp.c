@@ -12,48 +12,6 @@
 
 #include "../minishell.h"
 
-char	*getenvp(t_env *list, char *name)
-{
-	while (list)
-	{
-		if (ft_strcmp(list->name, name) == 0)
-			return (list->value);
-		list = list->next;
-	}
-	return (NULL);
-}
-/* void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
-{
-	t_env	*new_var;
-	t_env	*tmp;
-
-	new_var = malloc(sizeof(t_env));
-	if (!new_var)
-	{
-		free(name);
-		malloc_failed(data);
-	}
-	new_var->name = ft_strdup(name);
-	new_var->value = ft_strdup(value);
-	if (!new_var->name || !new_var->value)
-	{
-		free(name);
-		free_env(&new_var);
-		malloc_failed(data);
-	}
-	new_var->next = NULL;
-	if (!*env_list)
-	{
-		*env_list = new_var;
-		return ;
-	}
-	tmp = *env_list;
-	while (tmp->next)
-		tmp = tmp->next;
-	tmp->next = new_var;
-} */
-
-
 t_env	*create_env_var(t_data *data, char *name, char *value)
 {
 	t_env	*new_var;
@@ -76,7 +34,6 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 	return (new_var);
 }
 
-
 void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*new_var;
@@ -93,80 +50,6 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 		tmp = tmp->next;
 	tmp->next = new_var;
 }
-/* 
-void	copy_env(t_env *tmp, int count, char **envp)
-{
-	int		i;
-	size_t	len;
-
-	i = 0;
-	while (i < count)
-	{
-		if (tmp->value == NULL)
-		{
-			tmp = tmp->next;
-			continue ; // ne pas inclure cette variable dans envp
-		}
-		len = ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2;
-		envp[i] = malloc(len);
-		if (!envp[i])
-		{
-			perror("malloc");
-			exit(EXIT_FAILURE);
-		}
-		ft_strcpy(envp[i], tmp->name);
-		ft_strcat(envp[i], "=");
-		ft_strcat(envp[i], tmp->value);
-		tmp = tmp->next;
-		i++;
-	}
-} */
-
-/* int count_env_vars(t_env *env_list)
-{
-    int count = 0;
-    while (env_list)
-    {
-        if (env_list->value != NULL)
-            count++;
-        env_list = env_list->next;
-    }
-    return count;
-}
-
-char **convert_env(t_env *env_list)
-{
-    int count = count_env_vars(env_list);
-    char **envp = malloc((count + 1) * sizeof(char *));
-    int i = 0;
-    
-    if (!envp)
-    {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    while (env_list)
-    {
-        if (env_list->value != NULL)
-        {
-            size_t len = ft_strlen(env_list->name) + ft_strlen(env_list->value) + 2;
-            envp[i] = malloc(len);
-            if (!envp[i])
-            {
-                perror("malloc");
-                exit(EXIT_FAILURE);
-            }
-            ft_strcpy(envp[i], env_list->name);
-            ft_strcat(envp[i], "=");
-            ft_strcat(envp[i], env_list->value);
-            i++;
-        }
-        env_list = env_list->next;
-    }
-    envp[i] = NULL;
-    return envp;
-} */
-
 
 void	copy_env(t_env *tmp, char **envir)
 {

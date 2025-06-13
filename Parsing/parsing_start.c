@@ -14,7 +14,9 @@
 
 void	set_token_prev_links(t_token *tokens)
 {
-	t_token *prev = NULL;
+	t_token	*prev;
+
+	prev = NULL;
 	while (tokens)
 	{
 		tokens->prev = prev;
@@ -23,49 +25,59 @@ void	set_token_prev_links(t_token *tokens)
 	}
 }
 
-
-
-bool validate_tokens(t_token *tokens, t_data *data)
+bool	check_redirection_syntax(t_token *tok, t_data *data)
 {
-    while (tokens)
-    {
-        if (tokens->type == OUTPUT || tokens->type == INPUT
-            || tokens->type == APPEND || tokens->type == HEREDOC)
-        {
-            if (!tokens->next || tokens->next->type != ARG)
-            {
-                ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-                if (!tokens->next)
-                    ft_putstr_fd("newline", 2);
-                else
-                    ft_putstr_fd(tokens->next->str, 2);
-                ft_putstr_fd("'\n", 2);
-                data->exit_code = 2;
-                return false;
-            }
-        }
-        else if (tokens->type == PIPE)
-        {
-            // PIPE en début ou fin de ligne ?
-            if (!tokens->prev || !tokens->next)
-            {
-                ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
-                data->exit_code = 2;
-                return false;
-            }
-            // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
-            if (tokens->prev->type == PIPE || tokens->next->type == PIPE)
-            {
-                ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
-                data->exit_code = 2;
-                return false;
-            }
-        }
-        tokens = tokens->next;
-    }
-    return true;
+	if (!tok->next || tok->next->type != ARG)
+	{
+		ft_putstr_fd("shel: syntax error near unexpected token `", 2);
+		if (!tok->next)
+			ft_putstr_fd("newline", 2);
+		else
+			ft_putstr_fd(tok->next->str, 2);
+		ft_putstr_fd("'\n", 2);
+		data->exit_code = 2;
+		return (false);
+	}
+	return (true);
 }
 
+bool	check_pipe_syntax(t_token *tok, t_data *data)
+{
+	if (!tok->prev || !tok->next)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+		data->exit_code = 2;
+		return (false);
+	}
+   // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
+	if (tok->prev->type == PIPE || tok->next->type == PIPE)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
+		data->exit_code = 2;
+		return (false);
+	}
+	return (true);
+}
+
+bool	validate_tokens(t_token *tokens, t_data *data)
+{
+	while (tokens)
+	{
+		if (tokens->type == OUTPUT || tokens->type == INPUT
+			|| tokens->type == APPEND || tokens->type == HEREDOC)
+		{
+			if (!check_redirection_syntax(tokens, data))
+				return (false);
+		}
+		else if (tokens->type == PIPE)
+		{
+			if (!check_pipe_syntax(tokens, data))
+				return (false);
+		}
+		tokens = tokens->next;
+	}
+	return (true);
+}
 
 bool	parse_line(t_data *data)
 {
@@ -83,11 +95,10 @@ bool	parse_line(t_data *data)
 	set_token_prev_links(data->token);
 	if (!validate_tokens(data->token, data))
 	{
-   	 	free(data->line);
-   		 free_token(&data->token);
-   	 	return false;
+		free(data->line);
+		free_token(&data->token);
+		return (false);
 	}
-
 	data->cmd = tokens_to_commands(data->token, data);
 	if (!(data->cmd))
 	{

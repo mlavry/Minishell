@@ -6,26 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 02:34:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:32:01 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
-void	emptyenv(t_data *data, t_env **env_list)
-{
-	char	*cwd;
-
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		malloc_failed(data);
-	if (*env_list == NULL)
-	{
-		add_env_var(data, env_list, "PWD", cwd);
-		add_env_var(data, env_list, "SHLVL", "1");
-	}
-	free(cwd);
-}
 
 void	built_path(char *newpath, t_data *data)
 {
@@ -69,9 +54,9 @@ static char	*handle_cd_null(t_data *data)
 	return ((char *)home);
 }
 
-static char *handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
+static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 {
-	t_env *old;
+	t_env	*old;
 
 	old = find_env_var(data->env, "OLDPWD");
 	if (!old || !old->value)
@@ -125,45 +110,4 @@ void	builtin_cd(char *newpath, t_data *data)
 		built_path(newpath, data);
 	if (must_free)
 		free(newpath);
-}
-
-void	unset(t_env **env_list, char *name )
-{
-	t_env	*current;
-	t_env	*previous;
-
-	current = *env_list;
-	previous = NULL;
-	while (current)
-	{
-		if (ft_strcmp(current->name, name) == 0)
-		{
-			if (previous)
-				previous->next = current->next;
-			else
-				*env_list = current->next;
-			free(current->name);
-			free(current->value);
-			free(current);
-			break ;
-		}
-		previous = current;
-		current = current->next;
-	}
-}
-
-void	builtin_unset(t_env **env_list, t_cmd *cmd)
-{
-	char	*name;
-	int		i;
-
-	if (!cmd->args || !cmd->args[1])
-		return ;
-	i = 1;
-	while (cmd->args[i])
-	{
-		name = cmd->args[i];
-		unset(env_list, name);
-		i++;
-	}
 }

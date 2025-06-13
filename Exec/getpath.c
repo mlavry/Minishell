@@ -58,10 +58,8 @@ char	*getpath(char *cmd, t_data *data)
 	fullpath = get_absolute_path(cmd);
 	if (fullpath)
 		return (fullpath);
-
 	fullpath = find_cmd_path(cmd, data->env);
 	if (!fullpath)
 		data->exit_code = 127;
-
 	return (fullpath);
 }

@@ -69,7 +69,6 @@ int	is_multiple_heredoc(char *str)
 	return (0);
 }
 
-
 int	is_multiple_append(char *str)
 {
 	while (*str)
@@ -96,4 +95,3 @@ int	is_multiple_append(char *str)
 	}
 	return (0);
 }
-

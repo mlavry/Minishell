@@ -43,27 +43,6 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 	exit(127);
 }
 
-bool	is_a_directory(char *path, char **args, t_data *data)
-{
-	struct stat	sb;
-
-	if (!args[0] || args[0][0] == '\0')
-	{
-		printf("minishell: command not found\n");
-		data->exit_code = 127;
-		free(path);
-		return (true);
-	}
-	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
-	{
-		printf("bash: %s: Is a directory\n", args[0]);
-		free(path);
-		data->exit_code = 126;
-		return (true);
-	}
-	return (false);
-}
-
 bool	have_no_permission(char *cmd_path, t_data *data)
 {
 	if (access(cmd_path, F_OK) != 0)
@@ -84,9 +63,10 @@ bool	have_no_permission(char *cmd_path, t_data *data)
 void	launch_extern_command(char **args, t_env *env, t_data *data)
 {
 	pid_t	pid;
-	int		status = 0;
+	int		status;
 	char	*path;
 
+	status = 0;
 	if (ft_strchr(args[0], '/'))
 		path = ft_strdup(args[0]);
 	else
@@ -124,9 +104,6 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	}
 	launch_extern_command(args, env, data);
 }
-
-
-
 
 /* void	exec_extern_command(char **args, t_env *env, t_data *data)
 {

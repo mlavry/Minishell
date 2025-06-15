@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec3.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:16:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:16:35 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/13 13:25:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,14 @@ int	ft_atoi_safe(const char *str, int *out)
 		return (0);
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
 		i++;
-	if (str[i++] == '-')
-		sign = -1;
+	if (str[i] == '+' || str[i] == '-')
+		if (str[i++] == '-')
+			sign = -1;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		digit = str[i++] - '0';
 		res = res * 10 + digit;
-		if (sign == 1 && res > INT_MAX)
-			return (0);
-		if (sign == -1 && (-res) < INT_MIN)
+		if ((sign == 1 && res > INT_MAX) || (sign == -1 && (-res) < INT_MIN))
 			return (0);
 	}
 	*out = res * sign;

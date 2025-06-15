@@ -93,13 +93,9 @@ int		handle_output(t_token **tokens, t_cmd **cur, t_data *data);
 int		handle_input(t_token **tokens, t_cmd **cur, t_data *data);
 int		handle_pipe(t_token **tokens, t_cmd **cur);
 int		handle_heredoc(t_token **tokens, t_cmd *cur);
-int	handle_append(t_token **tokens, t_cmd **cur, t_data *data);
-int	handle_arg(t_cmd *cur, t_token *token);
-int	handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
-
-
-
-//bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data);
+int		handle_append(t_token **tokens, t_cmd **cur, t_data *data);
+int		handle_arg(t_cmd *cur, t_token *token);
+int		handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
 char	*check_next(char *line, char *actual_chain, int *pos);

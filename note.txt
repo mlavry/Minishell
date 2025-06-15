@@ -90,3 +90,55 @@ Token: echo            | Type: 6  | QU: 0
 Token: x;;;d           | Type: 7  | QU: 0
 Token: salutsalutcava  | Type: 7  | QU: 0
 x;;;d salutsalutcava
+
+
+mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i ./minishell
+minishell$ env
+Token: env             | Type: 6 
+SHLVL=1
+_=/usr/bin/env
+minishell$ unset SHLVL
+Token: unset           | Type: 6 
+Token: SHLVL           | Type: 7 
+minishell$ ./minishell
+Token: ./minishell     | Type: 6 
+minishell$ env
+Token: env             | Type: 6 
+[1]    691624 segmentation fault  env -i ./minishell
+mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i ./minishell
+minishell$ env
+Token: env             | Type: 6 
+SHLVL=1
+_=/usr/bin/env
+minishell$ unset _
+Token: unset           | Type: 6 
+Token: _               | Type: 7 
+minishell$ ./minishell
+Token: ./minishell     | Type: 6 
+minishell$ env
+Token: env             | Type: 6 
+SHLVL=2
+_=/usr/bin/env
+minishell$ unset SHLVL
+Token: unset           | Type: 6 
+Token: SHLVL           | Type: 7 
+minishell$ ./minishell
+Token: ./minishell     | Type: 6 
+minishell$ env
+Token: env             | Type: 6 
+minishell$ env
+Token: env             | Type: 6 
+SHLVL=1
+_=/usr/bin/env
+minishell$ exit
+mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i bash       
+mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ env
+PWD=/home/mlavry/Documents/Minishell
+SHLVL=1
+_=/usr/bin/env
+mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ unset PWD SHLVL
+mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ bash
+mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ env
+PWD=/home/mlavry/Documents/Minishell
+SHLVL=1
+_=/usr/bin/env

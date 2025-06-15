@@ -43,6 +43,8 @@ void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 		free(old->value);
 		old->value = ft_strdup(oldpath);
 	}
+	else
+		add_env_var(NULL, env_list, "OLDPWD", oldpath);
 	if (newpwd && pwd)
 	{
 		free(pwd->value);

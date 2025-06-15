@@ -82,7 +82,7 @@ void	emptyenv(t_data *data, t_env **env_list)
 	if (*env_list == NULL)
 	{
 		add_env_var(data, env_list, "PWD", cwd);
-		add_env_var(data, env_list, "SHLVL", "1");
+		add_env_var(data, env_list, "PATH", "/usr/bin:/bin");
 	}
 	free(cwd);
 }

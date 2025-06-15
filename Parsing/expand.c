@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/11 20:04:03 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/12 19:04:31 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,22 +66,67 @@ void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 	(*src)++;
 }
 
-int	check_quote_dollars(char **src)
+static bool is_shell_delim(char c)
 {
-	int	i;
+    return (c == '|' || c == '&' || c == ';' ||
+            c == '(' || c == ')' || c == '<' || c == '>');
+}
 
-	i = 1;
-	if (is_quoted((*src)[i]))
-	{
-		(*src)++;
-		return (1);
-	}
-	if (ft_isdigit((*src)[i]))
-	{
-		(*src) += 2;
-		return (1);
-	}
-	return (0);
+/*  cur pointe sur le '$'
+    line_start est data->line (début de la commande)           */
+static bool  is_in_heredoc_delim(char *cur, char *line_start)
+{
+    char *p = cur;
+
+    /* ① remonter jusqu’au début du MOT (= pas d’espace ni sep.) */
+    while (p > line_start &&
+           !is_space(*(p - 1)) &&
+           !is_shell_delim(*(p - 1)))
+        --p;
+
+    /* ② reculer encore pour sauter les espaces éventuels        */
+    while (p > line_start && is_space(*(p - 1)))
+        --p;
+
+    /* ③ tester ‘<<’ ou ‘<<-’ juste avant */
+    if (p - line_start >= 2 &&
+        *(p - 1) == '<' && *(p - 2) == '<')
+        return true;
+
+    if (p - line_start >= 3 &&
+        *(p - 1) == '-' &&
+        *(p - 2) == '<' && *(p - 3) == '<')
+        return true;
+
+    return false;          /* → ce n’est pas le délimiteur */
+}
+
+/* retourne 1 si on NE doit PAS expander  */
+int  check_quote_dollars(char **res, int *len_buf, char **src, t_data *data)
+{
+    /* a) le $ est dans le mot-délimiteur here-doc -------------- */
+    if (is_in_heredoc_delim(*src, data->line))
+    {
+		if (!char_append(res, len_buf, *(*src)))
+			malloc_failed(data);
+        (*src)++;          /* on garde le caractère tel quel      */
+        return 1;
+    }
+
+    /* b) juste après un guillemet ------------------------------ */
+    if (is_quoted((*src)[1]))
+    {
+        (*src)++;
+        return 1;
+    }
+
+    /* c) cas $<digit> ----------------------------------------- */
+    if (ft_isdigit((*src)[1]))
+    {
+        (*src) += 2;
+        return 1;
+    }
+    return 0;              /* expansion normale sinon             */
 }
 
 void	replace_dollars(t_data *data)
@@ -104,7 +149,7 @@ void	replace_dollars(t_data *data)
 		quote_choice(&sq, &dq, *src);
 		if (*src == '$' && !dq && !sq)
 		{
-			if (check_quote_dollars(&src))
+			if (check_quote_dollars(&res, &len_buf, &src, data))
 				continue ;
 		}
 		if (*src == '$' && !sq)

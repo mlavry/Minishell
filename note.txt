@@ -142,3 +142,10 @@ mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ env
 PWD=/home/mlavry/Documents/Minishell
 SHLVL=1
 _=/usr/bin/env
+
+
+0
+minishell$ echo la | lo >>>>>>>>>>>>>
+lo: command not found
+minishell$ echo $?
+0

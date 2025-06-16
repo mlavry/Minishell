@@ -61,15 +61,16 @@ bool	empty_line(char *line, t_data *data)
 	return (false);
 }
 
-
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
 	init_data(&data, argc, argv, envp);
-	parse_env(envp, &data);
+	if (!envp || !*envp || !envp[0])
+		emptyenv(&data, &data.env);
+	else
+		parse_env(envp, &data);
 	execshell(&data, &data.env);
-	emptyenv(&data, &data.env);
 	while (1)
 	{
 		data.line = readline("minishell$ ");
@@ -91,6 +92,7 @@ int	main(int argc, char *argv[], char **envp)
 		free(data.line);
 	}
 	free_all(&data, 0, true);
+	//close_all_fd();
 	clear_history();
 	return (0);
 }

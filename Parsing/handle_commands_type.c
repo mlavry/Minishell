@@ -18,11 +18,11 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur, t_data *data)
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
 		data->exit_code = 2;
-		return (false); // ✨ très important
+		return (false);
 	}
 	if (!handle_heredoc(tok, cur))
 		return (false);
-	*tok = (*tok)->next->next; // HEREDOC + ARG
+	*tok = (*tok)->next->next;
 	return (true);
 }
 
@@ -57,5 +57,3 @@ bool	handle_redirectarg_type(t_token *tok, t_token **tokens)
 	}
 	return (false);
 }
-
-

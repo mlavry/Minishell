@@ -80,9 +80,17 @@ void	executecommand(t_data *data)
 	else
 	{
 		if (data->cmd->fd_in != STDIN_FILENO)
+		{
 			close(data->cmd->fd_in);
+			data->cmd->fd_in =STDIN_FILENO;
+		}
 		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
 			close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO;
+		}
+		while(wait(NULL) > 0)
+			;
 	}
 }
 
@@ -96,4 +104,3 @@ t_env	*find_env_var(t_env *env_list, char *name)
 	}
 	return (NULL);
 }
-

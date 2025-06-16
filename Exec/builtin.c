@@ -70,6 +70,23 @@ int	is_numeric(const char *str)
 	return (1);
 }
 
+static int	validate_exit_code(t_data *data, int *exit_code)
+{
+	if (!is_numeric(data->cmd->args[1]))
+	{
+		printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
+		free_all(data, 2, true);
+		return (0);
+	}
+	else if (!ft_atoi_safe(data->cmd->args[1], exit_code))
+	{
+		printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
+		free_all(data, 2, true);
+		return (0);
+	}
+	return (1);
+}
+
 void	builtin_exit(t_data *data)
 {
 	int	exit_code;
@@ -77,16 +94,8 @@ void	builtin_exit(t_data *data)
 	printf("exit\n");
 	if (data->cmd->args[1])
 	{
-		if (!is_numeric(data->cmd->args[1]))
-		{
-			printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
-			free_all(data, 2, true);
-		}
-		else if (!ft_atoi_safe(data->cmd->args[1], &exit_code))
-		{
-			printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
-			free_all(data, 2, true);
-		}
+		if (!validate_exit_code(data, &exit_code))
+			return ;
 		else if (data->cmd->args[2])
 		{
 			printf("bash: exit: too many arguments\n");

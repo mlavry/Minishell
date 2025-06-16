@@ -57,6 +57,7 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
+
 void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
@@ -89,8 +90,7 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-		while(wait(NULL) > 0)
-			;
+		close_all_fd();
 	}
 }
 

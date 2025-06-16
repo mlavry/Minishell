@@ -31,6 +31,53 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	}
 }
 
+
+void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
+{
+	t_env	*old = find_env_var(*env_list, "OLDPWD");
+	t_env	*pwd = find_env_var(*env_list, "PWD");
+
+	if (old)
+	{
+		free(old->value);
+		old->value = oldpath ? ft_strdup(oldpath) : ft_strdup("");
+	}
+	else
+		add_env_var(NULL, env_list, "OLDPWD", oldpath ? oldpath : "");
+
+	if (pwd)
+	{
+		free(pwd->value);
+		pwd->value = newpwd ? ft_strdup(newpwd) : ft_strdup("");
+	}
+	else
+		add_env_var(NULL, env_list, "PWD", newpwd ? newpwd : "");
+}
+
+
+/* void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
+{
+	t_env	*old = find_env_var(*env_list, "OLDPWD");
+	t_env	*pwd = find_env_var(*env_list, "PWD");
+
+	if (old)
+	{
+		free(old->value);
+		old->value = oldpath ? ft_strdup(oldpath) : NULL;
+	}
+	else if (oldpath)
+		add_env_var(NULL, env_list, "OLDPWD", oldpath);
+
+	if (pwd)
+	{
+		free(pwd->value);
+		pwd->value = newpwd ? ft_strdup(newpwd) : NULL;
+	}
+	else if (newpwd)
+		add_env_var(NULL, env_list, "PWD", newpwd);
+} */
+
+/* 
 void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 {
 	t_env	*old;
@@ -50,7 +97,8 @@ void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 		free(pwd->value);
 		pwd->value = ft_strdup(newpwd);
 	}
-}
+} */
+
 
 void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 {

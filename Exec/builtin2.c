@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-void	built_path(char *newpath, t_data *data)
+/* void	built_path(char *newpath, t_data *data)
 {
 	char		cwd[1024];
 	struct stat	sb;
@@ -38,7 +38,47 @@ void	built_path(char *newpath, t_data *data)
 	getcwd(cwd, sizeof(cwd));
 	chdir(newpath);
 	updatepwd(data, &data->env, cwd);
+} */
+
+void	built_path(char *newpath, t_data *data)
+{
+	struct stat	sb;
+	char		*oldpwd;
+
+	if (access(newpath, F_OK) != 0)
+	{
+		printf("cd: %s: No such file or directory\n", newpath);
+		data->exit_code = 1;
+		return ;
+	}
+	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
+	{
+		printf("bash: cd: %s: Not a directory\n", newpath);
+		data->exit_code = 1;
+		return ;
+	}
+	if (access(newpath, X_OK) != 0)
+	{
+		printf("bash: cd: %s: Permission denied\n", newpath);
+		data->exit_code = 126;
+		return ;
+	}
+
+	oldpwd = getcwd(NULL, 0);
+	if (!oldpwd)
+		oldpwd = ft_strdup(""); // fallback safe
+
+	if (chdir(newpath) == -1)
+	{
+		perror("cd");
+		free(oldpwd);
+		return ;
+	}
+	updatepwd(data, &data->env, oldpwd);
+	free(oldpwd);
 }
+
+
 
 static char	*handle_cd_null(t_data *data)
 {

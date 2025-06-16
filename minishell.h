@@ -136,6 +136,7 @@ void	free_cmd(t_cmd **cmd);
 void	free_all(t_data *data, int exit_code, bool exit_or_not);
 void	malloc_failed(t_data *data);
 void	close_all_fd(void);
+void dump_fds(char *when);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
@@ -146,6 +147,7 @@ void	builtin_cd( char *newpath, t_data *data);
 void	builtin_pwd(void);
 void	builtin_echo(t_data *data);
 void	builtin_exit(t_data *data);
+void	unset(t_env **env_list, char *name );
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
 void	existing_value(t_data *data, t_env **env_list, char *name, char *value);
 int		validate_export_name(char *name);

@@ -149,3 +149,5 @@ minishell$ echo la | lo >>>>>>>>>>>>>
 lo: command not found
 minishell$ echo $?
 0
+
+expand heredoc

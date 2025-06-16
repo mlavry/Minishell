@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_commands.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:33:00 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:33:02 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/17 00:01:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 	return (1);
 }
 
-int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
+int	handle_output(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
@@ -73,7 +73,7 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
@@ -92,7 +92,7 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 	return (1);
 }
 
-int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
+int	handle_input(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
@@ -100,7 +100,7 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)

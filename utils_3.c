@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/12 01:19:32 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:39:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ int	check_operators(char *line, char **tokens, int *pos)
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 {
 	if (data)
-		data->exit_code = exit_code;
+		g_exit_status = exit_code;
 	//ft_putstr_fd("minishell: ", 2);
 	if (cmd)
 	{

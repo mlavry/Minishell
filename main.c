@@ -6,11 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 20:50:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:43:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	g_exit_status;
 
 /*void	signal_handler(int sig)
 {
@@ -24,34 +26,26 @@
 	}
 }*/
 
-bool	empty_line(char *line, t_data *data)
+bool	empty_line(char *line)
 {
 	int	i;
 
 	i = 0;
-/* 	if (line[i] == '>' || line[i] == '<')
-    {
-		if (is_multiple_append(&line[i]) || is_multiple_heredoc(&line[i]))
-		{
-			data->exit_code = 2;
-			return true;
-		}
-	}  */
 	while (line[i] && (line[i] == ' ' || line[i] == ':' || line[i] == '.'))
 	{
 		i++;
-		data->exit_code = 0;
+		g_exit_status = 0;
 	}
 	if (line[0] == '|')
 	{
 		printf("bash: syntax error near unexpected token `|'\n");
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (true);
 	}
 	if (line[i] == '!')
 	{
 		i++;
-		data->exit_code = 1;
+		g_exit_status = 1;
 	}
 	if (i == (int)ft_strlen(line))
 	{
@@ -71,16 +65,17 @@ int	main(int argc, char *argv[], char **envp)
 	else
 		parse_env(envp, &data);
 	execshell(&data, &data.env);
+	init_signals_prompt();
 	while (1)
 	{
 		data.line = readline("minishell$ ");
 		if (!data.line)
 		{
 			ft_putstr_fd("exit\n", 2);
-			free_all(&data, 0, true);
+			free_all(&data, g_exit_status, true);
 			exit (0);
 		}
-		if (empty_line(data.line, &data))
+		if (empty_line(data.line))
 			continue ;
 		add_history(data.line);
 		if (!parse_line(&data))
@@ -92,7 +87,6 @@ int	main(int argc, char *argv[], char **envp)
 		free(data.line);
 	}
 	free_all(&data, 0, true);
-	//close_all_fd();
 	clear_history();
 	return (0);
 }

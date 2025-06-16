@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 19:51:27 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 17:45:00 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,5 @@ void	init_data(t_data *data, int argc, char **argv, char **envp)
 	data->cmd = NULL;
 	data->token = NULL;
 	data->line = NULL;
-	data->exit_code = 0;
+	g_exit_status = 0;
 }

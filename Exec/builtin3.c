@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:18:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 20:33:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:50:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
 		printf("%s", cmd->args[i]);
 }
 
-int	check_newline(t_data *data, char **args, int *i)
+int	check_newline(char **args, int *i)
 {
 	int	j;
 	int	newline ;
@@ -77,7 +77,7 @@ int	check_newline(t_data *data, char **args, int *i)
 		while (args[*i][j] == 'n')
 		{
 			j++;
-			data->exit_code = 0;
+			g_exit_status = 0;
 		}
 		if (args[*i][j] != '\0')
 			break ;
@@ -99,7 +99,7 @@ void	builtin_echo(t_data *data)
 	env_list = data->env;
 	i = 1;
 	args = cmd->args;
-	newline = check_newline(data, args, &i);
+	newline = check_newline(args, &i);
 	while (args[i])
 	{
 		echo(env_list, i, cmd, data);
@@ -110,6 +110,6 @@ void	builtin_echo(t_data *data)
 	if (newline)
 	{
 		printf("\n");
-		data->exit_code = 0;
+		g_exit_status = 0;
 	}
 }

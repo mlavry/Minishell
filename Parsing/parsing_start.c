@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/12 03:46:54 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 00:05:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	set_token_prev_links(t_token *tokens)
 	}
 }
 
-bool	check_redirection_syntax(t_token *tok, t_data *data)
+bool	check_redirection_syntax(t_token *tok)
 {
 	if (!tok->next || tok->next->type != ARG)
 	{
@@ -35,43 +35,43 @@ bool	check_redirection_syntax(t_token *tok, t_data *data)
 		else
 			ft_putstr_fd(tok->next->str, 2);
 		ft_putstr_fd("'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (false);
 	}
 	return (true);
 }
 
-bool	check_pipe_syntax(t_token *tok, t_data *data)
+bool	check_pipe_syntax(t_token *tok)
 {
 	if (!tok->prev || !tok->next)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (false);
 	}
    // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
 	if (tok->prev->type == PIPE || tok->next->type == PIPE)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (false);
 	}
 	return (true);
 }
 
-bool	validate_tokens(t_token *tokens, t_data *data)
+bool	validate_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
 		if (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC)
 		{
-			if (!check_redirection_syntax(tokens, data))
+			if (!check_redirection_syntax(tokens))
 				return (false);
 		}
 		else if (tokens->type == PIPE)
 		{
-			if (!check_pipe_syntax(tokens, data))
+			if (!check_pipe_syntax(tokens))
 				return (false);
 		}
 		tokens = tokens->next;
@@ -81,7 +81,7 @@ bool	validate_tokens(t_token *tokens, t_data *data)
 
 bool	parse_line(t_data *data)
 {
-	if (open_quote(data, data->line))
+	if (open_quote(data->line))
 	{
 		free(data->line);
 		return (false);
@@ -93,13 +93,13 @@ bool	parse_line(t_data *data)
 		return (false);
 	}
 	set_token_prev_links(data->token);
-	if (!validate_tokens(data->token, data))
+	if (!validate_tokens(data->token))
 	{
 		free(data->line);
 		free_token(&data->token);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data->token, data);
+	data->cmd = tokens_to_commands(data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);

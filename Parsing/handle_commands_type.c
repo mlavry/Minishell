@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   handle_commands_type.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:34:37 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:34:39 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/16 23:58:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur, t_data *data)
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
 {
 	if (!t->next || t->next->type != ARG)
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (false);
 	}
 	if (!handle_heredoc(tok, cur))

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/12 02:55:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 00:04:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@
 # define CMD 6 //"cmd"
 # define ARG 7 //"arg"
 
+extern int	g_exit_status;
+
 typedef struct s_token
 {
 	char			*str;
@@ -70,30 +72,28 @@ typedef struct s_data
 	t_env		*env;
 	t_token		*token;
 	t_cmd		*cmd;
-	int			exit_code;
 }				t_data;
 
 //------------------------Parsing functions---------------------
 bool	parse_line(t_data *data);
-int		open_quote(t_data *data, char *line);
+int		open_quote(char *line);
 int		tokenize(t_data *data);
 int		is_quoted(char c);
-void	stock_and_delete_quote(t_token *token);
 void	quote_choice(bool *sq, bool *dq, char c);
 int		count_tokens(char *line);
 char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_token *tokens, t_data *data);
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur, t_data *data);
+t_cmd	*tokens_to_commands(t_token *tokens);
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur);
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
 bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
 bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
-int		handle_output(t_token **tokens, t_cmd **cur, t_data *data);
-int		handle_input(t_token **tokens, t_cmd **cur, t_data *data);
+int		handle_output(t_token **tokens, t_cmd **cur);
+int		handle_input(t_token **tokens, t_cmd **cur);
 int		handle_pipe(t_token **tokens, t_cmd **cur);
 int		handle_heredoc(t_token **tokens, t_cmd *cur);
-int		handle_append(t_token **tokens, t_cmd **cur, t_data *data);
+int		handle_append(t_token **tokens, t_cmd **cur);
 int		handle_arg(t_cmd *cur, t_token *token);
 int		handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
@@ -126,6 +126,9 @@ int		ft_isnumeric(const char *str);
 int		check_operators(char *line, char **tokens, int *pos);
 int		ft_atoi_safe(const char *str, int *out);
 
+//------------------------Signals---------------------
+void	init_signals_prompt(void);
+
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
 void	free_env_list(t_env *env_list);
@@ -155,13 +158,13 @@ t_env	*copyenvlist(t_data *data, t_env *env_list);
 void	built_export(t_data *data, t_env *env_list);
 void	built_export2(t_data *data, t_env **env_list, char **args);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
-void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
+void	updatepwd(t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);
-bool	is_a_directory(char *path, char **args, t_data *data);
+bool	is_a_directory(char *path, char **args);
 
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 //------------Debug Functions---------------------

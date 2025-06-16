@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/14 19:33:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:52:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 	if (data->cmd->fd_out != STDOUT_FILENO)
 		close(data->cmd->fd_out);
 	if (WIFEXITED(status))
-		data->exit_code = WEXITSTATUS(status);
+		g_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
-		data->exit_code = 128 + WTERMSIG(status);
+		g_exit_status = 128 + WTERMSIG(status);
 }
 
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
@@ -43,18 +43,18 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 	exit(127);
 }
 
-bool	have_no_permission(char *cmd_path, t_data *data)
+bool	have_no_permission(char *cmd_path)
 {
 	if (access(cmd_path, F_OK) != 0)
 	{
 		printf("minishell: %s: No such file or directory\n", cmd_path);
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return (true);
 	}
 	if (access(cmd_path, X_OK) != 0)
 	{
 		printf("minishell: %s: Permission denied\n", cmd_path);
-		data->exit_code = 126;
+		g_exit_status = 126;
 		return (true);
 	}
 	return (false);
@@ -74,14 +74,14 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 	if (!path)
 	{
 		printf("%s: command not found\n", args[0]);
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return ;
 	}
-	if (is_a_directory(path, args, data) || have_no_permission(path, data))
+	if (is_a_directory(path, args) || have_no_permission(path))
 		return (free(path));
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), data->exit_code = 1, free(path));
+		return (perror("fork"), g_exit_status = 1, free(path));
 	if (pid == 0)
 		extern_childprocess(data, path, env, args);
 	else
@@ -93,13 +93,13 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	if (!args || !args[0] || args[0][0] == '\0')
 	{
 		printf("'' command not found\n");
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return ;
 	}
 	if (ft_strcmp(args[0], "\\n") == 0)
 	{
 		printf("n : command not found\n");
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return ;
 	}
 	launch_extern_command(args, env, data);
@@ -115,7 +115,7 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	if (!args || !args[0] || args[0][0] == '\0')
 	{
 		printf("'' command not found\n");
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return ;
 	}
 	if (ft_strchr(args[0], '/'))
@@ -127,12 +127,12 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		if (ft_strcmp(args[0], "\\n") == 0)
 		{
 			printf("n : command not found \n");
-			data->exit_code = 127;
+			g_exit_status = 127;
 		}
 		else
 			printf("%s: command not found\n", args[0]);
 		free(path);
-		data->exit_code = 127;
+		g_exit_status = 127;
 		return ;
 	}
 	if (is_a_directory(path, args, data))
@@ -144,7 +144,7 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 		return ;
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), data->exit_code = 1, free(path));
+		return (perror("fork"), g_exit_status = 1, free(path));
 	if (pid == 0)
 		extern_childprocess(data, path, env, args);
 	else

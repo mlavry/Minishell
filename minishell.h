@@ -135,6 +135,7 @@ void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);
 void	free_all(t_data *data, int exit_code, bool exit_or_not);
 void	malloc_failed(t_data *data);
+void	close_all_fd(void);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);

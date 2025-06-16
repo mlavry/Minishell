@@ -92,6 +92,7 @@ int	main(int argc, char *argv[], char **envp)
 		free(data.line);
 	}
 	free_all(&data, 0, true);
+	//close_all_fd();
 	clear_history();
 	return (0);
 }

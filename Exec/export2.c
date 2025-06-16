@@ -68,7 +68,7 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	free(newpwd);
 }
 
-void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+/* void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*existing;
 	char	*copied_value;
@@ -94,5 +94,51 @@ void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 				malloc_failed(data);
 		}
 		add_env_var(data, env_list, ft_strdup(name), copied_value);
+
 	}
+}  */
+
+
+void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+	char	*copied_name;
+	char	*copied_value;
+
+	copied_name = ft_strdup(name);
+	if (!copied_name)
+		malloc_failed(data);
+	copied_value = NULL;
+	if (value)
+	{
+		copied_value = ft_strdup(value);
+		if (!copied_value)
+		{
+			free(copied_name);
+			malloc_failed(data);
+		}
+	}
+	add_env_var(data, env_list, copied_name, copied_value);
+	free(copied_name);
+	if (copied_value)
+		free(copied_value);
+}
+
+ void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*existing;
+
+
+	existing = find_env_var(*env_list, name);
+	if (existing)
+	{
+		if (value)
+		{
+			free(existing->value);
+			existing->value = ft_strdup(value);
+			if (!existing->value)
+				malloc_failed(data);
+		}
+	}
+	else
+		dontexist_value(data, env_list, name, value);
 }

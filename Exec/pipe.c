@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 17:44:21 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 23:03:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void	exec_command(t_cmd *cmd, t_data *data)
 	path = getpath(cmd->args[0], data);
 	if (!path)
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
+	reset_signals_to_default();
 	execve(path, cmd->args, convert_env(data->env));
 	perror("execve");
 	exit(127);
@@ -75,8 +76,6 @@ void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 
 void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
 	if (*prev_fd != -1)
 		close(*prev_fd);
 	if (cmd->next)
@@ -113,5 +112,4 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	}
 	while (wait(NULL) > 0)
 		;
-	handle_status_and_print(g_exit_status);
 }

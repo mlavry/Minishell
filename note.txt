@@ -158,3 +158,5 @@ pas expand delimiteur entre double quote
 
 Change in builtin3.c && in exec.c
 && main.c && note.txt && signal.c
+
+signaux pipe

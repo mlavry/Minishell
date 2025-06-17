@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 01:07:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 {
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
+	ignore_sigint();
 	waitpid(pid, &status, 0);
+	handle_status_and_print(status);
 	free(path);
 	if (data->cmd->fd_in != STDIN_FILENO)
 		close(data->cmd->fd_in);
@@ -40,8 +40,7 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		dup2(data->cmd->fd_out, STDOUT_FILENO);
 		close(data->cmd->fd_out);
 	}
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	reset_signals_to_default();
 	execve(path, args, convert_env(env));
 	free_all(data, g_exit_status, true);
 }

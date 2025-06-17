@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/20 17:35:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 17:44:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 
 void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	if (*prev_fd != -1)
 		close(*prev_fd);
 	if (cmd->next)
@@ -111,4 +113,5 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	}
 	while (wait(NULL) > 0)
 		;
+	handle_status_and_print(g_exit_status);
 }

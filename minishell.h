@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 00:04:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 21:01:39 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,9 @@ int		ft_atoi_safe(const char *str, int *out);
 
 //------------------------Signals---------------------
 void	init_signals_prompt(void);
+void	handle_status_and_print(int status);
+void	reset_signals_to_default(void);
+void	ignore_sigint(void);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

@@ -155,3 +155,6 @@ exit status n'est pas update dans les pipes
 expand heredoc
 
 pas expand delimiteur entre double quote
+
+Change in builtin3.c && in exec.c
+&& main.c && note.txt && signal.c

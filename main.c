@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 01:01:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 17:42:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,6 @@ void	minishell_loop(t_data *data)
 		{
 			ft_putstr_fd("exit\n", 2);
 			free_all(data, g_exit_status, true);
-			exit (0);
 		}
 		if (empty_line(data->line))
 			continue ;

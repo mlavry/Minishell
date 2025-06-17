@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/16 20:59:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 02:24:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 21:00:54 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,37 @@ void	init_signals_prompt(void)
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = sigint_prompt;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sa, NULL);
-	sa.sa_handler = SIG_IGN;
+	signal(SIGQUIT, SIG_IGN);
+}
+
+void    handle_status_and_print(int status)
+{
+    if (WIFSIGNALED(status))
+    {
+        int sig = WTERMSIG(status);
+    	if (sig == SIGINT)
+            write(STDOUT_FILENO, "\n", 1);
+        else if (sig == SIGQUIT)
+            write(STDOUT_FILENO, "Quit\n", 5);
+        g_exit_status = 128 + sig;
+    }
+    else
+        g_exit_status = WEXITSTATUS(status);
+}
+
+void	reset_signals_to_default(void)
+{
+	struct sigaction	sa;
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_DFL;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
+}
+
+void	ignore_sigint(void)
+{
+	signal(SIGINT, SIG_IGN);
 }

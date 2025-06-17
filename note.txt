@@ -150,4 +150,8 @@ lo: command not found
 minishell$ echo $?
 0
 
+exit status n'est pas update dans les pipes
+
 expand heredoc
+
+pas expand delimiteur entre double quote

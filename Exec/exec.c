@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/16 23:52:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 01:07:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 {
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	waitpid(pid, &status, 0);
 	free(path);
 	if (data->cmd->fd_in != STDIN_FILENO)
@@ -38,9 +40,10 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		dup2(data->cmd->fd_out, STDOUT_FILENO);
 		close(data->cmd->fd_out);
 	}
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 	execve(path, args, convert_env(env));
-	perror("execve");
-	exit(127);
+	free_all(data, g_exit_status, true);
 }
 
 bool	have_no_permission(char *cmd_path)

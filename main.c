@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/16 23:43:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 01:01:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,31 @@ bool	empty_line(char *line)
 	return (false);
 }
 
+void	minishell_loop(t_data *data)
+{
+	while (1)
+	{
+		init_signals_prompt();
+		data->line = readline("minishell$ ");
+		if (!data->line)
+		{
+			ft_putstr_fd("exit\n", 2);
+			free_all(data, g_exit_status, true);
+			exit (0);
+		}
+		if (empty_line(data->line))
+			continue ;
+		add_history(data->line);
+		if (!parse_line(data))
+			continue ;
+		else
+			executecommand(data);
+		free_token(&data->token);
+		free_cmd(&data->cmd);
+		free(data->line);
+	}
+}
+
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
@@ -65,27 +90,7 @@ int	main(int argc, char *argv[], char **envp)
 	else
 		parse_env(envp, &data);
 	execshell(&data, &data.env);
-	init_signals_prompt();
-	while (1)
-	{
-		data.line = readline("minishell$ ");
-		if (!data.line)
-		{
-			ft_putstr_fd("exit\n", 2);
-			free_all(&data, g_exit_status, true);
-			exit (0);
-		}
-		if (empty_line(data.line))
-			continue ;
-		add_history(data.line);
-		if (!parse_line(&data))
-			continue ;
-		else
-			executecommand(&data);
-		free_token(&data.token);
-		free_cmd(&data.cmd);
-		free(data.line);
-	}
+	minishell_loop(&data);
 	free_all(&data, 0, true);
 	clear_history();
 	return (0);

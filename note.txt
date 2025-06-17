@@ -1,48 +1,5 @@
-------------------------EXEC-------------------------
-
-Ne doit rien afficher :
-
-mlavry@k1r4p3:Documents/exec ‹exec*›$ ./minishell
-minishell$ echo bonjour | $USERbhb
-3
-Token: echo            | Type: 6  | SQ: 0 | DQ: 0
-Token: bonjour         | Type: 7  | SQ: 0 | DQ: 0
-Token: |               | Type: 5  | SQ: 0 | DQ: 0
-bonjour
-minishell$ 
-
 minishell$ >>'la'
 bash: syntax error near unexpected token `>>'
-
-export ENV=$qu
-
-CAS BIZARRE VENANT DE EXEC 
-
-Lorsque l'on rentre uniquement une quote vide ou plusieurs tel que : ''
-on obtient un crash innatendu qui semble venir d'un free de exec
-
-./minishell | ./minishell ne semble pas fonctionner
-
---------------------------PARSING-------------------------------
-
-Securiser le code :
-
-depuis le debut
-
-Error syntax :
-
-Si le pipe est dans des quotes on le prend comme un arg
-
-mlavry@k1r4p1:~ $ bash             
-mlavry@k1r4p1:~$ ls '|' wc -l
-ls: cannot access '|': No such file or directory
-ls: cannot access 'wc': No such file or directory
-mlavry@k1r4p1:~$ ls | wc -l
-12
-
-Malloc failed (Error message) :
-
-"Cannot allocate memory\n" cest le mesage derreur quqnd malloc echoue
 
 Signaux
 
@@ -51,98 +8,9 @@ Bonjour
 mlavry@k1r4p3:~$ echo Bonjour ||| ls
 bash: syntax error near unexpected token `|'
 
-minishell$ ls '|'
-l
-Unquote
- 
-Unquote
-Token: ls              | Type: 6  | SQ: 0 | DQ: 0
-Token:  '|'            | Type: 7  | SQ: 0 | DQ: 0
-ls: cannot access ' '\''|'\''': No such file or directory
-
-token vide avamt | : ''"" |
-
-Je ne sais pas si je devrais renvoyer ca 
-
-minishell$ '|"''|'
-Token: '|'             | Type: 6  | QU: 0
-'|': command not found
-
-Je ne comprend pas d'pu vient ce probleme
-
 ----------------HERDEDOCS--------------------
 
-Ne pas expand le delimiteur 
-
 '\n' dans le cas ou on ctrl + D dans heredoc
-
-Stock comme un pipe
-
-"|"| a
-
-minishell$ "e"'c''h'"o" ';x;;;d' salut"salut"cava
-Token: echo            | Type: 6  | QU: 0
-Token: ;x;;;d          | Type: 7  | QU: 0
-Token: salutsalutcava  | Type: 7  | QU: 0
- salutsalutcava
-minishell$ "e"'c''h'"o" 'x;;;d' salut"salut"cava
-Token: echo            | Type: 6  | QU: 0
-Token: x;;;d           | Type: 7  | QU: 0
-Token: salutsalutcava  | Type: 7  | QU: 0
-x;;;d salutsalutcava
-
-
-mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i ./minishell
-minishell$ env
-Token: env             | Type: 6 
-SHLVL=1
-_=/usr/bin/env
-minishell$ unset SHLVL
-Token: unset           | Type: 6 
-Token: SHLVL           | Type: 7 
-minishell$ ./minishell
-Token: ./minishell     | Type: 6 
-minishell$ env
-Token: env             | Type: 6 
-[1]    691624 segmentation fault  env -i ./minishell
-mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i ./minishell
-minishell$ env
-Token: env             | Type: 6 
-SHLVL=1
-_=/usr/bin/env
-minishell$ unset _
-Token: unset           | Type: 6 
-Token: _               | Type: 7 
-minishell$ ./minishell
-Token: ./minishell     | Type: 6 
-minishell$ env
-Token: env             | Type: 6 
-SHLVL=2
-_=/usr/bin/env
-minishell$ unset SHLVL
-Token: unset           | Type: 6 
-Token: SHLVL           | Type: 7 
-minishell$ ./minishell
-Token: ./minishell     | Type: 6 
-minishell$ env
-Token: env             | Type: 6 
-minishell$ env
-Token: env             | Type: 6 
-SHLVL=1
-_=/usr/bin/env
-minishell$ exit
-mlavry@k1r2p12:Documents/Minishell ‹main*›$ env -i bash       
-mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ env
-PWD=/home/mlavry/Documents/Minishell
-SHLVL=1
-_=/usr/bin/env
-mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ unset PWD SHLVL
-mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ bash
-mlavry@k1r2p12:/home/mlavry/Documents/Minishell$ env
-PWD=/home/mlavry/Documents/Minishell
-SHLVL=1
-_=/usr/bin/env
-
 
 0
 minishell$ echo la | lo >>>>>>>>>>>>>
@@ -155,8 +23,5 @@ exit status n'est pas update dans les pipes
 expand heredoc
 
 pas expand delimiteur entre double quote
-
-Change in builtin3.c && in exec.c
-&& main.c && note.txt && signal.c
 
 signaux pipe

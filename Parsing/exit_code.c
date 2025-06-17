@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/13 21:12:23 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 00:26:49 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,6 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 
 void	malloc_failed(t_data *data)
 {
-	ft_putstr_fd("minishell: malloc failed\n", 2);
+	ft_putstr_fd("Cannot allocate memory\n", 2);
 	free_all(data, 1, true);
 }

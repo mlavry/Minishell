@@ -84,6 +84,10 @@ void	emptyenv(t_data *data, t_env **env_list)
 		add_env_var(data, env_list, "PWD", cwd);
 		add_env_var(data, env_list, "PATH", "/usr/bin:/bin");
 	}
+	t_env *pwd = find_env_var(*env_list, "PWD");
+		//printf("PWD = %s\n", pwd->value); // ← 💥 si pwd == NULL ou pwd->value == NULL
+	if (pwd && pwd->value)
+		chdir(pwd->value);
 	free(cwd);
 }
 

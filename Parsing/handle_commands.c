@@ -81,7 +81,7 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
 			close((*cur)->fd_out);
 		(*cur)->fd_out = open((*tokens)->next->str,
-				O_CREAT | O_WRONLY | O_TRUNC, 0644);
+				O_CREAT | O_WRONLY | O_TRUNC | __O_CLOEXEC, 0644);
 		if ((*cur)->fd_out < 0)
 		{
 			printf("%s: No such file or directory\n", (*tokens)->next->str);
@@ -107,7 +107,7 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 	{
 		if ((*cur)->fd_in != STDIN_FILENO)
 			close((*cur)->fd_in);
-		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY);
+		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY | __O_CLOEXEC);
 		if ((*cur)->fd_in < 0)
 		{
 			printf("%s: No such file or directory\n", (*tokens)->next->str);

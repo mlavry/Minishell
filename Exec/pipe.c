@@ -54,6 +54,7 @@ void	exec_command(t_cmd *cmd, t_data *data)
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
+		close_all_fd();
 		exit(0);
 	}
 	path = getpath(cmd->args[0], data);
@@ -90,6 +91,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	int		pipe_fd[2];
 	pid_t	pid;
 	int		prev_fd;
+	int		status;
 
 	prev_fd = -1;
 	while (cmd)
@@ -110,6 +112,9 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 		parent(cmd, pipe_fd, &prev_fd);
 		cmd = cmd->next;
 	}
-	while (wait(NULL) > 0)
-		;
+	while ((pid = wait(&status)) > 0)
+		g_exit_status = WEXITSTATUS(status);
+	close_all_fd(); 
+	/* while (wait(NULL) > 0)
+		; */
 }

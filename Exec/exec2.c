@@ -89,8 +89,8 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-		while(wait(NULL) > 0)
-			;
+	/* 	while(wait(NULL) > 0)
+			; */
 	}
 }
 

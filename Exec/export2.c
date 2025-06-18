@@ -98,7 +98,6 @@ void	updatepwd(t_env **env_list, char *oldpath)
 	}
 }  */
 
-
 void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	char	*copied_name;
@@ -126,7 +125,6 @@ void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
  void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*existing;
-
 
 	existing = find_env_var(*env_list, name);
 	if (existing)

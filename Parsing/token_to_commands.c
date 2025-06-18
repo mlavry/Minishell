@@ -16,7 +16,7 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
-	if ((*tokens)->type == APPEND && (!(*tokens)->prev
+ 	if ((*tokens)->type == APPEND && (!(*tokens)->prev
 			|| !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);

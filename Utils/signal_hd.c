@@ -6,25 +6,53 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 00:50:33 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/18 15:50:19 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 17:28:42 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void  set_hd_signals(struct sigaction *old_int, struct sigaction *old_quit)
+static void  sigint_hd(int signo)
 {
-    struct sigaction  sa;
-    sa.sa_handler = sigint_hd;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags   = 0;
-    sigaction(SIGINT, &sa, old_int);
-    sa.sa_handler = SIG_IGN;
-    sigaction(SIGQUIT, &sa, old_quit);
+    (void)signo;
+    g_exit_status = 130;          /* flag + valeur de retour              */
+    write(STDOUT_FILENO, "^C\n", 3);/* saute la ligne comme bash            */
 }
 
-void  restore_hd_signals(struct sigaction *old_int, struct sigaction *old_quit)
+/* installe handlers spéciaux et sauvegarde les anciens */
+void    hd_set_signals(struct sigaction *old_int)
+{
+    struct sigaction sa;
+
+    sa.sa_handler = sigint_hd;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags  = 0;
+    sigaction(SIGINT, &sa, old_int);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+/* restaure l’état précédent (appel obligatoire en sortie) */
+void    hd_restore_signals(const struct sigaction *old_int)
 {
     sigaction(SIGINT,  old_int,  NULL);
-    sigaction(SIGQUIT, old_quit, NULL);
+}
+
+void    disable_echoctl(void)
+{
+    struct termios  t;
+
+    if (tcgetattr(STDIN_FILENO, &t) == -1)
+        return ;
+    t.c_lflag &= ~ECHOCTL;
+    tcsetattr(STDIN_FILENO, TCSANOW, &t);
+}
+
+void	enable_echoctl(void)
+{
+	struct termios	term;
+
+	if (tcgetattr(STDIN_FILENO, &term) == -1)
+		return ;
+	term.c_lflag |= ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }

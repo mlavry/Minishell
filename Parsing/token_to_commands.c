@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/18 15:54:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 17:26:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ char	*heredoc_tmp(void)
 	return (filename);
 }
 
-int	write_heredoc(char *delimiter, int tmp_fd)
+/* int	write_heredoc(char *delimiter, int tmp_fd)
 {
 	char	*line;
 	char	*newline;
@@ -77,6 +77,51 @@ int	write_heredoc(char *delimiter, int tmp_fd)
 		free(line);
 	}
 	return (1);
+} */
+
+int write_heredoc(char *delimiter, int tmp_fd)
+{
+    char               *line;
+    char               *newline;
+    struct sigaction    old_int;
+    int                 saved_status = g_exit_status;   /* pour restauration */
+
+	disable_echoctl();
+    hd_set_signals(&old_int);                /* ← nouveau */
+
+    g_exit_status = 0;                                  /* fresh start       */
+    while (1)
+    {
+        write(STDOUT_FILENO, "> ", 2);
+        line = get_next_line(STDIN_FILENO);
+        if (!line)                      /* EOF ou read() interrompu          */
+            break;
+
+        if (g_exit_status == 130)
+        {
+            free(line);
+            break;
+        }
+        newline = ft_strchr(line, '\n');
+        if (newline)
+            *newline = '\0';
+        if (ft_strcmp(line, delimiter) == 0)
+        {
+            free(line);
+            break;
+        }
+        write(tmp_fd, line, ft_strlen(line));
+        write(tmp_fd, "\n", 1);
+        free(line);
+    }
+	enable_echoctl();
+    hd_restore_signals(&old_int);            /* ← nouveau */
+
+    /* si pas interrompu, on remet l’ancien exit-status */
+    if (g_exit_status != 130)
+        g_exit_status = saved_status;
+
+    return (g_exit_status == 130 ? -1 : 0);             /* -1 = heredoc tué  */
 }
 
 int	handle_heredoc(t_token **tokens, t_cmd *cur)
@@ -92,8 +137,13 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 		return (perror("open tmp"), 0);
 	if (!tokens || !*tokens || !(*tokens)->next)
 		return (0);
-	write_heredoc(delimiter, tmp_fd);
-	close(tmp_fd);
+	if (write_heredoc(delimiter, tmp_fd) == -1)
+	{
+		close(tmp_fd);
+		unlink(tmp_filename);
+		g_exit_status = 130;
+		return (0);
+	}
 	if (cur->fd_in != STDIN_FILENO)
 		close(cur->fd_in);
 	cur->fd_in = open(tmp_filename, O_RDONLY);
@@ -182,8 +232,11 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 		cur->name = ft_strdup("");
 		head = cur;
 	}
+	g_exit_status = 0;
 	while (tokens)
 	{
+		if (g_exit_status == 130)
+			break ;
 		if (!is_type_token (&tokens, &head, &cur))
 		{
 			free_cmd(&head);

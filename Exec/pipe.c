@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 23:03:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 22:38:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,11 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 		parent(cmd, pipe_fd, &prev_fd);
 		cmd = cmd->next;
 	}
+	ignore_sigint();
 	while ((pid = wait(&status)) > 0)
-		g_exit_status = WEXITSTATUS(status);
-	close_all_fd(); 
-	/* while (wait(NULL) > 0)
-		; */
+	{
+		if (g_exit_status != 130 && g_exit_status != 131)
+			handle_status_and_print(status);
+	}
+	close_all_fd();
 }

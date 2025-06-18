@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/16 20:59:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 21:00:54 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 23:03:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,15 @@ void    handle_status_and_print(int status)
 {
     if (WIFSIGNALED(status))
     {
-        int sig = WTERMSIG(status);
-    	if (sig == SIGINT)
-            write(STDOUT_FILENO, "\n", 1);
-        else if (sig == SIGQUIT)
-            write(STDOUT_FILENO, "Quit\n", 5);
-        g_exit_status = 128 + sig;
+        	int sig = WTERMSIG(status);
+			if (sig == SIGINT || sig == SIGQUIT)
+			{
+    			if (sig == SIGINT)
+            		write(STDOUT_FILENO, "\n", 1);
+        		else if (sig == SIGQUIT)
+            		write(STDOUT_FILENO, "Quit\n", 5);
+        		g_exit_status = 128 + sig;
+			}
     }
     else
         g_exit_status = WEXITSTATUS(status);

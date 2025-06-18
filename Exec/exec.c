@@ -16,6 +16,11 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 {
 	ignore_sigint();
 	waitpid(pid, &status, 0);
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+   	 	close(data->cmd->fd_in);
+   		data->cmd->fd_in = STDIN_FILENO;
+	}
 	handle_status_and_print(status);
 	free(path);
 	if (data->cmd->fd_in != STDIN_FILENO)
@@ -77,6 +82,21 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 	{
 		printf("%s: command not found\n", args[0]);
 		g_exit_status = 127;
+
+		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
+			close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO;
+		}
+		if (data->cmd->fd_in != STDIN_FILENO)
+		{
+			close(data->cmd->fd_in);
+			data->cmd->fd_in = STDIN_FILENO;
+		}
+		/* if (data->cmd->fd_out != STDOUT_FILENO)
+			close(data->cmd->fd_out);
+		if (data->cmd->fd_in != STDIN_FILENO)
+			close(data->cmd->fd_in); */
 		return ;
 	}
 	if (is_a_directory(path, args) || have_no_permission(path))
@@ -107,48 +127,3 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	launch_extern_command(args, env, data);
 }
 
-/* void	exec_extern_command(char **args, t_env *env, t_data *data)
-{
-	pid_t		pid;
-	int			status;
-	char		*path;
-
-	status = 0;
-	if (!args || !args[0] || args[0][0] == '\0')
-	{
-		printf("'' command not found\n");
-		g_exit_status = 127;
-		return ;
-	}
-	if (ft_strchr(args[0], '/'))
-		path = ft_strdup(args[0]);
-	else
-		path = getpath(args[0], data);
-	if (!path)
-	{
-		if (ft_strcmp(args[0], "\\n") == 0)
-		{
-			printf("n : command not found \n");
-			g_exit_status = 127;
-		}
-		else
-			printf("%s: command not found\n", args[0]);
-		free(path);
-		g_exit_status = 127;
-		return ;
-	}
-	if (is_a_directory(path, args, data))
-	{
-		free(path);
-		return ;
-	}
-	if (have_no_permission(path, data))
-		return ;
-	pid = fork();
-	if (pid == -1)
-		return (perror("fork"), g_exit_status = 1, free(path));
-	if (pid == 0)
-		extern_childprocess(data, path, env, args);
-	else
-		parent_and_wait(status, path, data, pid);
-} */

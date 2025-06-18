@@ -25,3 +25,7 @@ expand heredoc
 pas expand delimiteur entre double quote
 
 signaux pipe
+
+Probleme fait ls alors qu'il ne devrait pas :
+
+<< wnfkih woifnoiw | echo co | ls | << lol

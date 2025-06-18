@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 00:04:12 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 15:54:43 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	write_heredoc(char *delimiter, int tmp_fd)
 
 	while (1)
 	{
+		reset_signals_to_default();
 		write(1, "> ", 2);
 		line = get_next_line(0);
 		if (!line)

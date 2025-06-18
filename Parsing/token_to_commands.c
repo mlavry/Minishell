@@ -6,13 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/12 03:14:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 15:54:43 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
+int	handle_append(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
@@ -20,7 +20,7 @@ int	handle_append(t_token **tokens, t_cmd **cur, t_data *data)
 			|| !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (0);
 	}
 	if ((*tokens) && (*tokens)->type == APPEND
@@ -59,6 +59,7 @@ int	write_heredoc(char *delimiter, int tmp_fd)
 
 	while (1)
 	{
+		reset_signals_to_default();
 		write(1, "> ", 2);
 		line = get_next_line(0);
 		if (!line)
@@ -112,14 +113,14 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 			 if (!tokens->prev || !tokens->next)
    			 {
         		printf("minishell: syntax error near unexpected token `|'\n");
-        		data->exit_code = 2;
+        		g_exit_status = 2;
         		return false;
     		}
             // Si le token précédent est une redirection, c'est une erreur
             if (tokens->prev && (tokens->prev->type == OUTPUT || tokens->prev->type == HEREDOC || tokens->prev->type == APPEND || tokens->prev->type == INPUT))
             {
                 printf("minishell: syntax error near unexpected token `%s'\n", tokens->str);
-                data->exit_code = 2;
+                g_exit_status = 2;
                 return false;
             }
         }
@@ -128,7 +129,7 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         if ((tokens->type == OUTPUT || tokens->type == APPEND || tokens->type == INPUT) && (!tokens->next || tokens->next->type != ARG))
         {
             printf("minishell: syntax error near unexpected token `%s'\n", tokens->next ? tokens->next->str : "newline");
-            data->exit_code = 2;
+            g_exit_status = 2;
             return false;
         }
 
@@ -137,7 +138,7 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
     return true;
 } */
 
-static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *data)
+static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 {
 	t_token	*tok;
 
@@ -151,19 +152,19 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur, t_data *d
 	if (tok->type == ARG)
 		return (handle_arg_type(tok, *cur, tokens));
 	if (tok->type == OUTPUT)
-		return (handle_output(tokens, cur, data));
+		return (handle_output(tokens, cur));
 	if (tok->type == INPUT)
-		return (handle_input(tokens, cur, data));
+		return (handle_input(tokens, cur));
 	if (tok->type == PIPE)
 		return (handle_pipe(tokens, cur));
 	if (tok->type == APPEND)
-		return (handle_append(tokens, cur, data));
+		return (handle_append(tokens, cur));
 	if (tok->type == HEREDOC)
-		return (handle_heredoc_type(tok, tokens, *cur, data));
+		return (handle_heredoc_type(tok, tokens, *cur));
 	return (true);
 }
 
-t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
+t_cmd	*tokens_to_commands(t_token *tokens)
 {
 	t_cmd	*head;
 	t_cmd	*cur;
@@ -183,7 +184,7 @@ t_cmd	*tokens_to_commands(t_token *tokens, t_data *data)
 	}
 	while (tokens)
 	{
-		if (!is_type_token (&tokens, &head, &cur, data))
+		if (!is_type_token (&tokens, &head, &cur))
 		{
 			free_cmd(&head);
 			return (NULL);

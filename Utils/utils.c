@@ -6,11 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 20:29:56 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/03 16:08:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 22:49:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*ft_strcat(char *dest, char *src)
 {

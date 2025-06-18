@@ -6,13 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 20:32:01 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:49:33 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-/* void	built_path(char *newpath, t_data *data)
+void	built_path(char *newpath, t_data *data)
 {
 	char		cwd[1024];
 	struct stat	sb;
@@ -20,67 +20,27 @@
 	if (access(newpath, F_OK) != 0)
 	{
 		printf("cd: %s: No such file or directory\n", newpath);
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return ;
 	}
 	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
 	{
 		printf("bash: cd: %s: Not a directory\n", newpath);
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return ;
 	}
 	if (access(newpath, X_OK) != 0)
 	{
 		printf("bash: cd: %s: Permission denied\n", newpath);
-		data->exit_code = 126;
+		g_exit_status = 126;
 		return ;
 	}
 	getcwd(cwd, sizeof(cwd));
 	chdir(newpath);
-	updatepwd(data, &data->env, cwd);
-} */
-
-void	built_path(char *newpath, t_data *data)
-{
-	struct stat	sb;
-	char		*oldpwd;
-
-	if (access(newpath, F_OK) != 0)
-	{
-		printf("cd: %s: No such file or directory\n", newpath);
-		data->exit_code = 1;
-		return ;
-	}
-	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
-	{
-		printf("bash: cd: %s: Not a directory\n", newpath);
-		data->exit_code = 1;
-		return ;
-	}
-	if (access(newpath, X_OK) != 0)
-	{
-		printf("bash: cd: %s: Permission denied\n", newpath);
-		data->exit_code = 126;
-		return ;
-	}
-
-	oldpwd = getcwd(NULL, 0);
-	if (!oldpwd)
-		oldpwd = ft_strdup(""); // fallback safe
-
-	if (chdir(newpath) == -1)
-	{
-		perror("cd");
-		free(oldpwd);
-		return ;
-	}
-	updatepwd(data, &data->env, oldpwd);
-	free(oldpwd);
+	updatepwd(&data->env, cwd);
 }
 
-
-
-static char	*handle_cd_null(t_data *data)
+static char	*handle_cd_null(void)
 {
 	const char	*home;
 
@@ -88,7 +48,7 @@ static char	*handle_cd_null(t_data *data)
 	if (!home)
 	{
 		printf("cd: HOME not set\n");
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return (NULL);
 	}
 	return ((char *)home);
@@ -102,7 +62,7 @@ static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 	if (!old || !old->value)
 	{
 		printf("cd: OLDPWD not set\n");
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return (NULL);
 	}
 	printf("%s\n", old->value);
@@ -122,7 +82,7 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 	if (!home)
 	{
 		printf("cd: HOME not set\n");
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return (NULL);
 	}
 	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
@@ -141,7 +101,7 @@ void	builtin_cd(char *newpath, t_data *data)
 
 	must_free = false;
 	if (newpath == NULL)
-		newpath = handle_cd_null(data);
+		newpath = handle_cd_null();
 	else if (newpath[0] == '-')
 		newpath = handle_cd_oldpwd(data, &must_free, newpath);
 	else if (newpath[0] == '~')

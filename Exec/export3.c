@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export3.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:24:58 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:25:00 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 		if (!name || !validate_export_name(name))
 		{
 			printf("export: `%s': not a valid identifier\n", args[i]);
-			data->exit_code = 1;
+			g_exit_status = 1;
 			increment_and_free(&i, value, name);
 			continue ;
 		}

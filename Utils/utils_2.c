@@ -6,11 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 17:46:33 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/20 17:46:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 22:49:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	is_operator(char c)
 {

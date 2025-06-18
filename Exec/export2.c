@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:47:12 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:30:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:45:18 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,53 +31,6 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	}
 }
 
-
-void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
-{
-	t_env	*old = find_env_var(*env_list, "OLDPWD");
-	t_env	*pwd = find_env_var(*env_list, "PWD");
-
-	if (old)
-	{
-		free(old->value);
-		old->value = oldpath ? ft_strdup(oldpath) : ft_strdup("");
-	}
-	else
-		add_env_var(NULL, env_list, "OLDPWD", oldpath ? oldpath : "");
-
-	if (pwd)
-	{
-		free(pwd->value);
-		pwd->value = newpwd ? ft_strdup(newpwd) : ft_strdup("");
-	}
-	else
-		add_env_var(NULL, env_list, "PWD", newpwd ? newpwd : "");
-}
-
-
-/* void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
-{
-	t_env	*old = find_env_var(*env_list, "OLDPWD");
-	t_env	*pwd = find_env_var(*env_list, "PWD");
-
-	if (old)
-	{
-		free(old->value);
-		old->value = oldpath ? ft_strdup(oldpath) : NULL;
-	}
-	else if (oldpath)
-		add_env_var(NULL, env_list, "OLDPWD", oldpath);
-
-	if (pwd)
-	{
-		free(pwd->value);
-		pwd->value = newpwd ? ft_strdup(newpwd) : NULL;
-	}
-	else if (newpwd)
-		add_env_var(NULL, env_list, "PWD", newpwd);
-} */
-
-/* 
 void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 {
 	t_env	*old;
@@ -97,10 +50,9 @@ void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 		free(pwd->value);
 		pwd->value = ft_strdup(newpwd);
 	}
-} */
+}
 
-
-void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
+void	updatepwd(t_env **env_list, char *oldpath)
 {
 	char	*newpwd;
 
@@ -108,7 +60,7 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	if (!newpwd)
 	{
 		perror("cd: error retrieving current directory");
-		data->exit_code = 1;
+		g_exit_status = 1;
 		update_env_paths(env_list, oldpath, NULL);
 		return ;
 	}
@@ -146,7 +98,6 @@ void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
 	}
 }  */
 
-
 void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	char	*copied_name;
@@ -174,7 +125,6 @@ void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
  void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	t_env	*existing;
-
 
 	existing = find_env_var(*env_list, name);
 	if (existing)

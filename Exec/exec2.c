@@ -6,20 +6,20 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 21:02:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:50:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-bool	is_a_directory(char *path, char **args, t_data *data)
+bool	is_a_directory(char *path, char **args)
 {
 	struct stat	sb;
 
 	if (!args[0] || args[0][0] == '\0')
 	{
 		printf("minishell: command not found\n");
-		data->exit_code = 127;
+		g_exit_status = 127;
 		free(path);
 		return (true);
 	}
@@ -27,7 +27,7 @@ bool	is_a_directory(char *path, char **args, t_data *data)
 	{
 		printf("bash: %s: Is a directory\n", args[0]);
 		free(path);
-		data->exit_code = 126;
+		g_exit_status = 126;
 		return (true);
 	}
 	return (false);
@@ -57,14 +57,13 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
-
 void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
 		return ;
 	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
 	{
-		data->exit_code = 1;
+		g_exit_status = 1;
 		return ;
 	}
 	if (data->cmd->next)
@@ -90,7 +89,8 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-		close_all_fd();
+	/* 	while(wait(NULL) > 0)
+			; */
 	}
 }
 

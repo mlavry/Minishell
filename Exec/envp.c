@@ -23,8 +23,7 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 		malloc_failed(data);
 	}
 	new_var->name = ft_strdup(name);
-	new_var->value = value ? ft_strdup(value) : NULL;
-	//new_var->value = ft_strdup(value);
+	new_var->value = ft_strdup(value);
 	if (!new_var->name || (value != NULL && !new_var->value))
 	{
 		free(name);
@@ -40,8 +39,6 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	t_env	*new_var;
 	t_env	*tmp;
 
-	if (!name )
-		return ;
 	new_var = create_env_var(data, name, value);
 	if (!*env_list)
 	{
@@ -80,57 +77,6 @@ void	copy_env(t_env *tmp, char **envir)
 	}
 }
 
-
-/* char	**convert_env(t_env *env_list)
-{
-	int		count = 0;
-	t_env	*tmp = env_list;
-	char	**envir;
-
-	// 1. Compter combien de vars valides
-	while (tmp)
-	{
-		if (tmp->name && tmp->value)
-			count++;
-		tmp = tmp->next;
-	}
-
-	// 2. Malloc le tableau final
-	envir = malloc((count + 1) * sizeof(char *));
-	if (!envir)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
-
-	// 3. Remplir le tableau
-	int i = 0;
-	tmp = env_list;
-	while (tmp)
-	{
-		if (tmp->name && tmp->value)
-		{
-			envir[i] = malloc(ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2);
-			if (!envir[i])
-			{
-				perror("malloc");
-				// 💣 free ce qu’on a déjà alloué
-				while (--i >= 0)
-					free(envir[i]);
-				free(envir);
-				exit(EXIT_FAILURE);
-			}
-			ft_strcpy(envir[i], tmp->name);
-			ft_strcat(envir[i], "=");
-			ft_strcat(envir[i], tmp->value);
-			i++;
-		}
-		tmp = tmp->next;
-	}
-	envir[i] = NULL;
-	return (envir);
-} */
-
 char	**convert_env(t_env *env_list)
 {
 	int		count;
@@ -155,7 +101,7 @@ char	**convert_env(t_env *env_list)
 	copy_env(env_list, envir);
 	envir[count] = NULL;
 	return (envir);
-} 
+}
 
 void	parse_env(char **envp, t_data *data)
 {

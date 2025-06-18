@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_commands.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:33:00 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:33:02 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/17 00:01:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 	return (1);
 }
 
-int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
+int	handle_output(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
@@ -73,7 +73,7 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
@@ -81,7 +81,7 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
 			close((*cur)->fd_out);
 		(*cur)->fd_out = open((*tokens)->next->str,
-				O_CREAT | O_WRONLY | O_TRUNC, 0644);
+				O_CREAT | O_WRONLY | O_TRUNC | __O_CLOEXEC, 0644);
 		if ((*cur)->fd_out < 0)
 		{
 			printf("%s: No such file or directory\n", (*tokens)->next->str);
@@ -92,7 +92,7 @@ int	handle_output(t_token **tokens, t_cmd **cur, t_data *data)
 	return (1);
 }
 
-int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
+int	handle_input(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
@@ -100,14 +100,14 @@ int	handle_input(t_token **tokens, t_cmd **cur, t_data *data)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		data->exit_code = 2;
+		g_exit_status = 2;
 		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_in != STDIN_FILENO)
 			close((*cur)->fd_in);
-		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY);
+		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY | __O_CLOEXEC);
 		if ((*cur)->fd_in < 0)
 		{
 			printf("%s: No such file or directory\n", (*tokens)->next->str);

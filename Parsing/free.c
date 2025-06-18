@@ -90,7 +90,7 @@ void	free_cmd(t_cmd **cmd)
 			free((*cmd)->name);
 		if ((*cmd)->args)
 			free_tab((*cmd)->args);
-		//close_all_fd();
+		close_all_fd();
 		free(*cmd);
 		*cmd = tmp;
 	}

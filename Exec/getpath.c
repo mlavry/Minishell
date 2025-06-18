@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 21:43:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/05/07 00:35:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,6 @@ char	*getpath(char *cmd, t_data *data)
 		return (fullpath);
 	fullpath = find_cmd_path(cmd, data->env);
 	if (!fullpath)
-		data->exit_code = 127;
+		g_exit_status = 127;
 	return (fullpath);
 }

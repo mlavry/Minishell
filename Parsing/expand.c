@@ -6,17 +6,17 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/15 21:50:04 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 19:04:31 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:58:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int	dollar_exit(t_data *data, char **src, char **res, int *len_buf)
+int	dollar_exit(char **src, char **res, int *len_buf)
 {
 	char	*nbr;
 
-	nbr = ft_itoa(data->exit_code);
+	nbr = ft_itoa(g_exit_status);
 	if (!nbr)
 		return (0);
 	if (!str_append(res, len_buf, nbr))
@@ -55,7 +55,7 @@ void	check_dollars(t_data *data, char **src, char **res, int *len_buf)
 {
 	if ((*src)[1] == '?')
 	{
-		if (!dollar_exit(data, src, res, len_buf))
+		if (!dollar_exit(src, res, len_buf))
 			malloc_failed(data);
 		return ;
 	}
@@ -72,23 +72,16 @@ static bool is_shell_delim(char c)
             c == '(' || c == ')' || c == '<' || c == '>');
 }
 
-/*  cur pointe sur le '$'
-    line_start est data->line (début de la commande)           */
 static bool  is_in_heredoc_delim(char *cur, char *line_start)
 {
     char *p = cur;
 
-    /* ① remonter jusqu’au début du MOT (= pas d’espace ni sep.) */
     while (p > line_start &&
            !is_space(*(p - 1)) &&
            !is_shell_delim(*(p - 1)))
         --p;
-
-    /* ② reculer encore pour sauter les espaces éventuels        */
     while (p > line_start && is_space(*(p - 1)))
         --p;
-
-    /* ③ tester ‘<<’ ou ‘<<-’ juste avant */
     if (p - line_start >= 2 &&
         *(p - 1) == '<' && *(p - 2) == '<')
         return true;
@@ -97,8 +90,7 @@ static bool  is_in_heredoc_delim(char *cur, char *line_start)
         *(p - 1) == '-' &&
         *(p - 2) == '<' && *(p - 3) == '<')
         return true;
-
-    return false;          /* → ce n’est pas le délimiteur */
+    return false;
 }
 
 /* retourne 1 si on NE doit PAS expander  */

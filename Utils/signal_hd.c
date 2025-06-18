@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 00:50:33 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/18 17:28:42 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 21:00:20 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,10 @@
 static void  sigint_hd(int signo)
 {
     (void)signo;
-    g_exit_status = 130;          /* flag + valeur de retour              */
-    write(STDOUT_FILENO, "^C\n", 3);/* saute la ligne comme bash            */
+    g_exit_status = 130;
+    write(STDOUT_FILENO, "^C\n", 3);
 }
 
-/* installe handlers spéciaux et sauvegarde les anciens */
 void    hd_set_signals(struct sigaction *old_int)
 {
     struct sigaction sa;
@@ -31,7 +30,6 @@ void    hd_set_signals(struct sigaction *old_int)
 	signal(SIGQUIT, SIG_IGN);
 }
 
-/* restaure l’état précédent (appel obligatoire en sortie) */
 void    hd_restore_signals(const struct sigaction *old_int)
 {
     sigaction(SIGINT,  old_int,  NULL);

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/16 23:40:26 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 20:51:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	exec_builtin(t_data *data)
 	else if (ft_strcmp(cmd->name, "export") == 0)
 		builtin_export(data, &env_list, cmd);
 	else if (ft_strcmp(cmd->name, "unset") == 0)
-		builtin_unset(&env_list, cmd);
+		builtin_unset(&data->env, cmd);
 }
 
 int	is_numeric(const char *str)

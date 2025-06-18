@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/18 17:26:55 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/18 21:17:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,19 +84,21 @@ int write_heredoc(char *delimiter, int tmp_fd)
     char               *line;
     char               *newline;
     struct sigaction    old_int;
-    int                 saved_status = g_exit_status;   /* pour restauration */
+    int                 saved_status = g_exit_status;
+	bool				eof = false;
 
 	disable_echoctl();
-    hd_set_signals(&old_int);                /* ← nouveau */
-
-    g_exit_status = 0;                                  /* fresh start       */
+    hd_set_signals(&old_int);
+    g_exit_status = 0;
     while (1)
     {
         write(STDOUT_FILENO, "> ", 2);
         line = get_next_line(STDIN_FILENO);
-        if (!line)                      /* EOF ou read() interrompu          */
-            break;
-
+        if (!line)
+		{
+			eof = true;
+            break ;
+		}
         if (g_exit_status == 130)
         {
             free(line);
@@ -115,13 +117,16 @@ int write_heredoc(char *delimiter, int tmp_fd)
         free(line);
     }
 	enable_echoctl();
-    hd_restore_signals(&old_int);            /* ← nouveau */
-
-    /* si pas interrompu, on remet l’ancien exit-status */
+    hd_restore_signals(&old_int);
+	if (eof && g_exit_status != 130)
+	{
+		printf("\n");
+		printf("minishell: warning: here-document delimited by end-of-file "
+			"(wanted `%s')\n", delimiter);
+	}
     if (g_exit_status != 130)
         g_exit_status = saved_status;
-
-    return (g_exit_status == 130 ? -1 : 0);             /* -1 = heredoc tué  */
+    return (g_exit_status == 130 ? -1 : 0);
 }
 
 int	handle_heredoc(t_token **tokens, t_cmd *cur)

@@ -10,8 +10,6 @@ bash: syntax error near unexpected token `|'
 
 ----------------HERDEDOCS--------------------
 
-'\n' dans le cas ou on ctrl + D dans heredoc
-
 0
 minishell$ echo la | lo >>>>>>>>>>>>>
 lo: command not found
@@ -29,3 +27,5 @@ signaux pipe
 Probleme fait ls alors qu'il ne devrait pas :
 
 << wnfkih woifnoiw | echo co | ls | << lol
+
+PWD doit revenir si on relance un minishell

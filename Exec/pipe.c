@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/18 22:46:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 02:09:58 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 {
 	int		pipe_fd[2];
 	pid_t	pid;
+	pid_t	last_pid;
 	int		prev_fd;
 	int		status;
 
@@ -109,14 +110,28 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 		}
 		if (pid == 0)
 			children(cmd, data, prev_fd, pipe_fd);
+		if (cmd->next == NULL)
+			last_pid = pid;
 		parent(cmd, pipe_fd, &prev_fd);
 		cmd = cmd->next;
 	}
 	ignore_sigint();
+	bool sigint_printed = false;
 	while ((pid = wait(&status)) > 0)
 	{
-		if (g_exit_status != 130 && g_exit_status != 131)
-			handle_status_and_print(status);
+    	if (WIFSIGNALED(status))
+    	{
+        	int sig = WTERMSIG(status);
+        	if (sig == SIGINT && !sigint_printed && pid != last_pid)
+        	{
+            	write(STDOUT_FILENO, "\n", 1);
+            	sigint_printed = true;
+        	}
+    	}
+    if (pid == last_pid && !sigint_printed)
+        handle_status_and_print(status);
+	else if (pid == last_pid && sigint_printed)
+		g_exit_status = 130;
 	}
 	close_all_fd();
 }

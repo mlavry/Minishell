@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 17:42:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 01:27:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,11 @@ int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
+	if (!isatty(STDIN_FILENO))
+	{
+		ft_putstr_fd("minishell: not a tty, exiting.\n", STDERR_FILENO);
+		return (0);
+	}
 	init_data(&data, argc, argv, envp);
 	if (!envp || !*envp || !envp[0])
 		emptyenv(&data, &data.env);

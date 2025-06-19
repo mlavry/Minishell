@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 23:59:04 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 16:55:03 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,8 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+	if (line[pos[1] - 1] && line[pos[1]]
+		&& is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
 			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
@@ -203,7 +204,8 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+	if (line[pos[1] - 1] && line[pos[1]]
+		&& is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
 			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		pos[1]++;
@@ -271,11 +273,13 @@ int	handle_unquoted(char *line, char **tokens, int *pos)
 	}
 	if (!temp && line[pos[1]])
 		temp = ft_strdup("");
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+	while (line[pos[1]] && line[pos[1] + 1]
+		&& is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] = pos[1] + 2;
 	pos[1]++;
-	if (is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+	if (line[pos[1] - 1] && line[pos[1]]
+		&& is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
 			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
 	{
 		quote_choice(&sq, &dq, line[pos[1]]);

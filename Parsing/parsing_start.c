@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 00:05:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 19:05:08 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ bool	check_redirection_syntax(t_token *tok)
 {
 	if (!tok->next || tok->next->type != ARG)
 	{
-		ft_putstr_fd("shel: syntax error near unexpected token `", 2);
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 		if (!tok->next)
 			ft_putstr_fd("newline", 2);
 		else
@@ -49,7 +49,6 @@ bool	check_pipe_syntax(t_token *tok)
 		g_exit_status = 2;
 		return (false);
 	}
-   // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
 	if (tok->prev->type == PIPE || tok->next->type == PIPE)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);

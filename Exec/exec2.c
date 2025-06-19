@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/16 23:50:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 17:43:48 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,9 +70,9 @@ void	executecommand(t_data *data)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
 	{
-	/* 	if (!ft_strcmp(data->cmd->args[0], "exit"))
+	 	if (!ft_strcmp(data->cmd->args[0], "exit"))
 			builtin_exit(data);
-		else */
+		else 
 			exec_builtin_redirection(data);
 	}
 	else if (!data->cmd->args || !data->cmd->args[0])

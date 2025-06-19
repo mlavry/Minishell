@@ -6,11 +6,12 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 19:05:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 22:47:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
 
 void	set_token_prev_links(t_token *tokens)
 {
@@ -49,6 +50,7 @@ bool	check_pipe_syntax(t_token *tok)
 		g_exit_status = 2;
 		return (false);
 	}
+   // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
 	if (tok->prev->type == PIPE || tok->next->type == PIPE)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);

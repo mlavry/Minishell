@@ -65,11 +65,18 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 	return (1);
 }
 
+
 int	handle_output(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
-	if ((*tokens)->type == OUTPUT
+	if ((*cur)->args == NULL && (*cur)->name == NULL)
+	{
+		(*cur)->name = ft_strdup(""); // pour signaler que ce t_cmd existe
+		(*cur)->fd_in = STDIN_FILENO;
+		(*cur)->fd_out = STDOUT_FILENO;
+	}	
+	if (((*tokens)->type == OUTPUT || (*tokens)->type == APPEND || (*tokens)->type == INPUT || (*tokens)->type == HEREDOC)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
@@ -87,6 +94,7 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 			printf("%s: No such file or directory\n", (*tokens)->next->str);
 			return (0);
 		}
+		printf("handle_output: opening file %s\n", (*tokens)->next->str); // DEBUG
 		*tokens = (*tokens)->next;
 	}
 	return (1);
@@ -113,6 +121,7 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 			printf("%s: No such file or directory\n", (*tokens)->next->str);
 			return (0);
 		}
+
 		*tokens = (*tokens)->next;
 	}
 	return (1);

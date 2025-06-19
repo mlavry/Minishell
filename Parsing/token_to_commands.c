@@ -225,7 +225,7 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 	tok = *tokens;
 	if (!tok)
 		return (false);
-	if (tok->type == HEREDOC)
+	/* if (tok->type == HEREDOC)
 		return (handle_heredoc_type(tok, tokens, *cur));
 	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
 		return (true);
@@ -241,6 +241,23 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 		return (handle_pipe(tokens, cur));
 	if (tok->type == APPEND)
 		return (handle_append(tokens, cur));
+ */
+	if (tok->type == CMD)
+    	return (handle_cmd_type(tok, head, cur, tokens));
+	if (tok->type == PIPE)
+    	return (handle_pipe(tokens, cur));
+	if (tok->type == OUTPUT)
+   	 	return (handle_output(tokens, cur));
+	if (tok->type == APPEND)
+    	return (handle_append(tokens, cur));
+	if (tok->type == INPUT)
+   	 	return (handle_input(tokens, cur));
+	if (tok->type == HEREDOC)
+    	return (handle_heredoc_type(tok, tokens, *cur));
+	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+    	return (true);
+	if (tok->type == ARG)
+   	 return (handle_arg_type(tok, *cur, tokens));
 
 	return (true);
 }

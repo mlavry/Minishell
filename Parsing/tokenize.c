@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 19:10:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 23:02:34 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,18 +50,18 @@ static void	check_value(t_token *token)
 	}
 }
 
-void	add_token(t_data *data, t_token **head, char *value)
+int	add_token(t_token **head, char *value)
 {
 	t_token	*new;
 	t_token	*tmp;
 
 	new = malloc(sizeof(t_token));
 	if (!new)
-		return ;
+		return (0);
 	new->str = ft_strdup(value);
 	new->type = get_token_type(new->str);
 	if (!check_arg_op_syntax(new))
-		free_all(data, g_exit_status, false);
+		return (0);
 	check_value(new);
 	new->next = NULL;
 	if (!*head)
@@ -73,9 +73,10 @@ void	add_token(t_data *data, t_token **head, char *value)
 			tmp = tmp->next;
 		tmp->next = new;
 	}
+	return (1);
 }
 
-void	parse_token(t_data *data, char **tokens)
+int	parse_token(t_data *data, char **tokens)
 {
 	int		i;
 	t_token	*token_list;
@@ -84,18 +85,20 @@ void	parse_token(t_data *data, char **tokens)
 	i = 0;
 	while (tokens[i])
 	{
-		add_token(data, &token_list, tokens[i]);
+		if (!add_token(&token_list, tokens[i]))
+			return (0);
 		i++;
 	}
 	data->token = token_list;
 	mark_commands(data);
-	// t_token *tmp = token_list;
- 	// while (tmp)
-	// {
-	// 	printf("Token: %-15s | Type: %-2d\n",
-	// 	tmp->str, tmp->type);
-	// 	tmp = tmp->next;
-	// }
+/* 	t_token *tmp = token_list;
+ 	while (tmp)
+	{
+		printf("Token: %-15s | Type: %-2d\n",
+		tmp->str, tmp->type);
+		tmp = tmp->next;
+	} */
+	return (1);
 }
 
 int	tokenize(t_data *data)
@@ -108,7 +111,8 @@ int	tokenize(t_data *data)
 		g_exit_status = 2;
 		return (0);
 	}
-	parse_token(data, token);
+	if (!parse_token(data, token))
+		return (0);
 	free_tab(token);
 	return (1);
 }

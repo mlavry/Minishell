@@ -98,8 +98,18 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 void	builtin_cd(char *newpath, t_data *data)
 {
 	bool		must_free;
+	int			count;
 
 	must_free = false;
+	count = 0;
+	while (data->cmd->args[count])
+		count++;
+	if (count > 2)
+	{
+		printf("%s: too many arguments\n", *data->cmd->args);
+		g_exit_status = 1;
+		return ;
+	}
 	if (newpath == NULL)
 		newpath = handle_cd_null();
 	else if (newpath[0] == '-')

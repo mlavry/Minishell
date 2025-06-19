@@ -218,6 +218,31 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
     return true;
 } */
 
+/* 
+bool	handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
+{
+	t_token *tok = *tokens;
+
+	// Vérifie si on est bien sur un token de redirection
+	if (!tok || !(tok->type == OUTPUT || tok->type == APPEND || tok->type == INPUT || tok->type == HEREDOC))
+		return (false);
+
+	t_cmd *cmd = *cur;
+
+	// On gère chaque type de redirection
+	if (tok->type == OUTPUT)
+		return handle_output(tokens, &cmd);
+	else if (tok->type == APPEND)
+		return handle_append(tokens, &cmd);
+	else if (tok->type == INPUT)
+		return handle_input(tokens, &cmd);
+	else if (tok->type == HEREDOC)
+		return handle_heredoc_type(tok, tokens, cmd);
+
+	return false;
+} */
+
+
 static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 {
 	t_token	*tok;
@@ -242,21 +267,22 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 	if (tok->type == APPEND)
 		return (handle_append(tokens, cur));
  */
-	if (tok->type == CMD)
-    	return (handle_cmd_type(tok, head, cur, tokens));
-	if (tok->type == PIPE)
-    	return (handle_pipe(tokens, cur));
-	if (tok->type == OUTPUT)
-   	 	return (handle_output(tokens, cur));
-	if (tok->type == APPEND)
-    	return (handle_append(tokens, cur));
-	if (tok->type == INPUT)
-   	 	return (handle_input(tokens, cur));
+
 	if (tok->type == HEREDOC)
     	return (handle_heredoc_type(tok, tokens, *cur));
-	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
-    	return (true);
-	if (tok->type == ARG)
+	else if (tok->type == OUTPUT)
+   	 	return (handle_output(tokens, cur));
+	else if (tok->type == APPEND)
+    	return (handle_append(tokens, cur));
+	else if (tok->type == INPUT)
+   	 	return (handle_input(tokens, cur));
+	else if (tok->type == PIPE)
+    	return (handle_pipe(tokens, cur));
+ 	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+    	return (true); 
+	else if (tok->type == CMD)
+    	return (handle_cmd_type(tok, head, cur, tokens));	
+	else if (tok->type == ARG)
    	 return (handle_arg_type(tok, *cur, tokens));
 
 	return (true);
@@ -304,7 +330,7 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 	return (head);
 }
 
-/* void print_cmds(t_cmd *c)
+/*  void print_cmds(t_cmd *c)
 {
     int idx;
     while (c)
@@ -315,4 +341,4 @@ t_cmd	*tokens_to_commands(t_token *tokens)
         printf("  fd_in = %d, fd_out = %d\n", c->fd_in, c->fd_out);
         c = c->next;
     }
-} */
+}  */

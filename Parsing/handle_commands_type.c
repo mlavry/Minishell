@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
+ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
 {
 	if (!t->next || t->next->type != ARG)
 	{
@@ -24,7 +24,7 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
 		return (false);
 	*tok = (*tok)->next->next;
 	return (true);
-}
+} 
 
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens)
 {

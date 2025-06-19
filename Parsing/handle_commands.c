@@ -50,6 +50,81 @@ int	handle_arg(t_cmd *cur, t_token *token)
 	return (1);
 }
 
+t_cmd	*create_new_cmd(void)
+{
+	t_cmd	*cmd;
+
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	cmd->args = NULL;
+	cmd->fd_in = STDIN_FILENO;
+	cmd->fd_out = STDOUT_FILENO;
+	cmd->next = NULL;
+	return (cmd);
+}
+
+
+
+bool is_redirection(int type)
+{
+	return (type == OUTPUT || type == APPEND || type == INPUT || type == HEREDOC);
+}
+
+int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
+{
+	while (*tokens && is_redirection((*tokens)->type))
+	{
+		int type = (*tokens)->type;
+
+		if (type == OUTPUT)
+		{
+			if (!handle_output(tokens, cur))
+				return (0);
+		}
+		else if (type == APPEND)
+		{
+			if (!handle_append(tokens, cur))
+				return (0);
+		}
+		else if (type == INPUT)
+		{
+			if (!handle_input(tokens, cur))
+				return (0);
+		}
+		else if (type == HEREDOC)
+		{
+			if (!handle_heredoc_type(*tokens, tokens, *cur))
+				return (0);
+		}
+	}
+	return (1);
+}
+
+/* int handle_pipe(t_token **tokens, t_cmd **cur)
+{
+	if (!cur || !*cur)
+		return (0);
+	if ((*tokens)->type == PIPE && (!(*tokens)->next))
+	{
+		printf("minishell: syntax error near unexpected token `|'\n");
+		return (0);
+	}
+
+	*tokens = (*tokens)->next;
+	if (*tokens && is_redirection((*tokens)->type))
+	{
+		if (!*cur)
+			*cur = create_new_cmd();
+		if (!handle_redirect_after_pipe(tokens, cur))
+			return (0);
+	}
+	return (1);
+} */
+
+
+
+
 int	handle_pipe(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
@@ -59,9 +134,19 @@ int	handle_pipe(t_token **tokens, t_cmd **cur)
 		printf("minishell: syntax error near unexpected token `|'\n");
 		return (0);
 	}
+
 	*tokens = (*tokens)->next;
-	if (!cur || !*cur)
-		return (0);
+	if (*tokens && is_redirection((*tokens)->type))
+	{
+    	if (!*cur)
+        	*cur = create_new_cmd(); // Crée un t_cmd vide
+
+    	if (handle_redirect_after_pipe(tokens, cur))
+			return 0;
+	}
+
+/* 	if (!cur || !*cur)
+		return (0); */
 	return (1);
 }
 
@@ -94,7 +179,6 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 			printf("%s: No such file or directory\n", (*tokens)->next->str);
 			return (0);
 		}
-		printf("handle_output: opening file %s\n", (*tokens)->next->str); // DEBUG
 		*tokens = (*tokens)->next;
 	}
 	return (1);

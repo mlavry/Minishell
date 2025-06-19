@@ -150,6 +150,14 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 		close(pipe_fd[1]);
 		*prev_fd = pipe_fd[0];
 	}
+	else
+	{
+		// Pas de commande suivante ou elle est vide
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		*prev_fd = -1;
+	}
+	
 }
 
 /* bool	is_invalid_command(char *path, char *cmd_name)
@@ -170,6 +178,21 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 } */
 
 
+bool	has_real_command(t_cmd *cmd)
+{
+	while (cmd)
+	{
+		if (cmd->args && cmd->args[0])
+			return true;
+		cmd = cmd->next;
+	}
+	return false;
+}
+
+bool	is_empty_cmd(t_cmd *cmd)
+{
+	return (!cmd || !cmd->args || !cmd->args[0]);
+}
 
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
@@ -184,63 +207,147 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	prev_fd = -1;
 	while (cmd)
 	{
-		bool next_cmd_valid = cmd->next && cmd->next->args && cmd->next->args[0];
+		
+// 		/* if (has_real_command(cmd->next) && pipe(pipe_fd) == -1)
+// 		{
+// 				perror("pipe");
+// 			exit(1);
+
+// 		} */
+
+// 		/* 
+// 		bool next_cmd_valid = cmd->next && cmd->next->args && cmd->next->args[0];
+// 		if (next_cmd_valid && pipe(pipe_fd) == -1)
+// 		{
+// 			perror("pipe");
+// 			exit(1);
+// 		} */
+// 		//bool is_empty_cmd = (!cmd->args || !cmd->args[0]);
+// 	//bool is_invalid = false;
+
+
+// /* 	if (is_empty_cmd)
+// 	{
+// 	// Si on a une redirection de sortie, elle sera déjà gérée dans le parsing
+// 		 if (cmd->fd_out != STDOUT_FILENO)
+//             close(cmd->fd_out); 
+// 		cmd = cmd->next;
+// 		continue;
+// 	} */
+
+// 	/* if (!is_empty_cmd)
+// 	{
+		
+// 		path = getpath(cmd->args[0], data);
+// 		if (!path)
+// 		{
+// 			fprintf(stderr, "minishell: %s: command not found\n", cmd->args[0]);
+// 			g_exit_status = 127;
+// 			is_invalid = true;
+// 		}
+// 	} */
+
+// /*  		if (cmd->fd_in == -1 || cmd->fd_out == -1 || !cmd->args || !cmd->args[0])
+// 		{
+//     		break;
+// 		} 
+// 		path = getpath(cmd->args[0], data);
+// 		if (!path)
+// 		{
+// 			printf("%s: command not found\n", cmd->args[0]);
+// 			g_exit_status = 127;
+// 			break ;
+// 		}   */
+	
+// /* 		if (!cmd->args || !cmd->args[0])
+// {
+// 	g_exit_status = 127;
+// 	fprintf(stderr, "minishell: command not found\n");
+// 	break;
+// }
+
+// 		if (is_invalid_command(path,cmd->args[0]))
+// 		{
+// 			printf("%s: command not found\n", cmd->args[0]);
+//     		g_exit_status = 127;
+//     		break;
+// 		} 
+//  */
+// 		if ((!cmd->args || !cmd->args[0]))
+// 		{
+//     // On crée un fichier vide si redirection de sortie
+//    			 if (cmd->fd_out != STDOUT_FILENO)
+//     		{
+//        	 		write(cmd->fd_out, "", 0);
+//         		close(cmd->fd_out);
+//         		cmd->fd_out = STDOUT_FILENO;
+//     		}
+
+//     // Si une redirection d'entrée avait été ouverte, on la ferme
+//     		if (cmd->fd_in != STDIN_FILENO)
+//     		{
+//        	 		close(cmd->fd_in);
+//         		cmd->fd_in = STDIN_FILENO;
+//     		}
+// 			if (has_real_command(cmd->next))
+// 			{
+// 				close(pipe_fd[0]);
+// 				close(pipe_fd[1]);
+// 			}
+
+//     		// Et surtout : on NE FORKE PAS
+//     		cmd = cmd->next;
+//     		continue;
+// 		}
+
+		if ((!cmd->args || !cmd->args[0]))
+		{
+
+			if (cmd->fd_in != STDIN_FILENO)
+			{
+    // Ferme fd_in, pour qu’il ne lise pas le pipe précédent
+   				 close(cmd->fd_in);
+    			cmd->fd_in = STDIN_FILENO;
+			}
+
+
+		}
+
+		bool next_cmd_valid = cmd->next && !is_empty_cmd(cmd->next);
 		if (next_cmd_valid && pipe(pipe_fd) == -1)
 		{
 			perror("pipe");
 			exit(1);
 		}
-		bool is_empty_cmd = (!cmd->args || !cmd->args[0]);
-	//bool is_invalid = false;
 
-
-	if (is_empty_cmd)
-	{
-	// Si on a une redirection de sortie, elle sera déjà gérée dans le parsing
-		 if (cmd->fd_out != STDOUT_FILENO)
-            close(cmd->fd_out); 
-		cmd = cmd->next;
-		continue;
-	}
-
-	/* if (!is_empty_cmd)
-	{
-		
-		path = getpath(cmd->args[0], data);
-		if (!path)
+		if (is_empty_cmd(cmd))
 		{
-			fprintf(stderr, "minishell: %s: command not found\n", cmd->args[0]);
-			g_exit_status = 127;
-			is_invalid = true;
+			// Crée un fichier vide si redirection de sortie
+			if (cmd->fd_out != STDOUT_FILENO)
+			{
+				write(cmd->fd_out, "", 0);
+				close(cmd->fd_out);
+				cmd->fd_out = STDOUT_FILENO;
+			}
+
+			if (cmd->fd_in != STDIN_FILENO)
+			{
+				close(cmd->fd_in);
+				cmd->fd_in = STDIN_FILENO;
+			}
+
+			// 🔥 Fermer le pipe inutilement ouvert pour cette commande vide
+			if (next_cmd_valid)
+			{
+				close(pipe_fd[0]);
+				close(pipe_fd[1]);
+			}
+
+			cmd = cmd->next->next;
+			continue;
 		}
-	} */
 
-/*  		if (cmd->fd_in == -1 || cmd->fd_out == -1 || !cmd->args || !cmd->args[0])
-		{
-    		break;
-		} 
-		path = getpath(cmd->args[0], data);
-		if (!path)
-		{
-			printf("%s: command not found\n", cmd->args[0]);
-			g_exit_status = 127;
-			break ;
-		}   */
-	
-/* 		if (!cmd->args || !cmd->args[0])
-{
-	g_exit_status = 127;
-	fprintf(stderr, "minishell: command not found\n");
-	break;
-}
 
-		if (is_invalid_command(path,cmd->args[0]))
-		{
-			printf("%s: command not found\n", cmd->args[0]);
-    		g_exit_status = 127;
-    		break;
-		} 
- */
 		pid = fork();
 		if (pid == -1)
 		{
@@ -272,12 +379,12 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	else if (pid == last_pid && sigint_printed)
 		g_exit_status = 130;
 	}
-	close_all_fd();
+	//close_all_fd();
 /* 	while ((pid = wait(&status)) > 0)
 		g_exit_status = WEXITSTATUS(status);
 	close_all_fd();  */
-	/*  while (wait(NULL) > 0)
+	  while (wait(NULL) > 0)
 		;
 	if (prev_fd != -1)
-		close(prev_fd); */
+		close(prev_fd); 
 }

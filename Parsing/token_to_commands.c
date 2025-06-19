@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/18 21:17:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 02:40:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
-	if ((*tokens)->type == APPEND && (!(*tokens)->prev
+ 	if ((*tokens)->type == APPEND && (!(*tokens)->prev
 			|| !(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
@@ -158,6 +158,31 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 	return (1);
 }
 
+/* int	handle_heredoc(t_token **tokens, t_cmd *cur)
+{
+	char	*delimiter;
+	char	*tmp_filename;
+	int		tmp_fd;
+
+	delimiter = (*tokens)->next->str;
+	tmp_filename = heredoc_tmp();
+	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	if (tmp_fd == -1)
+		return (perror("open tmp"), 0);
+	if (!tokens || !*tokens || !(*tokens)->next)
+		return (0);
+	write_heredoc(delimiter, tmp_fd);
+	close(tmp_fd);
+	if (cur->fd_in != STDIN_FILENO)
+		close(cur->fd_in);
+	cur->fd_in = open(tmp_filename, O_RDONLY);
+	unlink(tmp_filename);
+	if (cur->fd_in == -1)
+		return (perror("open heredoc read"), 0);
+	free(tmp_filename);
+	return (1);
+} */
+
 /* bool check_token_syntax(t_token *tokens, t_data *data)
 {
     while (tokens)
@@ -200,6 +225,8 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 	tok = *tokens;
 	if (!tok)
 		return (false);
+	if (tok->type == HEREDOC)
+		return (handle_heredoc_type(tok, tokens, *cur));
 	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
 		return (true);
 	if (tok->type == CMD)
@@ -214,10 +241,11 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 		return (handle_pipe(tokens, cur));
 	if (tok->type == APPEND)
 		return (handle_append(tokens, cur));
-	if (tok->type == HEREDOC)
-		return (handle_heredoc_type(tok, tokens, *cur));
+
 	return (true);
 }
+
+
 
 t_cmd	*tokens_to_commands(t_token *tokens)
 {
@@ -226,6 +254,14 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 
 	head = NULL;
 	cur = NULL;
+
+	if ((tokens->type == PIPE && (!tokens->next || tokens->next->type == PIPE
+				|| tokens->next->type == OUTPUT)) || (tokens->type == OUTPUT
+			&& (!tokens->next || tokens->next->type != CMD)))
+	{
+		printf("shell: syntax error near unexpected token\n");
+		return (free_cmd(&head), NULL);
+	}
 	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC))
 	{

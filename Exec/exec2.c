@@ -16,7 +16,7 @@ bool	is_a_directory(char *path, char **args)
 {
 	struct stat	sb;
 
-	if (!args[0] || args[0][0] == '\0')
+	if (!args || !args[0] || args[0][0] == '\0')
 	{
 		printf("minishell: command not found\n");
 		g_exit_status = 127;
@@ -75,11 +75,28 @@ void	executecommand(t_data *data)
 		else
 			exec_builtin_redirection(data);
 	}
+	else if (!data->cmd->args || !data->cmd->args[0])
+	{
+	// Ne pas exécuter, mais si redirection seule, tu crées le fichier vide
+		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
+			write(data->cmd->fd_out, "", 0);
+			close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO;
+		}
+		if (data->cmd->fd_in != STDIN_FILENO)
+		{
+			close(data->cmd->fd_in);
+			data->cmd->fd_in = STDIN_FILENO;
+		}
+
+		return ;
+	}
 	else if (data->cmd->args && data->cmd->args[0])
 		exec_extern_command(data->cmd->args, data->env, data);
 	else
 	{
-		if (data->cmd->fd_in != STDIN_FILENO)
+	/* 	if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			close(data->cmd->fd_in);
 			data->cmd->fd_in =STDIN_FILENO;
@@ -88,9 +105,19 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
+		} */
+		while(wait(NULL) > 0)
+			;
+		if (data->cmd->fd_in != STDIN_FILENO)
+		{
+    		close(data->cmd->fd_in);
+   	 		data->cmd->fd_in = STDIN_FILENO;
 		}
-	/* 	while(wait(NULL) > 0)
-			; */
+		if (data->cmd->fd_out != STDOUT_FILENO)
+		{
+			close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO;
+		}
 	}
 }
 

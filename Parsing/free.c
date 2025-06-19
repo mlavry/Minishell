@@ -27,6 +27,14 @@ void	free_tab(char **tokens)
 	free(tokens);
 }
 
+/* void closefd(t_data *data)
+{
+	if (data->cmd->fd_in != STDIN_FILENO)
+		close(data->cmd->fd_in);
+	if (data->cmd->fd_out != STDOUT_FILENO)
+		close(data->cmd->fd_out);
+} */
+
 void	close_all_fd(void)
 {
 	int	fd;

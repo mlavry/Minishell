@@ -6,25 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 01:27:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 02:43:22 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_exit_status;
-
-/*void	signal_handler(int sig)
-{
-	if (sig == SIGINT)
-	{
-		ft_putstr_fd("\n", STDOUT_FILENO);
-		rl_replace_line("", 0);
-		if (rl_on_new_line() != 0)
-			ft_putstr_fd("Error: problem with new line\n", 2);
-		rl_redisplay();
-	}
-}*/
 
 bool	empty_line(char *line)
 {

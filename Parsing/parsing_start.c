@@ -64,6 +64,21 @@ bool	validate_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
+
+	/* 	if (tokens->type == PIPE)
+		{
+			// Si juste après pipe on a une redirection
+			if (tokens->next && (tokens->next->type == OUTPUT || tokens->next->type == APPEND
+				|| tokens->next->type == INPUT || tokens->next->type == HEREDOC))
+			{
+				ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+				ft_putstr_fd(tokens->next->str, 2);
+				ft_putstr_fd("'\n", 2);
+				g_exit_status = 2;
+				return (false);
+			}
+		}
+		 */
 		if (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC)
 		{

@@ -57,6 +57,23 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
+
+
+
+void	reset_fd(t_cmd *cmd)
+{
+    if (cmd->fd_in != STDIN_FILENO)
+    {
+        close(cmd->fd_in);
+        cmd->fd_in = STDIN_FILENO;
+    }
+    if (cmd->fd_out != STDOUT_FILENO)
+    {
+        close(cmd->fd_out);
+        cmd->fd_out = STDOUT_FILENO;
+    }
+}
+
 void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
@@ -81,15 +98,10 @@ void	executecommand(t_data *data)
 		if (data->cmd->fd_out != STDOUT_FILENO)
 		{
 			write(data->cmd->fd_out, "", 0);
-			close(data->cmd->fd_out);
-			data->cmd->fd_out = STDOUT_FILENO;
+			/* close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO; */
 		}
-		if (data->cmd->fd_in != STDIN_FILENO)
-		{
-			close(data->cmd->fd_in);
-			data->cmd->fd_in = STDIN_FILENO;
-		}
-
+		reset_fd(data->cmd);
 		return ;
 	}
 	else if (data->cmd->args && data->cmd->args[0])

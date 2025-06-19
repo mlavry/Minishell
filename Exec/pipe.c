@@ -184,24 +184,41 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	prev_fd = -1;
 	while (cmd)
 	{
-		bool next_cmd_valid = cmd->next && cmd->next->args && cmd->next->args[0];
-		if (next_cmd_valid && pipe(pipe_fd) == -1)
+
+		bool has_next_cmd = cmd->next && cmd->next->args && cmd->next->args[0];
+
+    	if ((!cmd->args || !cmd->args[0]) && cmd->fd_out != STDOUT_FILENO)
+    	{
+        // Commande vide mais redirection de sortie présente
+        // On crée juste le fichier (fd_out est déjà ouvert), on ferme le fd puis on continue
+        	/* if (cmd->fd_out != -1)
+           	 	close(cmd->fd_out); */
+        // Passe à la suite
+		write(cmd->fd_out, "", 0);
+        close(cmd->fd_out);
+        cmd->fd_out = STDOUT_FILENO;
+        
+       		cmd = cmd->next;
+        	continue;
+    	}
+		//bool next_cmd_valid = cmd->next && cmd->next->args && cmd->next->args[0];
+		if (has_next_cmd && pipe(pipe_fd) == -1)
 		{
 			perror("pipe");
 			exit(1);
 		}
-		bool is_empty_cmd = (!cmd->args || !cmd->args[0]);
+		//bool is_empty_cmd = (!cmd->args || !cmd->args[0]);
 	//bool is_invalid = false;
 
 
-	if (is_empty_cmd)
+/* 	if (is_empty_cmd)
 	{
 	// Si on a une redirection de sortie, elle sera déjà gérée dans le parsing
 		 if (cmd->fd_out != STDOUT_FILENO)
             close(cmd->fd_out); 
 		cmd = cmd->next;
 		continue;
-	}
+	}  */
 
 	/* if (!is_empty_cmd)
 	{

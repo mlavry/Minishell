@@ -141,5 +141,7 @@ char	*get_next_line(int fd)
 	}
 	if (nextline(fd, &buffer[fd], &line) > 0)
 		return (line);
-	return (free(buffer[fd]), buffer[fd] = NULL, NULL);
+	free(buffer[fd]);
+	buffer[fd] = NULL;
+	return (NULL);
 }

@@ -12,6 +12,24 @@
 
 #include "../minishell.h"
 
+
+int ft_cd(t_cmd *cmd, t_data *data)
+{
+	int count;
+
+	count = 0;
+
+	while ( cmd->args[count])
+		count++;
+
+	if ( count > 2)
+	{
+		handle_command_error(*cmd->args,"cd: too many arguments\n",1, data);
+		return 1;
+	}
+	return 0;
+}
+
 void	built_path(char *newpath, t_data *data)
 {
 	char		cwd[1024];
@@ -98,8 +116,18 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 void	builtin_cd(char *newpath, t_data *data)
 {
 	bool		must_free;
+	int			count;
 
 	must_free = false;
+	count = 0;
+	while (data->cmd->args[count])
+		count++;
+	if (count > 2)
+	{
+		printf("%s: too many arguments\n", *data->cmd->args);
+		g_exit_status = 1;
+		return ;
+	}
 	if (newpath == NULL)
 		newpath = handle_cd_null();
 	else if (newpath[0] == '-')

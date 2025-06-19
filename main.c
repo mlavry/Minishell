@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 02:43:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 17:17:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,11 +71,10 @@ int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
-	if (!isatty(STDIN_FILENO))
-	{
-		ft_putstr_fd("minishell: not a tty, exiting.\n", STDERR_FILENO);
-		return (0);
-	}
+	if (!isatty(1))
+		return (ft_putstr_fd("Error output is not a terminal\n", 2), 1);
+	if (!isatty(0))
+		return (ft_putstr_fd("Error intput is not a terminal\n", 2), 1);
 	init_data(&data, argc, argv, envp);
 	if (!envp || !*envp || !envp[0])
 		emptyenv(&data, &data.env);

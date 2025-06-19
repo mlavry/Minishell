@@ -70,9 +70,9 @@ void	executecommand(t_data *data)
 		exec_pipe(data->cmd, data);
 	else if (isbuiltin(data))
 	{
-	/* 	if (!ft_strcmp(data->cmd->args[0], "exit"))
+	 	if (!ft_strcmp(data->cmd->args[0], "exit"))
 			builtin_exit(data);
-		else */
+		else 
 			exec_builtin_redirection(data);
 	}
 	else if (!data->cmd->args || !data->cmd->args[0])

@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
-void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
+/* void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
 		// STDIN ← prev_fd ou redirection
 	 if (cmd->fd_in != STDIN_FILENO)
@@ -43,7 +43,53 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 		close(pipe_fd[1]);
 	if (prev_fd != -1)
 		close(prev_fd); 
+}  */
+
+void setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
+{
+    // STDIN
+    if (cmd->fd_in != STDIN_FILENO)  // redirection input
+    {
+        dup2(cmd->fd_in, STDIN_FILENO);
+        close(cmd->fd_in);
+    }
+    else if (prev_fd != -1)  // sinon, lecture depuis pipe précédent
+    {
+        dup2(prev_fd, STDIN_FILENO);
+        close(prev_fd);
+    }
+
+    // STDOUT
+    if (cmd->fd_out != STDOUT_FILENO)  // redirection output
+    {
+        dup2(cmd->fd_out, STDOUT_FILENO);
+        close(cmd->fd_out);
+        // IMPORTANT : si redirigé vers fichier, on ne touche pas au pipe !
+        // On ferme pipe_fd si créé, sinon le pipe pourrait traîner
+        if (cmd->next)
+        {
+            close(pipe_fd[0]);
+            close(pipe_fd[1]);
+        }
+    }
+    else if (cmd->next)  // Pas de redirection, y a un pipe -> écrire dans pipe
+    {
+        dup2(pipe_fd[1], STDOUT_FILENO);
+        close(pipe_fd[1]);
+        close(pipe_fd[0]);
+    }
+    else  // dernier cmd sans redirection ni pipe
+    {
+        if (cmd->next == NULL)
+        {
+            if (pipe_fd[0] != -1) close(pipe_fd[0]);
+            if (pipe_fd[1] != -1) close(pipe_fd[1]);
+        }
+    }
 }
+
+
+
 
 void	exec_command(t_cmd *cmd, t_data *data)
 {
@@ -72,15 +118,28 @@ void	exec_command(t_cmd *cmd, t_data *data)
 	exit(127);
 }
 
-
 void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
+	data->cmd = cmd;
+
+	setup_outandin(cmd, prev_fd, pipe_fd);
+	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement
+	exec_command(cmd, data);
+}
+
+/* 
+void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
+{
+	if (!cmd->args || !cmd->args[0])
+        exit(0); // juste redirection, pas de commande à exécuter
 	data->cmd = cmd;
  	if (cmd->fd_in == -1 || cmd->fd_out == -1)
 		exit(1);// redirection échouée, on quitte proprement
 	setup_outandin(cmd, prev_fd, pipe_fd);
+
 	exec_command(cmd, data);
-}
+} */
 
 void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
@@ -111,6 +170,8 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 } */
 
 
+
+
 void	exec_pipe(t_cmd *cmd, t_data *data)
 {
 	int		pipe_fd[2];
@@ -118,12 +179,43 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 	pid_t	last_pid;
 	int		prev_fd;
 	int		status;
-	char *path;
+	//char *path;
 
 	prev_fd = -1;
 	while (cmd)
 	{
-		if (cmd->fd_in == -1 || cmd->fd_out == -1 || !cmd->args || !cmd->args[0])
+		bool next_cmd_valid = cmd->next && cmd->next->args && cmd->next->args[0];
+		if (next_cmd_valid && pipe(pipe_fd) == -1)
+		{
+			perror("pipe");
+			exit(1);
+		}
+		bool is_empty_cmd = (!cmd->args || !cmd->args[0]);
+	//bool is_invalid = false;
+
+
+	if (is_empty_cmd)
+	{
+	// Si on a une redirection de sortie, elle sera déjà gérée dans le parsing
+		 if (cmd->fd_out != STDOUT_FILENO)
+            close(cmd->fd_out); 
+		cmd = cmd->next;
+		continue;
+	}
+
+	/* if (!is_empty_cmd)
+	{
+		
+		path = getpath(cmd->args[0], data);
+		if (!path)
+		{
+			fprintf(stderr, "minishell: %s: command not found\n", cmd->args[0]);
+			g_exit_status = 127;
+			is_invalid = true;
+		}
+	} */
+
+/*  		if (cmd->fd_in == -1 || cmd->fd_out == -1 || !cmd->args || !cmd->args[0])
 		{
     		break;
 		} 
@@ -133,7 +225,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			printf("%s: command not found\n", cmd->args[0]);
 			g_exit_status = 127;
 			break ;
-		}
+		}   */
 	
 /* 		if (!cmd->args || !cmd->args[0])
 {
@@ -149,11 +241,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
     		break;
 		} 
  */
-		if (cmd->next && pipe(pipe_fd) == -1)
-		{
-			perror("pipe");
-			exit(1);
-		}
 		pid = fork();
 		if (pid == -1)
 		{

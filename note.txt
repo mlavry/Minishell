@@ -10,22 +10,14 @@ bash: syntax error near unexpected token `|'
 
 ----------------HERDEDOCS--------------------
 
-'\n' dans le cas ou on ctrl + D dans heredoc
-
 0
 minishell$ echo la | lo >>>>>>>>>>>>>
 lo: command not found
 minishell$ echo $?
 0
 
-exit status n'est pas update dans les pipes
-
 expand heredoc
 
 pas expand delimiteur entre double quote
 
-signaux pipe
-
-Probleme fait ls alors qu'il ne devrait pas :
-
-<< wnfkih woifnoiw | echo co | ls | << lol
+PWD doit revenir si on relance un minishell

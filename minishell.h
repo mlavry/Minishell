@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 21:01:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 02:44:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,11 @@ void	init_signals_prompt(void);
 void	handle_status_and_print(int status);
 void	reset_signals_to_default(void);
 void	ignore_sigint(void);
+void    hd_set_signals(struct sigaction *old_int);
+void    hd_restore_signals(const struct sigaction *old_int);
+void    disable_echoctl(void);
+void	enable_echoctl(void);
+void	handle_signal_print(int status);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);

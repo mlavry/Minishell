@@ -256,6 +256,8 @@ static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **
 }
 
 
+
+
 t_cmd	*tokens_to_commands(t_data *data,t_token *tokens)
 {
     t_cmd	*head;
@@ -279,7 +281,7 @@ t_cmd	*tokens_to_commands(t_data *data,t_token *tokens)
             return (free_cmd(&head), NULL);
     }
     return head;
-}
+} 
 
 
 /* 

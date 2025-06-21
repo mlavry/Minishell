@@ -145,6 +145,7 @@ void	free_cmd(t_cmd **cmd)
 	}
 	*cmd = NULL;
 } */
+
 void	free_cmd(t_cmd **cmd)
 {
     t_cmd	*tmp;
@@ -173,6 +174,12 @@ void	free_cmd(t_cmd **cmd)
            // printf("Freeing args...\n");
             free_tab(current->args);
         }
+		   if (current->heredoc_file)
+        {
+            unlink(current->heredoc_file);
+            free(current->heredoc_file);
+        }
+
        // if (current->fd_in)
           //  printf("Freeing infile: %d\n", current->fd_in);
        // if (current->fd_out)

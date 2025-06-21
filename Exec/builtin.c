@@ -17,7 +17,7 @@ int	isbuiltin(t_data *data)
 	char	*cmd;
 
 	if (!data || !data->cmd || !data->cmd->name)
-		return (0);
+		return (free_all(data, 0, true),0);
 	cmd = data->cmd->name;
 	return (ft_strcmp(cmd, "echo") == 0 || ft_strcmp(cmd, "pwd") == 0
 		|| ft_strcmp(cmd, "env") == 0 || ft_strcmp(cmd, "exit") == 0

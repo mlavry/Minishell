@@ -14,8 +14,7 @@
 
 void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
-	 signal(SIGPIPE, SIG_IGN);
-	 if (cmd->fd_in != STDIN_FILENO)
+	if (cmd->fd_in != STDIN_FILENO)
 	{
 		dup2(cmd->fd_in, STDIN_FILENO);
 		close(cmd->fd_in);
@@ -43,7 +42,7 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 		close(pipe_fd[1]); */
 	if (prev_fd != -1)
 		close(prev_fd); 
-} 
+}
 
 bool	is_empty_cmd(t_cmd *cmd)
 {
@@ -58,34 +57,41 @@ void	exec_command(t_cmd *cmd, t_data *data)
 
 	if (!cmd || !cmd->args || !cmd->args[0])
 		exit(0);
+/* 	if (!cmd->next || !cmd->next->args || !cmd->next->args[0])
+    	{
+        	int devnull = open("/dev/null", O_WRONLY);
+        	if (devnull != -1)
+        		{
+           	 		dup2(devnull, STDOUT_FILENO);
+            	//dup2(devnull, STDERR_FILENO);
+           	 		close(devnull);
+        		}
+   	 	}   */
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
 		close_all_fd();
 		exit(0);
 	}
-	path = getpath(cmd->args[0], data);
+ 	path = getpath(cmd->args[0], data);
 	if (!path)
 	{
 		close_all_fd();
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
 	}
 	reset_signals_to_default();
-    envi = convert_env(data->env);
-	if (execve(path, cmd->args, envi) == -1)
-	{
-		close_all_fd();
-        free_tab(envi);
-		perror("execve");
-        exit(127);
-	}
+	envi = convert_env(data->env);
+	execve(path, cmd->args, envi) ;
+	close_all_fd();
+	free_tab(envi);
+	perror("execve");
 	dprintf(2, "EXECUTING CMD: %s\n", cmd->args[0]);
 	exit(127);
 }
 
 void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
-    signal(SIGPIPE, SIG_IGN);
+
     if (is_empty_cmd(cmd))
     {
         if (prev_fd != -1)
@@ -102,7 +108,7 @@ void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
         exit(0);
     }
 
-    if (cmd->fd_in == -1 || cmd->fd_out == -1)
+  /*   if (cmd->fd_in == -1 || cmd->fd_out == -1)
     {
         if (prev_fd != -1)
             close(prev_fd);
@@ -112,18 +118,22 @@ void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
             if (pipe_fd[1] != -1) close(pipe_fd[1]);
         }
         exit(1);
-    }
+    } */
 
     data->cmd = cmd;
+
     setup_outandin(cmd, prev_fd, pipe_fd);
-     if (cmd->heredoc_file)
+
+    if (cmd->heredoc_file)
     {
         unlink(cmd->heredoc_file); // Supprime le fichier immédiatement
         free(cmd->heredoc_file);
         cmd->heredoc_file = NULL;
     }
-      if (cmd->fd_in != STDIN_FILENO && cmd->fd_in != -1)
+
+       if (cmd->fd_in != STDIN_FILENO && cmd->fd_in != -1)
         close(cmd->fd_in);
+
     exec_command(cmd, data);
 } 
 
@@ -180,28 +190,26 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 	}
 	dprintf(2, "PARENT: closing pipe_fd: %d %d\n", pipe_fd[0], pipe_fd[1]);
 
-} 
-
-
+}
 
 void	close_all_fds_after_exec(t_cmd *cmd)
 {
-    while (cmd)
-    {
-        if (cmd->fd_in != STDIN_FILENO)
-            close(cmd->fd_in);
-        if (cmd->fd_out != STDOUT_FILENO && cmd->fd_out != -1)
-            close(cmd->fd_out);
+	while (cmd)
+	{
+		if (cmd->fd_in != STDIN_FILENO)
+			close(cmd->fd_in);
+		if (cmd->fd_out != STDOUT_FILENO && cmd->fd_out != -1)
+			close(cmd->fd_out);
 
         // Supprime le fichier heredoc s'il existe
-        if (cmd->heredoc_file)
-        {
-            unlink(cmd->heredoc_file);
-            free(cmd->heredoc_file);
-            cmd->heredoc_file = NULL;
-        }
-        cmd = cmd->next;
-    }
+		if (cmd->heredoc_file)
+		{
+			unlink(cmd->heredoc_file);
+			free(cmd->heredoc_file);
+			cmd->heredoc_file = NULL;
+		}
+		cmd = cmd->next;
+	}
 }
 
 
@@ -216,12 +224,12 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 
     head =cmd;
     prev_fd = -1;
-    signal(SIGPIPE, SIG_IGN);
     while (cmd)
     {
+	
         if (cmd->next)
             pipe(pipe_fd);
-		
+
         pid = fork();
         if (pid == -1)
         {
@@ -231,6 +239,7 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 
         if (pid == 0)
             children(cmd, data, prev_fd, pipe_fd);
+
         
         if (cmd->next == NULL)
             last_pid = pid;

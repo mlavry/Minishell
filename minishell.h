@@ -57,7 +57,7 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	char	*heredoc_file;
+	//char	*heredoc_file;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -86,14 +86,14 @@ int		count_tokens(char *line);
 char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_data *data, t_token *tokens);
+t_cmd	*tokens_to_commands(t_token *tokens);
 bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur);
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
 bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
 bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
-int		handle_output(t_data *data, t_token **tokens, t_cmd **cur);
+int		handle_output(t_token **tokens, t_cmd **cur);
 int		handle_input(t_token **tokens, t_cmd **cur);
-int		handle_pipe(t_data *data, t_token **tokens, t_cmd **cur);
+int		handle_pipe(t_token **tokens, t_cmd **cur);
 int		handle_heredoc(t_token **tokens, t_cmd *cur);
 int		handle_append(t_token **tokens, t_cmd **cur);
 int		handle_arg(t_cmd *cur, t_token *token);

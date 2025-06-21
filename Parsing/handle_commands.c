@@ -60,7 +60,6 @@ t_cmd	*create_new_cmd(void)
 	cmd->args = NULL;
 	cmd->fd_in = STDIN_FILENO;
 	cmd->fd_out = STDOUT_FILENO;
-	cmd->heredoc_file = NULL;
 	cmd->next = NULL;
 	cmd->name = NULL;
 	return (cmd);
@@ -73,7 +72,7 @@ bool is_redirection(int type)
 	return (type == OUTPUT || type == APPEND || type == INPUT || type == HEREDOC);
 }
 
-int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
+int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
 {
 	while (*tokens && is_redirection((*tokens)->type))
 	{
@@ -81,7 +80,7 @@ int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 
 		if (type == OUTPUT)
 		{
-			if (!handle_output(data,tokens, cur))
+			if (!handle_output(tokens, cur))
 				return (0);
 		}
 		else if (type == APPEND)
@@ -103,7 +102,7 @@ int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 	return (1);
 }
 
-int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
+int handle_pipe(t_token **tokens, t_cmd **cur)
 {
 
     if (!tokens || !*tokens)
@@ -136,7 +135,7 @@ int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
 
         // Ici, on a traité la redirection, on continue normalement
         return 1; */
-		if (!handle_redirect_after_pipe(data, tokens, cur))
+		if (!handle_redirect_after_pipe(tokens, cur))
         	return 0;
     }
 
@@ -174,19 +173,25 @@ int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
 }  */
 
 
-int	handle_output(t_data *data, t_token **tokens, t_cmd **cur)
+int	handle_output(t_token **tokens, t_cmd **cur)
 {
-	(void)data;
 	if (!cur || !*cur)
 		return (0);
 	if ((*cur)->args == NULL && (*cur)->name == NULL)
 	{
-		(*cur)->name = ft_strdup("");
+		(*cur)->name = ft_strdup(""); 
 		if ( !(*cur)->name)
 			return (0);
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
-	}
+	}	
+	/* if (((*tokens)->type == OUTPUT || (*tokens)->type == APPEND || (*tokens)->type == INPUT || (*tokens)->type == HEREDOC)
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+	{
+		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
+		g_exit_status = 2;
+		return (0);
+	} */
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)

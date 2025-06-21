@@ -26,13 +26,8 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || (value != NULL && !new_var->value))
 	{
-		if (new_var->name)
-        	free(new_var->name);
-    	if (new_var->value)
-        	free(new_var->value);
-    	free(new_var);
-		//free(name);
-		//free_env(&new_var);
+		free(name);
+		free_env(&new_var);
 		malloc_failed(data);
 	}
 	new_var->next = NULL;
@@ -129,7 +124,6 @@ void	parse_env(char **envp, t_data *data)
 			malloc_failed(data);
 		value = equal_pos + 1;
 		add_env_var(data, &data->env, name, value);
-		printf(">> ENV ALLOCATED: %s\n",value);
 		free(name);
 		i++;
 	}

@@ -14,7 +14,8 @@
 
 void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
-	if (cmd->fd_in != STDIN_FILENO)
+
+	 if (cmd->fd_in != STDIN_FILENO)
 	{
 		dup2(cmd->fd_in, STDIN_FILENO);
 		close(cmd->fd_in);
@@ -42,7 +43,7 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 		close(pipe_fd[1]); */
 	if (prev_fd != -1)
 		close(prev_fd); 
-}
+} 
 
 bool	is_empty_cmd(t_cmd *cmd)
 {
@@ -53,45 +54,40 @@ bool	is_empty_cmd(t_cmd *cmd)
 void	exec_command(t_cmd *cmd, t_data *data)
 {
 	char	*path;
-    char **envi;
 
 	if (!cmd || !cmd->args || !cmd->args[0])
 		exit(0);
-/* 	if (!cmd->next || !cmd->next->args || !cmd->next->args[0])
-    	{
-        	int devnull = open("/dev/null", O_WRONLY);
-        	if (devnull != -1)
-        		{
-           	 		dup2(devnull, STDOUT_FILENO);
-            	//dup2(devnull, STDERR_FILENO);
-           	 		close(devnull);
-        		}
-   	 	}   */
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
 		close_all_fd();
 		exit(0);
 	}
- 	path = getpath(cmd->args[0], data);
+	path = getpath(cmd->args[0], data);
 	if (!path)
 	{
 		close_all_fd();
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
 	}
 	reset_signals_to_default();
-	envi = convert_env(data->env);
-	execve(path, cmd->args, envi) ;
-	close_all_fd();
-	free_tab(envi);
-	perror("execve");
+/* 	if (cmd->fd_out == STDOUT_FILENO && !cmd->next)
+	{
+		int devnull = open("/dev/null", O_WRONLY);
+		if (devnull != -1)
+			dup2(devnull, STDOUT_FILENO);
+	} */
+	
+	if (execve(path, cmd->args, convert_env(data->env)) == -1)
+	{
+		close_all_fd();
+		perror("execve");
+	}
 	dprintf(2, "EXECUTING CMD: %s\n", cmd->args[0]);
 	exit(127);
 }
 
 void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
-
     if (is_empty_cmd(cmd))
     {
         if (prev_fd != -1)
@@ -108,7 +104,7 @@ void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
         exit(0);
     }
 
-  /*   if (cmd->fd_in == -1 || cmd->fd_out == -1)
+    if (cmd->fd_in == -1 || cmd->fd_out == -1)
     {
         if (prev_fd != -1)
             close(prev_fd);
@@ -118,27 +114,54 @@ void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
             if (pipe_fd[1] != -1) close(pipe_fd[1]);
         }
         exit(1);
-    } */
-
-    data->cmd = cmd;
-
-    setup_outandin(cmd, prev_fd, pipe_fd);
-
-    if (cmd->heredoc_file)
-    {
-        unlink(cmd->heredoc_file); // Supprime le fichier immédiatement
-        free(cmd->heredoc_file);
-        cmd->heredoc_file = NULL;
     }
 
-       if (cmd->fd_in != STDIN_FILENO && cmd->fd_in != -1)
-        close(cmd->fd_in);
-
+    data->cmd = cmd;
+    setup_outandin(cmd, prev_fd, pipe_fd);
     exec_command(cmd, data);
-} 
+}
 
+
+/* void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
+{
+	 if (!cmd || !cmd->args || !cmd->args[0])
+	 {
+
+		if (prev_fd != -1)
+			close(prev_fd);
+		if (pipe_fd)
+		{
+			close(pipe_fd[0]);
+			close(pipe_fd[1]);
+		}
+		if (cmd && cmd->fd_in > 2)
+			close(cmd->fd_in);
+		if (cmd && cmd->fd_out > 2)
+			close(cmd->fd_out);
+		exit(0); // Ne rien faire si la commande est vide
+	}
+	data->cmd = cmd;
+
+	setup_outandin(cmd, prev_fd, pipe_fd);
+	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement
+	//dprintf(2, "CHILD: cmd = %s\n", cmd->args ? cmd->args[0] : "NULL");	
+	exec_command(cmd, data);
+} */
 
 /* 
+void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
+{
+	if (!cmd->args || !cmd->args[0])
+        exit(0); // juste redirection, pas de commande à exécuter
+	data->cmd = cmd;
+ 	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement
+	setup_outandin(cmd, prev_fd, pipe_fd);
+
+	exec_command(cmd, data);
+} */
+
 void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
     if (*prev_fd != -1)
@@ -156,9 +179,9 @@ void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
     {
         *prev_fd = -1;
 	}
-} */
-/* 
-void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
+}
+
+/* void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
     fprintf(stderr, "PARENT: closing prev_fd %d\n", *prev_fd);
     if (*prev_fd != -1)
@@ -169,9 +192,9 @@ void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
         close(pipe_fd[1]);
         *prev_fd = pipe_fd[0];
     }
-}  */
+} */
 
-
+/* 
 void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
 	if (*prev_fd != -1)
@@ -190,26 +213,35 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 	}
 	dprintf(2, "PARENT: closing pipe_fd: %d %d\n", pipe_fd[0], pipe_fd[1]);
 
-}
+} */
 
-void	close_all_fds_after_exec(t_cmd *cmd)
+/* bool	is_invalid_command(char *path, char *cmd_name)
+{
+	if (!cmd_name || cmd_name[0] == '\0')
+		return (true); // vide
+
+	if (access(path, F_OK) != 0)
+		return (true); // n'existe pas
+
+	if (is_a_directory(path, NULL))
+		return (true); // dossier
+
+	if (access(path, X_OK) != 0)
+		return (true); // pas exécutable
+
+	return (false); // tout est ok
+} */
+
+
+bool	has_real_command(t_cmd *cmd)
 {
 	while (cmd)
 	{
-		if (cmd->fd_in != STDIN_FILENO)
-			close(cmd->fd_in);
-		if (cmd->fd_out != STDOUT_FILENO && cmd->fd_out != -1)
-			close(cmd->fd_out);
-
-        // Supprime le fichier heredoc s'il existe
-		if (cmd->heredoc_file)
-		{
-			unlink(cmd->heredoc_file);
-			free(cmd->heredoc_file);
-			cmd->heredoc_file = NULL;
-		}
+		if (cmd->args && cmd->args[0])
+			return true;
 		cmd = cmd->next;
 	}
+	return false;
 }
 
 
@@ -220,16 +252,13 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
     pid_t	last_pid;
     int		prev_fd;
     int		status;
-    t_cmd	*head; 
 
-    head =cmd;
     prev_fd = -1;
     while (cmd)
     {
-	
         if (cmd->next)
             pipe(pipe_fd);
-
+		
         pid = fork();
         if (pid == -1)
         {
@@ -239,7 +268,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 
         if (pid == 0)
             children(cmd, data, prev_fd, pipe_fd);
-
         
         if (cmd->next == NULL)
             last_pid = pid;
@@ -266,8 +294,172 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
         else if (pid == last_pid && sigint_printed)
             g_exit_status = 130;
     }
-     close_all_fds_after_exec(head);
- /*    while ((pid = wait(&status)) > 0)
-        g_exit_status = WEXITSTATUS(status);
-    close_all_fd(); */
+    close_all_fd();
 }
+
+
+/* void	exec_pipe(t_cmd *cmd, t_data *data)
+{
+    int		pipe_fd[2];
+    pid_t	pid;
+    pid_t	last_pid;
+    int		prev_fd;
+    int		status;
+
+    if (!cmd || !data)
+        return ;
+
+    prev_fd = -1;
+    while (cmd)
+    {
+        if (is_empty_cmd(cmd))
+        {
+            if (cmd->fd_in != STDIN_FILENO)
+                close(cmd->fd_in);
+            if (cmd->fd_out != STDOUT_FILENO)
+                close(cmd->fd_out);
+            cmd = cmd->next;
+            continue;
+        }
+
+        if (cmd->next)
+            pipe(pipe_fd);
+
+        pid = fork();
+        if (pid == -1)
+        {
+            perror("fork");
+            exit(1);
+        }
+
+        if (pid == 0)
+            children(cmd, data, prev_fd, pipe_fd);
+        if (cmd->next == NULL)
+            last_pid = pid;
+        parent(cmd, pipe_fd, &prev_fd);
+        cmd = cmd->next;
+    }
+
+    ignore_sigint();
+    bool sigint_printed = false;
+    while ((pid = wait(&status)) > 0)
+    {
+        if (WIFSIGNALED(status))
+        {
+            int sig = WTERMSIG(status);
+            if (sig == SIGINT && !sigint_printed && pid != last_pid)
+            {
+                write(STDOUT_FILENO, "\n", 1);
+                sigint_printed = true;
+            }
+        }
+        if (pid == last_pid && !sigint_printed)
+            handle_status_and_print(status);
+        else if (pid == last_pid && sigint_printed)
+            g_exit_status = 130;
+    }
+    close_all_fd();
+} */
+
+
+// void	exec_pipe(t_cmd *cmd, t_data *data)
+// {
+// 	int		pipe_fd[2];
+// 	pid_t	pid;
+// 	pid_t	last_pid;
+// 	int		prev_fd;
+// 	int		status;
+// 	//char *path;
+
+// 	prev_fd = -1;
+// 	while (cmd)
+//  	 {
+
+// 		//bool next_cmd_valid = cmd->next && !is_empty_cmd(cmd->next);
+
+// 	/* 	if (is_empty_cmd(cmd))
+// 		{
+// 			if (cmd->fd_out != STDOUT_FILENO)
+// 			{
+// 				close(cmd->fd_out);
+//         		cmd->fd_out = STDOUT_FILENO;
+// 			}
+// 			if (cmd->fd_in != STDIN_FILENO)
+// 			{
+// 				close(cmd->fd_in);
+// 				cmd->fd_in = STDIN_FILENO;
+// 			}
+// 			if (prev_fd != -1)
+// 			{
+// 				close(prev_fd);
+// 				prev_fd = -1;
+// 			}
+// 			cmd = cmd->next;
+// 			continue;
+// 		} 
+
+// 		if (cmd->next && !is_empty_cmd(cmd->next))
+// 		{
+// 			if (pipe(pipe_fd) == -1)
+// 			{
+// 				perror("pipe");
+// 				exit(1);
+// 			}
+// 		}
+// 		else
+// 		{
+// 			pipe_fd[0] = -1;
+//    			pipe_fd[1] = -1;
+// 		}*/
+// 		if (!cmd->args || !cmd->args[0])
+// 		{
+// 			// Ferme les fds si nécessaire
+// 			if (cmd->fd_in != STDIN_FILENO)
+// 				close(cmd->fd_in);
+// 			if (cmd->fd_out != STDOUT_FILENO)
+// 				close(cmd->fd_out);
+// 			exit(0); // Juste redirection, pas de commande
+// 		}
+// 		 if (cmd->next)
+//             pipe(pipe_fd);
+// 		pid = fork();
+// 		if (pid == -1)
+// 		{
+// 			perror("fork");
+// 			exit(1);
+// 		} 
+// 		if (pid == 0)
+// 			children(cmd, data, prev_fd, pipe_fd);
+// 		if (cmd->next == NULL)
+// 			last_pid = pid;
+// 		parent(cmd, pipe_fd, &prev_fd);
+// 		cmd = cmd->next;
+// 	} 
+
+// 	ignore_sigint();
+// 	bool sigint_printed = false;
+// 	while ((pid = wait(&status)) > 0)
+// 	{
+//     	if (WIFSIGNALED(status))
+//     	{
+//         	int sig = WTERMSIG(status);
+//         	if (sig == SIGINT && !sigint_printed && pid != last_pid)
+//         	{
+//             	write(STDOUT_FILENO, "\n", 1);
+//             	sigint_printed = true;
+//         	}
+//     	}
+//     if (pid == last_pid && !sigint_printed)
+//         handle_status_and_print(status);
+// 	else if (pid == last_pid && sigint_printed)
+// 		g_exit_status = 130;
+// 	}
+// 	close_all_fd();
+// /* 	while ((pid = wait(&status)) > 0)
+// 		g_exit_status = WEXITSTATUS(status);
+// 	close_all_fd();  */
+// 	/*   while (wait(NULL) > 0)
+// 		;
+// 	if (prev_fd != -1)
+// 		close(prev_fd);  */
+// }

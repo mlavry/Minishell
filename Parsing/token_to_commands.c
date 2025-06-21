@@ -47,13 +47,37 @@ char	*heredoc_tmp(void)
 	char		*filename;
 
 	num = ft_itoa(i++);
-	if (!num)
-		return (NULL);
 	filename = ft_strjoin("/tmp/heredoc_%d.tmp", num);
 	free(num);
 	return (filename);
 }
 
+/* int	write_heredoc(char *delimiter, int tmp_fd)
+{
+	char	*line;
+	char	*newline;
+
+	while (1)
+	{
+		reset_signals_to_default();
+		write(1, "> ", 2);
+		line = get_next_line(0);
+		if (!line)
+			break ;
+		newline = ft_strchr(line, '\n');
+		if (newline)
+			*newline = '\0';
+		if (ft_strcmp(line, delimiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(tmp_fd, line, ft_strlen(line));
+		write(tmp_fd, "\n", 1);
+		free(line);
+	}
+	return (1);
+} */
 
 int write_heredoc(char *delimiter, int tmp_fd)
 {
@@ -107,43 +131,43 @@ int write_heredoc(char *delimiter, int tmp_fd)
 
 int	handle_heredoc(t_token **tokens, t_cmd *cur)
 {
-	char	*delimiter;
-	char	*tmp_filename;
-	int		tmp_fd;
+    char	*delimiter;
+    char	*tmp_filename;
+    int		tmp_fd;
 
+    delimiter = (*tokens)->next->str;
+    tmp_filename = heredoc_tmp();
+    if (!tmp_filename)
+        return (0);
 
-	delimiter = (*tokens)->next->str;
-	tmp_filename = heredoc_tmp();
-	if (!tmp_filename)
-		return (0);
+    tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    if (tmp_fd == -1)
+        return (perror("open tmp"), free(tmp_filename), 0);
 
-	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (tmp_fd == -1)
-		return (perror("open tmp"), free(tmp_filename), 0);
+    if (!tokens || !*tokens || !(*tokens)->next)
+        return (close(tmp_fd), free(tmp_filename), 0);
 
-	if (!tokens || !*tokens || !(*tokens)->next)
-		return (close(tmp_fd), free(tmp_filename), 0);
+    if (write_heredoc(delimiter, tmp_fd) == -1)
+    {
+        close(tmp_fd);
+        unlink(tmp_filename);
+        free(tmp_filename);
+        g_exit_status = 130;
+        return (0);
+    }
 
-	if (write_heredoc(delimiter, tmp_fd) == -1)
-	{
-		close(tmp_fd);
-		unlink(tmp_filename);
-		free(tmp_filename);
-		g_exit_status = 130;
-		return (0);
-	}
-	close(tmp_fd);
+    close(tmp_fd); // ⚠️ Ferme tmp_fd ici après écriture
 
-	cur->heredoc_file = tmp_filename; // Sauvegarde pour suppression plus tard
-	cur->fd_in = open(tmp_filename, O_RDONLY);
-	if (cur->fd_in == -1)
-	{
-		perror("open heredoc read");
-		unlink(tmp_filename);
-		free(tmp_filename);
-		return (0);
-	}
-	return (1);
+    //cur->heredoc_file = tmp_filename; // Sauvegarde pour suppression plus tard
+    cur->fd_in = open(tmp_filename, O_RDONLY);
+    if (cur->fd_in == -1)
+    {
+        perror("open heredoc read");
+        unlink(tmp_filename);
+        free(tmp_filename);
+        return (0);
+    }
+    return (1);
 }
 
 
@@ -228,23 +252,41 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 } */
 
 
-static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **cur)
+static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 {
 	t_token	*tok;
 
 	tok = *tokens;
 	if (!tok)
 		return (false);
+	/* if (tok->type == HEREDOC)
+		return (handle_heredoc_type(tok, tokens, *cur));
+	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+		return (true);
+	if (tok->type == CMD)
+		return (handle_cmd_type(tok, head, cur, tokens));
+	if (tok->type == ARG)
+		return (handle_arg_type(tok, *cur, tokens));
+	if (tok->type == OUTPUT)
+		return (handle_output(tokens, cur));
+	if (tok->type == INPUT)
+		return (handle_input(tokens, cur));
+	if (tok->type == PIPE)
+		return (handle_pipe(tokens, cur));
+	if (tok->type == APPEND)
+		return (handle_append(tokens, cur));
+ */
+
 	if (tok->type == HEREDOC)
     	return (handle_heredoc_type(tok, tokens, cur));
 	else if (tok->type == OUTPUT)
-   	 	return (handle_output(data, tokens, cur));
+   	 	return (handle_output(tokens, cur));
 	else if (tok->type == APPEND)
     	return (handle_append(tokens, cur));
 	else if (tok->type == INPUT)
    	 	return (handle_input(tokens, cur));
 	else if (tok->type == PIPE)
-    	return (handle_pipe(data, tokens, cur));
+    	return (handle_pipe(tokens, cur));
 	else if (tok->type == CMD)
     	return (handle_cmd_type(tok, head, cur, tokens));
 	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
@@ -256,9 +298,7 @@ static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **
 }
 
 
-
-
-t_cmd	*tokens_to_commands(t_data *data,t_token *tokens)
+t_cmd	*tokens_to_commands(t_token *tokens)
 {
     t_cmd	*head;
     t_cmd	*cur;
@@ -275,13 +315,15 @@ t_cmd	*tokens_to_commands(t_data *data,t_token *tokens)
             return (NULL);
         head = cur;
     }
+
     while (tokens && g_exit_status != 130)
     {
-        if (!is_type_token(data, &tokens, &head, &cur)) // ✅ Déjà bien utilisé ici
+        if (!is_type_token(&tokens, &head, &cur)) // ✅ Déjà bien utilisé ici
             return (free_cmd(&head), NULL);
     }
+
     return head;
-} 
+}
 
 
 /* 

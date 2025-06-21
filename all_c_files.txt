@@ -626,13 +626,8 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || (value != NULL && !new_var->value))
 	{
-		if (new_var->name)
-        	free(new_var->name);
-    	if (new_var->value)
-        	free(new_var->value);
-    	free(new_var);
-		//free(name);
-		//free_env(&new_var);
+		free(name);
+		free_env(&new_var);
 		malloc_failed(data);
 	}
 	new_var->next = NULL;
@@ -729,7 +724,6 @@ void	parse_env(char **envp, t_data *data)
 			malloc_failed(data);
 		value = equal_pos + 1;
 		add_env_var(data, &data->env, name, value);
-		printf(">> ENV ALLOCATED: %s\n", data->env->name);
 		free(name);
 		i++;
 	}
@@ -1434,9 +1428,9 @@ void	executecommand(t_data *data)
 	}
 	else if (data->cmd->args && data->cmd->args[0])
 		exec_extern_command(data->cmd->args, data->env, data);
-/* 	else
+	else
 	{
-	 	if (data->cmd->fd_in != STDIN_FILENO)
+	/* 	if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			close(data->cmd->fd_in);
 			data->cmd->fd_in =STDIN_FILENO;
@@ -1445,7 +1439,7 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
-		} 
+		} */
 		while(wait(NULL) > 0)
 			;
 		if (data->cmd->fd_in != STDIN_FILENO)
@@ -1458,8 +1452,8 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-	}*/
-} 
+	}
+}
 
 t_env	*find_env_var(t_env *env_list, char *name)
 {
@@ -1490,7 +1484,8 @@ t_env	*find_env_var(t_env *env_list, char *name)
 
 void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 {
-	if (cmd->fd_in != STDIN_FILENO)
+		// STDIN ← prev_fd ou redirection
+	 if (cmd->fd_in != STDIN_FILENO)
 	{
 		dup2(cmd->fd_in, STDIN_FILENO);
 		close(cmd->fd_in);
@@ -1512,13 +1507,13 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 		close(pipe_fd[1]);
 	} 
 	// 🔒 Ferme les extrémités inutiles
-	if (cmd->next && pipe_fd[0] != -1)
+	if (cmd->next)
 		close(pipe_fd[0]);
- /* 	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
-		close(pipe_fd[1]); */
+ 	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
+		close(pipe_fd[1]);
 	if (prev_fd != -1)
 		close(prev_fd); 
-}
+} 
 
 bool	is_empty_cmd(t_cmd *cmd)
 {
@@ -1529,124 +1524,53 @@ bool	is_empty_cmd(t_cmd *cmd)
 void	exec_command(t_cmd *cmd, t_data *data)
 {
 	char	*path;
-    char **envi;
 
-	if (!cmd || !cmd->args || !cmd->args[0])
+	if (!cmd->args || !cmd->args[0])
 		exit(0);
-/* 	if (!cmd->next || !cmd->next->args || !cmd->next->args[0])
-    	{
-        	int devnull = open("/dev/null", O_WRONLY);
-        	if (devnull != -1)
-        		{
-           	 		dup2(devnull, STDOUT_FILENO);
-            	//dup2(devnull, STDERR_FILENO);
-           	 		close(devnull);
-        		}
-   	 	}   */
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
 		close_all_fd();
 		exit(0);
 	}
- 	path = getpath(cmd->args[0], data);
+	path = getpath(cmd->args[0], data);
 	if (!path)
 	{
 		close_all_fd();
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
 	}
 	reset_signals_to_default();
-	envi = convert_env(data->env);
-	execve(path, cmd->args, envi) ;
-	close_all_fd();
-	free_tab(envi);
-	perror("execve");
-	dprintf(2, "EXECUTING CMD: %s\n", cmd->args[0]);
+	if (execve(path, cmd->args, convert_env(data->env)) == -1)
+	{
+		close_all_fd();
+		perror("execve");
+	}
 	exit(127);
 }
 
-void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
+void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
+	data->cmd = cmd;
 
-    if (is_empty_cmd(cmd))
-    {
-        if (prev_fd != -1)
-            close(prev_fd);
-        if (pipe_fd)
-        {
-            if (pipe_fd[0] != -1) close(pipe_fd[0]);
-            if (pipe_fd[1] != -1) close(pipe_fd[1]);
-        }
-        if (cmd && cmd->fd_in > 2)
-            close(cmd->fd_in);
-        if (cmd && cmd->fd_out > 2)
-            close(cmd->fd_out);
-        exit(0);
-    }
-
-  /*   if (cmd->fd_in == -1 || cmd->fd_out == -1)
-    {
-        if (prev_fd != -1)
-            close(prev_fd);
-        if (pipe_fd)
-        {
-            if (pipe_fd[0] != -1) close(pipe_fd[0]);
-            if (pipe_fd[1] != -1) close(pipe_fd[1]);
-        }
-        exit(1);
-    } */
-
-    data->cmd = cmd;
-
-    setup_outandin(cmd, prev_fd, pipe_fd);
-
-    if (cmd->heredoc_file)
-    {
-        unlink(cmd->heredoc_file); // Supprime le fichier immédiatement
-        free(cmd->heredoc_file);
-        cmd->heredoc_file = NULL;
-    }
-
-       if (cmd->fd_in != STDIN_FILENO && cmd->fd_in != -1)
-        close(cmd->fd_in);
-
-    exec_command(cmd, data);
-} 
-
+	setup_outandin(cmd, prev_fd, pipe_fd);
+	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement
+	dprintf(2, "CHILD: cmd = %s\n", cmd->args ? cmd->args[0] : "NULL");	
+	exec_command(cmd, data);
+}
 
 /* 
-void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
+void	children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
 {
-    if (*prev_fd != -1)
-    {
-        fprintf(stderr, "PARENT: closing prev_fd %d\n", *prev_fd);
-        close(*prev_fd);
-    }
-    if (cmd->next && pipe_fd[1] != -1)
-    {
-        fprintf(stderr, "PARENT: closing pipe_fd[1] %d\n", pipe_fd[1]);
-        close(pipe_fd[1]);
-        *prev_fd = pipe_fd[0];
-    }
-    else
-    {
-        *prev_fd = -1;
-	}
+	if (!cmd->args || !cmd->args[0])
+        exit(0); // juste redirection, pas de commande à exécuter
+	data->cmd = cmd;
+ 	if (cmd->fd_in == -1 || cmd->fd_out == -1)
+		exit(1);// redirection échouée, on quitte proprement
+	setup_outandin(cmd, prev_fd, pipe_fd);
+
+	exec_command(cmd, data);
 } */
-/* 
-void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
-{
-    fprintf(stderr, "PARENT: closing prev_fd %d\n", *prev_fd);
-    if (*prev_fd != -1)
-        close(*prev_fd);
-    if (cmd->next)
-    {
-        fprintf(stderr, "PARENT: closing pipe_fd[1] %d\n", pipe_fd[1]);
-        close(pipe_fd[1]);
-        *prev_fd = pipe_fd[0];
-    }
-}  */
-
 
 void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
@@ -1657,96 +1581,140 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 		close(pipe_fd[1]);
 		*prev_fd = pipe_fd[0];
 	}
- 	else
+/* 	else
 	{
 		// Pas de commande suivante ou elle est vide
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		*prev_fd = -1;
 	}
-	dprintf(2, "PARENT: closing pipe_fd: %d %d\n", pipe_fd[0], pipe_fd[1]);
+	dprintf(2, "PARENT: closing pipe_fd: %d %d\n", pipe_fd[0], pipe_fd[1]); */
 
 }
 
-void	close_all_fds_after_exec(t_cmd *cmd)
+/* bool	is_invalid_command(char *path, char *cmd_name)
+{
+	if (!cmd_name || cmd_name[0] == '\0')
+		return (true); // vide
+
+	if (access(path, F_OK) != 0)
+		return (true); // n'existe pas
+
+	if (is_a_directory(path, NULL))
+		return (true); // dossier
+
+	if (access(path, X_OK) != 0)
+		return (true); // pas exécutable
+
+	return (false); // tout est ok
+} */
+
+
+bool	has_real_command(t_cmd *cmd)
 {
 	while (cmd)
 	{
-		if (cmd->fd_in != STDIN_FILENO)
-			close(cmd->fd_in);
-		if (cmd->fd_out != STDOUT_FILENO && cmd->fd_out != -1)
-			close(cmd->fd_out);
-
-        // Supprime le fichier heredoc s'il existe
-		if (cmd->heredoc_file)
-		{
-			unlink(cmd->heredoc_file);
-			free(cmd->heredoc_file);
-			cmd->heredoc_file = NULL;
-		}
+		if (cmd->args && cmd->args[0])
+			return true;
 		cmd = cmd->next;
 	}
+	return false;
 }
+
+
 
 
 void	exec_pipe(t_cmd *cmd, t_data *data)
 {
-    int		pipe_fd[2];
-    pid_t	pid;
-    pid_t	last_pid;
-    int		prev_fd;
-    int		status;
-    t_cmd	*head; 
+	int		pipe_fd[2];
+	pid_t	pid;
+	pid_t	last_pid;
+	int		prev_fd;
+	int		status;
+	//char *path;
 
-    head =cmd;
-    prev_fd = -1;
-    while (cmd)
-    {
-	
-        if (cmd->next)
-            pipe(pipe_fd);
-		
-        pid = fork();
-        if (pid == -1)
-        {
-            perror("fork");
-            exit(1);
-        }
+	prev_fd = -1;
+	while (cmd)
+ 	 {
 
-        if (pid == 0)
-            children(cmd, data, prev_fd, pipe_fd);
+		//bool next_cmd_valid = cmd->next && !is_empty_cmd(cmd->next);
 
-        
-        if (cmd->next == NULL)
-            last_pid = pid;
+		if (is_empty_cmd(cmd))
+		{
+			if (cmd->fd_out != STDOUT_FILENO)
+			{
+				close(cmd->fd_out);
+        		cmd->fd_out = STDOUT_FILENO;
+			}
+			if (cmd->fd_in != STDIN_FILENO)
+			{
+				close(cmd->fd_in);
+				cmd->fd_in = STDIN_FILENO;
+			}
+			if (prev_fd != -1)
+			{
+				close(prev_fd);
+				prev_fd = -1;
+			}
+			cmd = cmd->next;
+			continue;
+		} 
 
-        parent(cmd, pipe_fd, &prev_fd);
-        cmd = cmd->next;
-    }
+		if (cmd->next && !is_empty_cmd(cmd->next))
+		{
+			if (pipe(pipe_fd) == -1)
+			{
+				perror("pipe");
+				exit(1);
+			}
+		}
+		else
+		{
+			pipe_fd[0] = -1;
+   			pipe_fd[1] = -1;
+		}
+		pid = fork();
+		if (pid == -1)
+		{
+			perror("fork");
+			exit(1);
+		}
+		if (pid == 0)
+			children(cmd, data, prev_fd, pipe_fd);
+		if (cmd->next == NULL)
+			last_pid = pid;
+		parent(cmd, pipe_fd, &prev_fd);
+		cmd = cmd->next;
+	} 
 
-    ignore_sigint();
-    bool sigint_printed = false;
-    while ((pid = wait(&status)) > 0)
-    {
-        if (WIFSIGNALED(status))
-        {
-            int sig = WTERMSIG(status);
-            if (sig == SIGINT && !sigint_printed && pid != last_pid)
-            {
-                write(STDOUT_FILENO, "\n", 1);
-                sigint_printed = true;
-            }
-        }
-        if (pid == last_pid && !sigint_printed)
-            handle_status_and_print(status);
-        else if (pid == last_pid && sigint_printed)
-            g_exit_status = 130;
-    }
-     close_all_fds_after_exec(head);
- /*    while ((pid = wait(&status)) > 0)
-        g_exit_status = WEXITSTATUS(status);
-    close_all_fd(); */
+	ignore_sigint();
+	bool sigint_printed = false;
+	while ((pid = wait(&status)) > 0)
+	{
+    	if (WIFSIGNALED(status))
+    	{
+        	int sig = WTERMSIG(status);
+        	if (sig == SIGINT && !sigint_printed && pid != last_pid)
+        	{
+            	write(STDOUT_FILENO, "\n", 1);
+            	sigint_printed = true;
+        	}
+    	}
+    if (pid == last_pid && !sigint_printed)
+        handle_status_and_print(status);
+	else if (pid == last_pid && sigint_printed)
+		g_exit_status = 130;
+	}
+	close_all_fd();
+/* 	while ((pid = wait(&status)) > 0)
+		g_exit_status = WEXITSTATUS(status);
+	close_all_fd();  */
+	/*   while (wait(NULL) > 0)
+		;
+	if (prev_fd != -1)
+		close(prev_fd);  */
 }
+
 
 /* ======= fichier: ./Gnl/get_next_line_utils.c ======= */
 /* ************************************************************************** */
@@ -4474,10 +4442,8 @@ void	replace_dollars(t_data *data)
 void	free_all(t_data *data, int exit_code, bool exit_or_not)
 {
 	free_env(&data->env);
-	if (data->token)
-		free_token(&data->token);
-	if (data->cmd)
-		free_cmd(&data->cmd);
+	free_token(&data->token);
+	free_cmd(&data->cmd);
 	if (data->line)
 	{
 		free(data->line);
@@ -4535,7 +4501,6 @@ void	free_tab(char **tokens)
 		close(data->cmd->fd_out);
 } */
 
-
 void	close_all_fd(void)
 {
 	int	fd;
@@ -4549,20 +4514,6 @@ void	close_all_fd(void)
 		fd++;
 	}
 }
-/* #include <fcntl.h>
-
-void close_all_fd(void)
-{
-    int fd = 3;
-    while (fd < 1024)
-    {
-        if (fcntl(fd, F_GETFD) != -1)
-            close(fd);
-        fd++;
-    }
-} */
-
-
 
 void	free_env(t_env **env)
 {
@@ -4574,10 +4525,7 @@ void	free_env(t_env **env)
 	{
 		tmp = (*env)->next;
 		if ((*env)->name)
-		{
-			printf("---------------------------------------------------------free env name");
 			free((*env)->name);
-		}
 		if ((*env)->value)
 			free((*env)->value);
 		free(*env);
@@ -4603,8 +4551,6 @@ void	free_token(t_token **token)
 	*token = NULL;
 }
 
-
-/* 
 void	free_cmd(t_cmd **cmd)
 {
 	t_cmd	*tmp;
@@ -4618,77 +4564,12 @@ void	free_cmd(t_cmd **cmd)
 			free((*cmd)->name);
 		if ((*cmd)->args)
 			free_tab((*cmd)->args);
-		//close_all_fd();
+		close_all_fd();
 		free(*cmd);
 		*cmd = tmp;
 	}
 	*cmd = NULL;
-}   */
-
-/* void	free_cmd(t_cmd **cmd)
-{
-	t_cmd *tmp;
-	t_cmd *next;
-
-	if (!cmd || !*cmd)
-		return;
-	tmp = *cmd;
-	while (tmp)
-	{
-		next = tmp->next;
-		if (tmp->args)
-			free_tab(tmp->args); // ta fonction qui libère un tableau de char*
-		if (tmp->name)
-			free(tmp->name);       // si t'as ce champ
-		free(tmp);
-		tmp = next;
-	}
-	*cmd = NULL;
-} */
-void	free_cmd(t_cmd **cmd)
-{
-    t_cmd	*tmp;
-    t_cmd	*current;
-
-	//tmp = NULL;
-    if (!cmd || !*cmd)
-		return ;
-/* 	if ((*cmd)->name)
-		free((*cmd)->name); */
-
-   // printf("Freeing cmd list...\n");
-    current = *cmd;
-    while (current)
-    {
-		tmp = current->next; 
-      //  printf("Current cmd: %p\n", (void*)current);
-      //  if (current->name)
-           // printf("Freeing name: %s\n", current->name), free(current->name);
-		 
-		
-		if (current->name)
-			free(current->name);  
-        if (current->args)
-        {
-           // printf("Freeing args...\n");
-            free_tab(current->args);
-        }
-		   if (current->heredoc_file)
-        {
-            unlink(current->heredoc_file);
-            free(current->heredoc_file);
-        }
-
-       // if (current->fd_in)
-          //  printf("Freeing infile: %d\n", current->fd_in);
-       // if (current->fd_out)
-         //   printf("Freeing outfile: %d\n", current->fd_out);
-      //  printf("Freeing command struct\n");
-        free(current);
-        current = tmp;
-    }
-    *cmd = NULL;
-} 
+}
 
 
 /* ======= fichier: ./Parsing/stock_tokens.c ======= */
@@ -5052,7 +4933,7 @@ char	**line_to_token(t_data *data)
 
 #include "../minishell.h"
 
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
+ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
 {
 	if (!t->next || t->next->type != ARG)
 	{
@@ -5060,60 +4941,11 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 		g_exit_status = 2;
 		return (false);
 	}
-	if (!cur)
-    {
-        t_cmd *new_cmd = create_new_cmd();
-        if (!new_cmd)
-            return (false);
-        cur = &new_cmd;
-    }
-
-	if (!handle_heredoc(tok, *cur))
+	if (!handle_heredoc(tok, cur))
 		return (false);
 	*tok = (*tok)->next->next;
 	return (true);
-}  
-
-/* bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
-{
-    if (!t || !t->next || t->next->type != ARG)
-    {
-        ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-        g_exit_status = 2;
-        return (false);
-    }
-
-    // Si cur == NULL → crée une nouvelle commande vide
-    if (!*cur)
-    {
-        *cur = create_new_cmd();
-        if (!*cur)
-            return false;
-    }
-
-    // Applique le here-doc
-    if (!handle_heredoc(tok, *cur))
-        return (false);
-
-    // Saute `<<` et le délimiteur
-    *tok = (*tok)->next->next;
-
-    // Vérifie si le token suivant est un ARG (ex: "LOL")
-    if (*tok && (*tok)->type == ARG)
-    {
-        char *cmd_name = (*tok)->str;
-        ft_putstr_fd("minishell: ", 2);
-        ft_putstr_fd(cmd_name, 2);
-        ft_putstr_fd(": command not found\n", 2);
-        g_exit_status = 127;
-
-        // Ignore ce token
-        *tok = (*tok)->next;
-    }
-
-    return (true);
-} */
-
+} 
 
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens)
 {
@@ -5476,9 +5308,7 @@ t_cmd	*create_new_cmd(void)
 	cmd->args = NULL;
 	cmd->fd_in = STDIN_FILENO;
 	cmd->fd_out = STDOUT_FILENO;
-	cmd->heredoc_file = NULL;
 	cmd->next = NULL;
-	cmd->name = NULL;
 	return (cmd);
 }
 
@@ -5489,7 +5319,7 @@ bool is_redirection(int type)
 	return (type == OUTPUT || type == APPEND || type == INPUT || type == HEREDOC);
 }
 
-int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
+int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
 {
 	while (*tokens && is_redirection((*tokens)->type))
 	{
@@ -5497,7 +5327,7 @@ int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 
 		if (type == OUTPUT)
 		{
-			if (!handle_output(data,tokens, cur))
+			if (!handle_output(tokens, cur))
 				return (0);
 		}
 		else if (type == APPEND)
@@ -5512,14 +5342,14 @@ int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 		}
 		else if (type == HEREDOC)
 		{
-			if (!handle_heredoc_type(*tokens, tokens, cur))
+			if (!handle_heredoc_type(*tokens, tokens, *cur))
 				return (0);
 		}
 	}
 	return (1);
 }
 
-int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
+int handle_pipe(t_token **tokens, t_cmd **cur)
 {
 
     if (!tokens || !*tokens)
@@ -5534,15 +5364,7 @@ int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
     // CAS 1 : Le token suivant est une redirection (sans commande explicite)
     if (*tokens && is_redirection((*tokens)->type))
     {
-
-		 t_cmd *new_cmd = create_new_cmd();
-        if (!new_cmd)
-            return 0;
-
-        if (*cur)
-            (*cur)->next = new_cmd;
-        *cur = new_cmd;
-       /*  // S'il n'y a pas encore de commande en cours, en créer une vide
+        // S'il n'y a pas encore de commande en cours, en créer une vide
         if (!*cur)
             *cur = create_new_cmd();
 
@@ -5551,14 +5373,12 @@ int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
             return 0; // erreur dans la redirection
 
         // Ici, on a traité la redirection, on continue normalement
-        return 1; */
-		if (!handle_redirect_after_pipe(data, tokens, cur))
-        	return 0;
+        return 1;
     }
 
-    /* if (!*cur)
+    if (!*cur)
         *cur = create_new_cmd();
- */
+
     // On continue normalement la lecture / parsing
     return 1;
 } 
@@ -5590,18 +5410,22 @@ int handle_pipe(t_data *data,t_token **tokens, t_cmd **cur)
 }  */
 
 
-int	handle_output(t_data *data, t_token **tokens, t_cmd **cur)
+int	handle_output(t_token **tokens, t_cmd **cur)
 {
-	(void)data;
 	if (!cur || !*cur)
 		return (0);
 	if ((*cur)->args == NULL && (*cur)->name == NULL)
 	{
-		(*cur)->name = ft_strdup("");
-		if ( !(*cur)->name)
-			return (0);
+		(*cur)->name = ft_strdup(""); // pour signaler que ce t_cmd existe
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
+	}	
+	if (((*tokens)->type == OUTPUT || (*tokens)->type == APPEND || (*tokens)->type == INPUT || (*tokens)->type == HEREDOC)
+		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
+	{
+		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
+		g_exit_status = 2;
+		return (0);
 	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
@@ -5750,7 +5574,7 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data, data->token);
+	data->cmd = tokens_to_commands(data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);
@@ -5811,13 +5635,37 @@ char	*heredoc_tmp(void)
 	char		*filename;
 
 	num = ft_itoa(i++);
-	if (!num)
-		return (NULL);
 	filename = ft_strjoin("/tmp/heredoc_%d.tmp", num);
 	free(num);
 	return (filename);
 }
 
+/* int	write_heredoc(char *delimiter, int tmp_fd)
+{
+	char	*line;
+	char	*newline;
+
+	while (1)
+	{
+		reset_signals_to_default();
+		write(1, "> ", 2);
+		line = get_next_line(0);
+		if (!line)
+			break ;
+		newline = ft_strchr(line, '\n');
+		if (newline)
+			*newline = '\0';
+		if (ft_strcmp(line, delimiter) == 0)
+		{
+			free(line);
+			break ;
+		}
+		write(tmp_fd, line, ft_strlen(line));
+		write(tmp_fd, "\n", 1);
+		free(line);
+	}
+	return (1);
+} */
 
 int write_heredoc(char *delimiter, int tmp_fd)
 {
@@ -5875,64 +5723,20 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 	char	*tmp_filename;
 	int		tmp_fd;
 
-
-	delimiter = (*tokens)->next->str;
-	tmp_filename = heredoc_tmp();
-	if (!tmp_filename)
-		return (0);
-
-	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (tmp_fd == -1)
-		return (perror("open tmp"), free(tmp_filename), 0);
-
-	if (!tokens || !*tokens || !(*tokens)->next)
-		return (close(tmp_fd), free(tmp_filename), 0);
-
-	if (write_heredoc(delimiter, tmp_fd) == -1)
-	{
-		close(tmp_fd);
-		unlink(tmp_filename);
-		free(tmp_filename);
-		g_exit_status = 130;
-		return (0);
-	}
-	close(tmp_fd);
-
-	cur->heredoc_file = tmp_filename; // Sauvegarde pour suppression plus tard
-	cur->fd_in = open(tmp_filename, O_RDONLY);
-	if (cur->fd_in == -1)
-	{
-		perror("open heredoc read");
-		unlink(tmp_filename);
-		free(tmp_filename);
-		return (0);
-	}
-	return (1);
-}
-
-
-/* int	handle_heredoc(t_token **tokens, t_cmd *cur)
-{
-	char	*delimiter;
-	char	*tmp_filename;
-	int		tmp_fd;
-
 	delimiter = (*tokens)->next->str;
 	tmp_filename = heredoc_tmp();
 	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (tmp_fd == -1)
-		return (perror("open tmp"),free(tmp_filename), 0);
+		return (perror("open tmp"), 0);
 	if (!tokens || !*tokens || !(*tokens)->next)
-		return (close(tmp_fd), free(tmp_filename),0);
+		return (0);
 	if (write_heredoc(delimiter, tmp_fd) == -1)
 	{
 		close(tmp_fd);
 		unlink(tmp_filename);
-		free(tmp_filename);
 		g_exit_status = 130;
 		return (0);
 	}
-	close(tmp_fd);
 	if (cur->fd_in != STDIN_FILENO)
 		close(cur->fd_in);
 	cur->fd_in = open(tmp_filename, O_RDONLY);
@@ -5940,7 +5744,7 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 		return (perror("open heredoc read"), 0);
 	free(tmp_filename);
 	return (1);
-} */
+}
 
 /* int	handle_heredoc(t_token **tokens, t_cmd *cur)
 {
@@ -5965,6 +5769,41 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 		return (perror("open heredoc read"), 0);
 	free(tmp_filename);
 	return (1);
+} */
+
+/* bool check_token_syntax(t_token *tokens, t_data *data)
+{
+    while (tokens)
+    {
+        // Vérifie si le token est un pipe
+        if (tokens->type == PIPE)
+        {
+			 if (!tokens->prev || !tokens->next)
+   			 {
+        		printf("minishell: syntax error near unexpected token `|'\n");
+        		g_exit_status = 2;
+        		return false;
+    		}
+            // Si le token précédent est une redirection, c'est une erreur
+            if (tokens->prev && (tokens->prev->type == OUTPUT || tokens->prev->type == HEREDOC || tokens->prev->type == APPEND || tokens->prev->type == INPUT))
+            {
+                printf("minishell: syntax error near unexpected token `%s'\n", tokens->str);
+                g_exit_status = 2;
+                return false;
+            }
+        }
+
+        // Vérifie si le token est une redirection sans fichier suivant
+        if ((tokens->type == OUTPUT || tokens->type == APPEND || tokens->type == INPUT) && (!tokens->next || tokens->next->type != ARG))
+        {
+            printf("minishell: syntax error near unexpected token `%s'\n", tokens->next ? tokens->next->str : "newline");
+            g_exit_status = 2;
+            return false;
+        }
+
+        tokens = tokens->next;
+    }
+    return true;
 } */
 
 
@@ -5992,63 +5831,53 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 } */
 
 
-static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **cur)
+static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 {
 	t_token	*tok;
 
 	tok = *tokens;
 	if (!tok)
 		return (false);
+	/* if (tok->type == HEREDOC)
+		return (handle_heredoc_type(tok, tokens, *cur));
+	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+		return (true);
+	if (tok->type == CMD)
+		return (handle_cmd_type(tok, head, cur, tokens));
+	if (tok->type == ARG)
+		return (handle_arg_type(tok, *cur, tokens));
+	if (tok->type == OUTPUT)
+		return (handle_output(tokens, cur));
+	if (tok->type == INPUT)
+		return (handle_input(tokens, cur));
+	if (tok->type == PIPE)
+		return (handle_pipe(tokens, cur));
+	if (tok->type == APPEND)
+		return (handle_append(tokens, cur));
+ */
+
 	if (tok->type == HEREDOC)
-    	return (handle_heredoc_type(tok, tokens, cur));
+    	return (handle_heredoc_type(tok, tokens, *cur));
 	else if (tok->type == OUTPUT)
-   	 	return (handle_output(data, tokens, cur));
+   	 	return (handle_output(tokens, cur));
 	else if (tok->type == APPEND)
     	return (handle_append(tokens, cur));
 	else if (tok->type == INPUT)
    	 	return (handle_input(tokens, cur));
 	else if (tok->type == PIPE)
-    	return (handle_pipe(data, tokens, cur));
+    	return (handle_pipe(tokens, cur));
+ 	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
+    	return (true); 
 	else if (tok->type == CMD)
-    	return (handle_cmd_type(tok, head, cur, tokens));
-	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
-    	return (true); 		
+    	return (handle_cmd_type(tok, head, cur, tokens));	
 	else if (tok->type == ARG)
-   	 	return (handle_arg_type(tok, *cur, tokens));
+   	 return (handle_arg_type(tok, *cur, tokens));
 
 	return (true);
 }
 
 
 
-
-t_cmd	*tokens_to_commands(t_data *data,t_token *tokens)
-{
-    t_cmd	*head;
-    t_cmd	*cur;
-
-    head = NULL;
-    cur = NULL;
-    g_exit_status = 0;
-
-    if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
-            || tokens->type == APPEND || tokens->type == HEREDOC))
-    {
-        cur = create_new_cmd(); // ✅ Utilise create_new_cmd()
-        if (!cur)
-            return (NULL);
-        head = cur;
-    }
-    while (tokens && g_exit_status != 130)
-    {
-        if (!is_type_token(data, &tokens, &head, &cur)) // ✅ Déjà bien utilisé ici
-            return (free_cmd(&head), NULL);
-    }
-    return head;
-} 
-
-
-/* 
 t_cmd	*tokens_to_commands(t_token *tokens)
 {
 	t_cmd	*head;
@@ -6057,14 +5886,14 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 	head = NULL;
 	cur = NULL;
 
- 	if ((tokens->type == PIPE && (!tokens->next || tokens->next->type == PIPE
+/* 	if ((tokens->type == PIPE && (!tokens->next || tokens->next->type == PIPE
 				|| tokens->next->type == OUTPUT)) || (tokens->type == OUTPUT
 			&& (!tokens->next || tokens->next->type != CMD)))
 	{
 		printf("shell: syntax error near unexpected token\n");
 		return (free_cmd(&head), NULL);
-	} 
-	 if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
+	} */
+	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC))
 	{
 		cur = ft_calloc(1, sizeof(t_cmd));
@@ -6074,7 +5903,7 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 		cur->fd_out = STDOUT_FILENO;
 		cur->name = ft_strdup("");
 		head = cur;
-	} 
+	}
 	g_exit_status = 0;
 	while (tokens)
 	{
@@ -6087,7 +5916,7 @@ t_cmd	*tokens_to_commands(t_token *tokens)
 		}
 	}
 	return (head);
-} */
+}
 
 /*  void print_cmds(t_cmd *c)
 {
@@ -6669,19 +6498,6 @@ bool	empty_line(char *line)
 	return (false);
 }
 
-void	exit_minishell(t_data *data)
-{
-	ft_putstr_fd("exit\n", 2);
-	free_token(&data->token);
-	free_cmd(&data->cmd);
-	free_env(&data->env);
-	clear_history(); // readline
-	close_all_fd();
-	exit(g_exit_status);
-}
-
-
-
 void	minishell_loop(t_data *data)
 {
 	while (1)
@@ -6690,9 +6506,8 @@ void	minishell_loop(t_data *data)
 		data->line = readline("minishell$ ");
 		if (!data->line)
 		{
-			exit_minishell(data);
-		/* 	ft_putstr_fd("exit\n", 2);
-			free_all(data, g_exit_status, true); */
+			ft_putstr_fd("exit\n", 2);
+			free_all(data, g_exit_status, true);
 		}
 		if (empty_line(data->line))
 			continue ;
@@ -6710,7 +6525,7 @@ void	minishell_loop(t_data *data)
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
-	
+
 	if (!isatty(1))
 		return (ft_putstr_fd("Error output is not a terminal\n", 2), 1);
 	if (!isatty(0))
@@ -6722,9 +6537,7 @@ int	main(int argc, char *argv[], char **envp)
 		parse_env(envp, &data);
 	execshell(&data, &data.env);
 	minishell_loop(&data);
-	free_env(&data.env);
-	//free_all(&data, 0, true);
-	close_all_fd();
+	free_all(&data, 0, true);
 	clear_history();
 	return (0);
 }

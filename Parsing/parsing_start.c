@@ -100,7 +100,7 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data, data->token);
+	data->cmd = tokens_to_commands(data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);

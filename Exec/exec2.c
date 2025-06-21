@@ -94,9 +94,9 @@ void	executecommand(t_data *data)
 	}
 	else if (data->cmd->args && data->cmd->args[0])
 		exec_extern_command(data->cmd->args, data->env, data);
-/* 	else
+	else
 	{
-	 	if (data->cmd->fd_in != STDIN_FILENO)
+	/* 	if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			close(data->cmd->fd_in);
 			data->cmd->fd_in =STDIN_FILENO;
@@ -105,7 +105,7 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
-		} 
+		} */
 		while(wait(NULL) > 0)
 			;
 		if (data->cmd->fd_in != STDIN_FILENO)
@@ -118,8 +118,8 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-	}*/
-} 
+	}
+}
 
 t_env	*find_env_var(t_env *env_list, char *name)
 {

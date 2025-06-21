@@ -90,5 +90,5 @@ void	execshell(t_data *data, t_env **env_list)
 	if (!pwd)
 		add_env_var(data, env_list, "PWD", cwd);
 	free(cwd);
-	free_env(env_list);
+
 }

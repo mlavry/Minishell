@@ -43,42 +43,18 @@ bool	empty_line(char *line)
 	return (false);
 }
 
-void	exit_minishell(t_data *data)
-{
-	ft_putstr_fd("exit\n", 2);
-	free_token(&data->token);
-	free_cmd(&data->cmd);
-	free_env(&data->env);
-	clear_history(); // readline
-	close_all_fd();
-	exit(g_exit_status);
-}
-
-void	free_heredoc(t_cmd *cmd)
-{
-    while (cmd)
-    {
-        if (cmd->heredoc_file)
-        {
-            unlink(cmd->heredoc_file);
-            free(cmd->heredoc_file);
-            cmd->heredoc_file = NULL;
-        }
-        cmd = cmd->next;
-    }
-}
-
 void	minishell_loop(t_data *data)
 {
 	while (1)
 	{
+	
+
 		init_signals_prompt();
 		data->line = readline("minishell$ ");
 		if (!data->line)
 		{
-			exit_minishell(data);
-		/* 	ft_putstr_fd("exit\n", 2);
-			free_all(data, g_exit_status, true); */
+			ft_putstr_fd("exit\n", 2);
+			free_all(data, g_exit_status, true);
 		}
 		if (empty_line(data->line))
 			continue ;
@@ -87,14 +63,11 @@ void	minishell_loop(t_data *data)
 			continue ;
 		else
 			executecommand(data);
-		free_heredoc(data->cmd);
 		free_token(&data->token);
 		free_cmd(&data->cmd);
 		free(data->line);
 	}
 }
-
-
 
 int	main(int argc, char *argv[], char **envp)
 {
@@ -111,9 +84,7 @@ int	main(int argc, char *argv[], char **envp)
 		parse_env(envp, &data);
 	execshell(&data, &data.env);
 	minishell_loop(&data);
-	free_env(&data.env);
-	//free_all(&data, 0, true);
-	close_all_fd();
+	free_all(&data, 0, true);
 	clear_history();
 	return (0);
 }

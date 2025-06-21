@@ -48,7 +48,7 @@ void	close_all_fd(void)
 		close(fd);
 		fd++;
 	}
-}
+} 
 /* #include <fcntl.h>
 
 void close_all_fd(void)
@@ -74,10 +74,7 @@ void	free_env(t_env **env)
 	{
 		tmp = (*env)->next;
 		if ((*env)->name)
-		{
-			printf("---------------------------------------------------------free env name");
 			free((*env)->name);
-		}
 		if ((*env)->value)
 			free((*env)->value);
 		free(*env);
@@ -103,7 +100,37 @@ void	free_token(t_token **token)
 	*token = NULL;
 }
 
+/* void	free_cmd(t_cmd **cmd)
+{
+    t_cmd	*tmp;
 
+    while (*cmd)
+    {
+        tmp = *cmd;
+        *cmd = (*cmd)->next;
+
+        if (tmp->name)
+        {
+            free(tmp->name);
+            tmp->name = NULL;
+        }
+
+        if (tmp->args)
+        {
+            int i = 0;
+            while (tmp->args[i])
+            {
+                free(tmp->args[i]);
+                tmp->args[i] = NULL;
+                i++;
+            }
+            free(tmp->args);
+            tmp->args = NULL;
+        }
+
+        free(tmp);
+    }
+}  */
 /* 
 void	free_cmd(t_cmd **cmd)
 {
@@ -145,7 +172,6 @@ void	free_cmd(t_cmd **cmd)
 	}
 	*cmd = NULL;
 } */
-
 void	free_cmd(t_cmd **cmd)
 {
     t_cmd	*tmp;
@@ -153,10 +179,7 @@ void	free_cmd(t_cmd **cmd)
 
 	//tmp = NULL;
     if (!cmd || !*cmd)
-		return ;
-/* 	if ((*cmd)->name)
-		free((*cmd)->name); */
-
+        return ;
    // printf("Freeing cmd list...\n");
     current = *cmd;
     while (current)
@@ -165,21 +188,11 @@ void	free_cmd(t_cmd **cmd)
       //  printf("Current cmd: %p\n", (void*)current);
       //  if (current->name)
            // printf("Freeing name: %s\n", current->name), free(current->name);
-		 
-		
-		if (current->name)
-			free(current->name);  
         if (current->args)
         {
            // printf("Freeing args...\n");
             free_tab(current->args);
         }
-		   if (current->heredoc_file)
-        {
-            unlink(current->heredoc_file);
-            free(current->heredoc_file);
-        }
-
        // if (current->fd_in)
           //  printf("Freeing infile: %d\n", current->fd_in);
        // if (current->fd_out)

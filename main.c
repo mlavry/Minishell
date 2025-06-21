@@ -70,7 +70,7 @@ void	minishell_loop(t_data *data)
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
-
+	
 	if (!isatty(1))
 		return (ft_putstr_fd("Error output is not a terminal\n", 2), 1);
 	if (!isatty(0))
@@ -83,6 +83,7 @@ int	main(int argc, char *argv[], char **envp)
 	execshell(&data, &data.env);
 	minishell_loop(&data);
 	free_all(&data, 0, true);
+	close_all_fd();
 	clear_history();
 	return (0);
 }

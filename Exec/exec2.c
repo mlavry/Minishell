@@ -57,23 +57,6 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
-
-
-
-void	reset_fd(t_cmd *cmd)
-{
-    if (cmd->fd_in != STDIN_FILENO)
-    {
-        close(cmd->fd_in);
-        cmd->fd_in = STDIN_FILENO;
-    }
-    if (cmd->fd_out != STDOUT_FILENO)
-    {
-        close(cmd->fd_out);
-        cmd->fd_out = STDOUT_FILENO;
-    }
-}
-
 void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
@@ -98,17 +81,22 @@ void	executecommand(t_data *data)
 		if (data->cmd->fd_out != STDOUT_FILENO)
 		{
 			write(data->cmd->fd_out, "", 0);
-			/* close(data->cmd->fd_out);
-			data->cmd->fd_out = STDOUT_FILENO; */
+			close(data->cmd->fd_out);
+			data->cmd->fd_out = STDOUT_FILENO;
 		}
-		reset_fd(data->cmd);
+		if (data->cmd->fd_in != STDIN_FILENO)
+		{
+			close(data->cmd->fd_in);
+			data->cmd->fd_in = STDIN_FILENO;
+		}
+
 		return ;
 	}
 	else if (data->cmd->args && data->cmd->args[0])
 		exec_extern_command(data->cmd->args, data->env, data);
-	else
+/* 	else
 	{
-	/* 	if (data->cmd->fd_in != STDIN_FILENO)
+	 	if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			close(data->cmd->fd_in);
 			data->cmd->fd_in =STDIN_FILENO;
@@ -117,7 +105,7 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
-		} */
+		} 
 		while(wait(NULL) > 0)
 			;
 		if (data->cmd->fd_in != STDIN_FILENO)
@@ -130,8 +118,8 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
-	}
-}
+	}*/
+} 
 
 t_env	*find_env_var(t_env *env_list, char *name)
 {

@@ -35,6 +35,7 @@ void	free_tab(char **tokens)
 		close(data->cmd->fd_out);
 } */
 
+
 void	close_all_fd(void)
 {
 	int	fd;
@@ -48,6 +49,20 @@ void	close_all_fd(void)
 		fd++;
 	}
 }
+/* #include <fcntl.h>
+
+void close_all_fd(void)
+{
+    int fd = 3;
+    while (fd < 1024)
+    {
+        if (fcntl(fd, F_GETFD) != -1)
+            close(fd);
+        fd++;
+    }
+} */
+
+
 
 void	free_env(t_env **env)
 {
@@ -59,7 +74,10 @@ void	free_env(t_env **env)
 	{
 		tmp = (*env)->next;
 		if ((*env)->name)
+		{
+			printf("---------------------------------------------------------free env name");
 			free((*env)->name);
+		}
 		if ((*env)->value)
 			free((*env)->value);
 		free(*env);
@@ -85,6 +103,8 @@ void	free_token(t_token **token)
 	*token = NULL;
 }
 
+
+/* 
 void	free_cmd(t_cmd **cmd)
 {
 	t_cmd	*tmp;
@@ -98,9 +118,68 @@ void	free_cmd(t_cmd **cmd)
 			free((*cmd)->name);
 		if ((*cmd)->args)
 			free_tab((*cmd)->args);
-		close_all_fd();
+		//close_all_fd();
 		free(*cmd);
 		*cmd = tmp;
 	}
 	*cmd = NULL;
-}
+}   */
+
+/* void	free_cmd(t_cmd **cmd)
+{
+	t_cmd *tmp;
+	t_cmd *next;
+
+	if (!cmd || !*cmd)
+		return;
+	tmp = *cmd;
+	while (tmp)
+	{
+		next = tmp->next;
+		if (tmp->args)
+			free_tab(tmp->args); // ta fonction qui libère un tableau de char*
+		if (tmp->name)
+			free(tmp->name);       // si t'as ce champ
+		free(tmp);
+		tmp = next;
+	}
+	*cmd = NULL;
+} */
+void	free_cmd(t_cmd **cmd)
+{
+    t_cmd	*tmp;
+    t_cmd	*current;
+
+	//tmp = NULL;
+    if (!cmd || !*cmd)
+		return ;
+/* 	if ((*cmd)->name)
+		free((*cmd)->name); */
+
+   // printf("Freeing cmd list...\n");
+    current = *cmd;
+    while (current)
+    {
+		tmp = current->next; 
+      //  printf("Current cmd: %p\n", (void*)current);
+      //  if (current->name)
+           // printf("Freeing name: %s\n", current->name), free(current->name);
+		 
+		
+		if (current->name)
+			free(current->name);  
+        if (current->args)
+        {
+           // printf("Freeing args...\n");
+            free_tab(current->args);
+        }
+       // if (current->fd_in)
+          //  printf("Freeing infile: %d\n", current->fd_in);
+       // if (current->fd_out)
+         //   printf("Freeing outfile: %d\n", current->fd_out);
+      //  printf("Freeing command struct\n");
+        free(current);
+        current = tmp;
+    }
+    *cmd = NULL;
+} 

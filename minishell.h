@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 02:44:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 22:49:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,11 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char			*name;
+
 	char			**args;
 	int				fd_in;
 	int				fd_out;
+	char	*heredoc_file;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -84,14 +86,14 @@ int		count_tokens(char *line);
 char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_token *tokens);
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur);
+t_cmd	*tokens_to_commands(t_data *data, t_token *tokens);
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur);
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
 bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
 bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
-int		handle_output(t_token **tokens, t_cmd **cur);
+int		handle_output(t_data *data, t_token **tokens, t_cmd **cur);
 int		handle_input(t_token **tokens, t_cmd **cur);
-int		handle_pipe(t_token **tokens, t_cmd **cur);
+int		handle_pipe(t_data *data, t_token **tokens, t_cmd **cur);
 int		handle_heredoc(t_token **tokens, t_cmd *cur);
 int		handle_append(t_token **tokens, t_cmd **cur);
 int		handle_arg(t_cmd *cur, t_token *token);
@@ -99,6 +101,7 @@ int		handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
 void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
 char	*check_next(char *line, char *actual_chain, int *pos);
+bool	check_arg_op_syntax(t_token *tok);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -175,6 +178,9 @@ void	exec_pipe(t_cmd *cmd, t_data *data);
 bool	is_a_directory(char *path, char **args);
 
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
+t_cmd	*create_new_cmd(void);
+bool is_redirection(int type);
+
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);
 

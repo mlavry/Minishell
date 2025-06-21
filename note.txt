@@ -20,13 +20,6 @@ expand heredoc
 
 pas expand delimiteur entre double quote
 
-PWD doit revenir si on relance un minishell
-
-cd foeihi rheghreoig -> quand plus de 1 arguments -> erreur: too many arguments
-
 Exit sans arguments -> garde le dernier code erreur
-
-unset HOME puis cd $HOME -> message d'erreur
-idem pour PWD -> message d'erreur different
 
 exit -> limite long long pas int

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/17 00:05:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/19 22:47:40 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ bool	check_redirection_syntax(t_token *tok)
 {
 	if (!tok->next || tok->next->type != ARG)
 	{
-		ft_putstr_fd("shel: syntax error near unexpected token `", 2);
+		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 		if (!tok->next)
 			ft_putstr_fd("newline", 2);
 		else
@@ -64,21 +64,6 @@ bool	validate_tokens(t_token *tokens)
 {
 	while (tokens)
 	{
-
-	/* 	if (tokens->type == PIPE)
-		{
-			// Si juste après pipe on a une redirection
-			if (tokens->next && (tokens->next->type == OUTPUT || tokens->next->type == APPEND
-				|| tokens->next->type == INPUT || tokens->next->type == HEREDOC))
-			{
-				ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-				ft_putstr_fd(tokens->next->str, 2);
-				ft_putstr_fd("'\n", 2);
-				g_exit_status = 2;
-				return (false);
-			}
-		}
-		 */
 		if (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC)
 		{
@@ -115,7 +100,7 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data->token);
+	data->cmd = tokens_to_commands(data, data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);

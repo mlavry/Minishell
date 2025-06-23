@@ -57,12 +57,16 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 			(*lvl)++;
 	}
 }
+static int call_count = 0;
+
 
 void	execshell(t_data *data, t_env **env_list)
 {
+	call_count++;
+    printf("execshell call #%d\n", call_count);
 	t_env	*shlvl;
 	int		lvl;
-	char	*new_val;
+	//char	*new_val;
 	t_env	*pwd;
 	char *cwd;
 
@@ -80,11 +84,13 @@ void	execshell(t_data *data, t_env **env_list)
 	{
 		lvl = 1;
 		shlvl_verification(shlvl, &lvl);
-		new_val = ft_itoa(lvl);
-		if (!new_val)
-			malloc_failed(data);
+	//	new_val = ft_itoa(lvl);
+		//if (!new_val)
+		//	malloc_failed(data);
 		free(shlvl->value);
-		shlvl->value = new_val;
+		shlvl->value = ft_itoa(lvl);
+		if (!shlvl->value)
+    		malloc_failed(data);
 	}
 	pwd = find_env_var(*env_list, "PWD");
 	if (!pwd)

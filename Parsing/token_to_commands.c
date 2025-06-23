@@ -167,6 +167,7 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         free(tmp_filename);
         return (0);
     }
+	close(cur->fd_in); 
     return (1);
 }
 

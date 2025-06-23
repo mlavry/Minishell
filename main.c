@@ -47,8 +47,6 @@ void	minishell_loop(t_data *data)
 {
 	while (1)
 	{
-	
-
 		init_signals_prompt();
 		data->line = readline("minishell$ ");
 		if (!data->line)

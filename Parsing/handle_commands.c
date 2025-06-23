@@ -178,10 +178,10 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 	if (!cur || !*cur)
 		return (0);
 	if ((*cur)->args == NULL && (*cur)->name == NULL)
-	{
+	{/* 
 		(*cur)->name = ft_strdup(""); 
 		if ( !(*cur)->name)
-			return (0);
+			return (0); */
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
 	}	

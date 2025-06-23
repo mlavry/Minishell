@@ -76,7 +76,10 @@ void	free_env(t_env **env)
 		if ((*env)->name)
 			free((*env)->name);
 		if ((*env)->value)
+		{
+			printf("Freeing env value: %p\n", (void *)(*env)->value);
 			free((*env)->value);
+		}
 		free(*env);
 		*env = tmp;
 	}
@@ -185,6 +188,8 @@ void	free_cmd(t_cmd **cmd)
     while (current)
     {
 		tmp = current->next; 
+		if ( current->name)
+			free(current->name);
       //  printf("Current cmd: %p\n", (void*)current);
       //  if (current->name)
            // printf("Freeing name: %s\n", current->name), free(current->name);

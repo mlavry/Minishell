@@ -26,7 +26,7 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || (value != NULL && !new_var->value))
 	{
-		free(name);
+		//free(name);
 		free_env(&new_var);
 		malloc_failed(data);
 	}

@@ -57,6 +57,7 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
+
 void	executecommand(t_data *data)
 {
 	if (!data || !data->line || !data->env)
@@ -89,14 +90,13 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_in);
 			data->cmd->fd_in = STDIN_FILENO;
 		}
-
 		return ;
 	}
 	else if (data->cmd->args && data->cmd->args[0])
 		exec_extern_command(data->cmd->args, data->env, data);
 	else
 	{
-	/* 	if (data->cmd->fd_in != STDIN_FILENO)
+	 	if (data->cmd->fd_in != STDIN_FILENO)
 		{
 			close(data->cmd->fd_in);
 			data->cmd->fd_in =STDIN_FILENO;
@@ -105,7 +105,7 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
-		} */
+		} 
 		while(wait(NULL) > 0)
 			;
 		if (data->cmd->fd_in != STDIN_FILENO)
@@ -119,6 +119,10 @@ void	executecommand(t_data *data)
 			data->cmd->fd_out = STDOUT_FILENO;
 		}
 	}
+  	free_cmd(&data->cmd);
+	data->cmd = NULL;  
+	close_all_fd();
+
 }
 
 t_env	*find_env_var(t_env *env_list, char *name)

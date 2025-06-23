@@ -21,16 +21,22 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
    	 	close(data->cmd->fd_in);
    		data->cmd->fd_in = STDIN_FILENO;
 	}
-	handle_status_and_print(status);
+	if (data->cmd->fd_out != STDOUT_FILENO)
+    {
+        close(data->cmd->fd_out);
+        data->cmd->fd_out = STDOUT_FILENO;
+    }
+
 	free(path);
-	if (data->cmd->fd_in != STDIN_FILENO)
+/* 	if (data->cmd->fd_in != STDIN_FILENO)
 		close(data->cmd->fd_in);
 	if (data->cmd->fd_out != STDOUT_FILENO)
-		close(data->cmd->fd_out);
+		close(data->cmd->fd_out); */
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 		g_exit_status = 128 + WTERMSIG(status);
+	handle_status_and_print(status);	
 }
 
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
@@ -47,7 +53,9 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 	}
 	reset_signals_to_default();
 	execve(path, args, convert_env(env));
-	free_all(data, g_exit_status, true);
+	free(path);
+	//free_all(data, g_exit_status, true);
+	exit(127);
 }
 
 bool	have_no_permission(char *cmd_path)
@@ -97,7 +105,8 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 			close(data->cmd->fd_out);
 		if (data->cmd->fd_in != STDIN_FILENO)
 			close(data->cmd->fd_in); */
-		return ;
+		//return (free_all(data, g_exit_status, true));
+		return;
 	}
 	if (is_a_directory(path, args) || have_no_permission(path))
 		return (free(path));

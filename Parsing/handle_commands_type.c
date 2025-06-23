@@ -12,7 +12,7 @@
 
 #include "../minishell.h"
 
- bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd *cur)
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 {
 	if (!t->next || t->next->type != ARG)
 	{
@@ -20,11 +20,60 @@
 		g_exit_status = 2;
 		return (false);
 	}
-	if (!handle_heredoc(tok, cur))
+	if (!cur)
+    {
+        t_cmd *new_cmd = create_new_cmd();
+        if (!new_cmd)
+            return (false);
+        cur = &new_cmd;
+    }
+
+	if (!handle_heredoc(tok, *cur))
 		return (false);
 	*tok = (*tok)->next->next;
 	return (true);
-} 
+}  
+
+/* bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
+{
+    if (!t || !t->next || t->next->type != ARG)
+    {
+        ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
+        g_exit_status = 2;
+        return (false);
+    }
+
+    // Si cur == NULL → crée une nouvelle commande vide
+    if (!*cur)
+    {
+        *cur = create_new_cmd();
+        if (!*cur)
+            return false;
+    }
+
+    // Applique le here-doc
+    if (!handle_heredoc(tok, *cur))
+        return (false);
+
+    // Saute `<<` et le délimiteur
+    *tok = (*tok)->next->next;
+
+    // Vérifie si le token suivant est un ARG (ex: "LOL")
+    if (*tok && (*tok)->type == ARG)
+    {
+        char *cmd_name = (*tok)->str;
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(cmd_name, 2);
+        ft_putstr_fd(": command not found\n", 2);
+        g_exit_status = 127;
+
+        // Ignore ce token
+        *tok = (*tok)->next;
+    }
+
+    return (true);
+} */
+
 
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens)
 {

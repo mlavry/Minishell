@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/23 19:37:51 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,12 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		close(data->cmd->fd_out);
 	}
 	reset_signals_to_default();
-	execve(path, args, convert_env(env));
+	if (execve(path, args, convert_env(env)) == -1)
+	{
+		perror(data->cmd->args[0]);
+		free_all(data, 127, true);
+	}
+	// execve(path, args, convert_env(env));
 	free_all(data, g_exit_status, true);
 }
 

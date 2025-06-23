@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/19 02:31:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/23 19:27:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,7 @@ void	exec_command(t_cmd *cmd, t_data *data)
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
-		close_all_fd();
-		exit(0);
+		free_all(data, g_exit_status, true);
 	}
 	path = getpath(cmd->args[0], data);
 	if (!path)
@@ -79,11 +78,9 @@ void	exec_command(t_cmd *cmd, t_data *data)
 	
 	if (execve(path, cmd->args, convert_env(data->env)) == -1)
 	{
-		close_all_fd();
-		perror("execve");
+		perror(cmd->args[0]);
+		free_all(data, 127, true);
 	}
-	dprintf(2, "EXECUTING CMD: %s\n", cmd->args[0]);
-	exit(127);
 }
 
 void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
@@ -166,12 +163,10 @@ void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 {
     if (*prev_fd != -1)
     {
-        fprintf(stderr, "PARENT: closing prev_fd %d\n", *prev_fd);
         close(*prev_fd);
     }
     if (cmd->next && pipe_fd[1] != -1)
     {
-        fprintf(stderr, "PARENT: closing pipe_fd[1] %d\n", pipe_fd[1]);
         close(pipe_fd[1]);
         *prev_fd = pipe_fd[0];
     }
@@ -275,7 +270,6 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
         parent(cmd, pipe_fd, &prev_fd);
         cmd = cmd->next;
     }
-
     ignore_sigint();
     bool sigint_printed = false;
     while ((pid = wait(&status)) > 0)

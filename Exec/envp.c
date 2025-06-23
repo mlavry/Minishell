@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/03 20:37:30 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/23 18:40:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,9 +127,4 @@ void	parse_env(char **envp, t_data *data)
 		free(name);
 		i++;
 	}
-	if (!data->env)
-   		printf("data->env is NULL after parse_env\n");
-	else
-    	printf("data->env initialized after parse_env\n");
-
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:16:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/13 13:25:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/23 18:39:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,13 +57,9 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 			(*lvl)++;
 	}
 }
-static int call_count = 0;
-
 
 void	execshell(t_data *data, t_env **env_list)
 {
-	call_count++;
-    printf("execshell call #%d\n", call_count);
 	t_env	*shlvl;
 	int		lvl;
 	//char	*new_val;

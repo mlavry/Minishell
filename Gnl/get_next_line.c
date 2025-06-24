@@ -121,7 +121,7 @@ int	nextline(int fd, char **buffer, char **line)
 	return (0);
 }
 
-char	*get_next_line(int fd)
+char	*get_next_line(int fd, int code)
 {
 	static char	*buffer[1024];
 	char		*line;
@@ -129,6 +129,8 @@ char	*get_next_line(int fd)
 	line = NULL;
 	if (fd < 0 || BUFFER_SIZE <= 0 || fd > 1023)
 		return (NULL);
+	if (code == 1)
+		return (free(buffer[fd]), buffer[fd] = NULL, NULL );
 	if (!buffer[fd])
 		buffer[fd] = ft_strdup("");
 	if (!buffer[fd])

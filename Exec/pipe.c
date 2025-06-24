@@ -205,6 +205,8 @@ void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
         }
         *prev_fd = -1;
 	}
+   close_all_fd();
+
 }
 
 /* void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
@@ -315,13 +317,16 @@ void exec_pipe(t_cmd *cmd, t_data *data)
         // 3. *** LA CORRECTION LA PLUS IMPORTANTE EST ICI ***
         // Le parent DOIT fermer SA copie des descripteurs de fichiers de redirection
         // pour la commande qu'il vient de lancer. C'est ça qui corrige la fuite.
-        if (current_cmd->fd_in != STDIN_FILENO)
+/*         if (current_cmd->fd_in != STDIN_FILENO)
             close(current_cmd->fd_in);
         if (current_cmd->fd_out != STDOUT_FILENO)
-            close(current_cmd->fd_out);
+            close(current_cmd->fd_out); */
         // Note : si vous utilisez `heredoc_file`, le fd correspondant est dans `fd_in`.
         // Cette correction gère donc aussi les heredocs.
-
+        if (current_cmd->fd_in > 2)
+            close(current_cmd->fd_in);
+        if (current_cmd->fd_out > 2)
+            close(current_cmd->fd_out);
         // On garde le PID de la dernière commande pour récupérer son statut
         if (current_cmd->next == NULL)
             last_pid = pid;

@@ -144,7 +144,7 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 			return (0); */
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
-	}	
+	}
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
@@ -158,6 +158,7 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 		}
 		*tokens = (*tokens)->next;
 	}
+	close_all_fd();
 	return (1);
 }
 
@@ -185,5 +186,6 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 
 		*tokens = (*tokens)->next;
 	}
+	close_all_fd();
 	return (1);
 }

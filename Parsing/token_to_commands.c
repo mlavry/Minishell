@@ -30,6 +30,7 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 		}
 		*tokens = (*tokens)->next->next;
 	}
+	close_all_fd();
 	return (1);
 }
 
@@ -60,7 +61,7 @@ int write_heredoc(char *delimiter, int tmp_fd)
     while (1)
     {
         write(STDOUT_FILENO, "> ", 2);
-        line = get_next_line(STDIN_FILENO);
+        line = get_next_line(STDIN_FILENO, 0);
         if (!line)
 		{
 			eof = true;
@@ -134,17 +135,14 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         free(tmp_filename);
         return (0);
     }
-	//unlink(tmp_filename); 
-	//free(tmp_filename);
-	close(cur->fd_in);  
 	 if (cur->heredoc_file)
     {
-        unlink(cur->heredoc_file); // On supprime l'ancien fichier qui ne sera pas utilisé
+        unlink(cur->heredoc_file); 
         free(cur->heredoc_file);
     }
     
-    // On ne met PAS de FD dans fd_in. On stocke le nom du fichier.
     cur->heredoc_file = tmp_filename;
+	get_next_line(STDIN_FILENO, 1);
     return (1);
 }
 

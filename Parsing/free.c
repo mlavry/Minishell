@@ -189,6 +189,10 @@ void	free_cmd(t_cmd **cmd)
 		tmp = current->next; 
 		if ( current->name)
 			free(current->name);
+		if (current->fd_in != STDIN_FILENO && current->fd_in > 2)
+			close(current->fd_in);
+		if (current->fd_out != STDOUT_FILENO && current->fd_out > 2)
+			close(current->fd_out);	
       //  printf("Current cmd: %p\n", (void*)current);
       //  if (current->name)
            // printf("Freeing name: %s\n", current->name), free(current->name);

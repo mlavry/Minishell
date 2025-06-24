@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 23:02:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 01:25:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,15 @@ int	add_token(t_token **head, char *value)
 	if (!new)
 		return (0);
 	new->str = ft_strdup(value);
+	if (!new->str)
+		return (free(new), 0);
 	new->type = get_token_type(new->str);
 	if (!check_arg_op_syntax(new))
+	{
+		free(new->str);
+		free(new);
 		return (0);
+	}
 	check_value(new);
 	new->next = NULL;
 	if (!*head)
@@ -86,7 +92,10 @@ int	parse_token(t_data *data, char **tokens)
 	while (tokens[i])
 	{
 		if (!add_token(&token_list, tokens[i]))
+		{
+			free_token(&token_list);
 			return (0);
+		}
 		i++;
 	}
 	data->token = token_list;
@@ -112,7 +121,10 @@ int	tokenize(t_data *data)
 		return (0);
 	}
 	if (!parse_token(data, token))
+	{
+		free_tab(token);
 		return (0);
+	}
 	free_tab(token);
 	return (1);
 }

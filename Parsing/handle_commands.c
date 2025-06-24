@@ -54,17 +54,20 @@ t_cmd	*create_new_cmd(void)
 {
 	t_cmd	*cmd;
 
-	cmd = malloc(sizeof(t_cmd));
+	cmd = ft_calloc(1,sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);
 	cmd->args = NULL;
+	cmd->infile = NULL;
+	cmd->outfile = NULL;
+	cmd->outfile_append = NULL;
+	cmd->heredoc_file = NULL;
 	cmd->fd_in = STDIN_FILENO;
 	cmd->fd_out = STDOUT_FILENO;
 	cmd->next = NULL;
 	cmd->name = NULL;
 	return (cmd);
 }
-
 
 
 bool is_redirection(int type)
@@ -81,7 +84,7 @@ int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
 		if (type == OUTPUT)
 		{
 			if (!handle_output(tokens, cur))
-				return (0);
+				return (free_cmd(cur),0);
 		}
 		else if (type == APPEND)
 		{
@@ -114,7 +117,6 @@ int handle_pipe(t_token **tokens, t_cmd **cur)
     }
     *tokens = (*tokens)->next;
 
-    // CAS 1 : Le token suivant est une redirection (sans commande explicite)
     if (*tokens && is_redirection((*tokens)->type))
     {
 
@@ -125,53 +127,11 @@ int handle_pipe(t_token **tokens, t_cmd **cur)
         if (*cur)
             (*cur)->next = new_cmd;
         *cur = new_cmd;
-       /*  // S'il n'y a pas encore de commande en cours, en créer une vide
-        if (!*cur)
-            *cur = create_new_cmd();
-
-        // Appeler la fonction qui gère la redirection après un pipe
-        if (!handle_redirect_after_pipe(tokens, cur))
-            return 0; // erreur dans la redirection
-
-        // Ici, on a traité la redirection, on continue normalement
-        return 1; */
 		if (!handle_redirect_after_pipe(tokens, cur))
         	return 0;
     }
-
-    /* if (!*cur)
-        *cur = create_new_cmd();
- */
-    // On continue normalement la lecture / parsing
     return 1;
 } 
-
-
-
-/* int	handle_pipe(t_token **tokens, t_cmd **cur)
-{
-	if (!cur || !*cur)
-		return (0);
-	if ((*tokens)->type == PIPE && (!(*tokens)->next))
-	{
-		printf("minishell: syntax error near unexpected token `|'\n");
-		return (0);
-	}
-
-	*tokens = (*tokens)->next;
-	if (*tokens && is_redirection((*tokens)->type))
-	{
-    	if (!*cur)
-        	*cur = create_new_cmd(); // Crée un t_cmd vide
-
-    	if (handle_redirect_after_pipe(tokens, cur))
-			return 0;
-	}
-	if (!cur || !*cur)
-		return (0); 
-	return (1);
-}  */
-
 
 int	handle_output(t_token **tokens, t_cmd **cur)
 {
@@ -185,13 +145,6 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
 	}	
-	/* if (((*tokens)->type == OUTPUT || (*tokens)->type == APPEND || (*tokens)->type == INPUT || (*tokens)->type == HEREDOC)
-		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
-	{
-		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		g_exit_status = 2;
-		return (0);
-	} */
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)

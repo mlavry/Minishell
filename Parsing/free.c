@@ -197,6 +197,28 @@ void	free_cmd(t_cmd **cmd)
            // printf("Freeing args...\n");
             free_tab(current->args);
         }
+		 // ...
+        if (current->heredoc_file)
+        {
+            // Le fichier devrait déjà être unlink, mais au cas où...
+            unlink(current->heredoc_file);
+            free(current->heredoc_file);
+        }
+		if (current->infile)
+        {
+           // printf("Freeing args...\n");
+            free(current->infile);
+        }
+		if (current->outfile)
+        {
+           // printf("Freeing args...\n");
+            free(current->outfile);
+        }
+		if (current->outfile_append)
+        {
+           // printf("Freeing args...\n");
+            free(current->outfile_append);
+        }
        // if (current->fd_in)
           //  printf("Freeing infile: %d\n", current->fd_in);
        // if (current->fd_out)

@@ -105,7 +105,7 @@ void	executecommand(t_data *data)
 		{
 			close(data->cmd->fd_out);
 			data->cmd->fd_out = STDOUT_FILENO;
-		} 
+		}
 		while(wait(NULL) > 0)
 			;
 		if (data->cmd->fd_in != STDIN_FILENO)
@@ -122,7 +122,6 @@ void	executecommand(t_data *data)
   	free_cmd(&data->cmd);
 	data->cmd = NULL;  
 	close_all_fd();
-
 }
 
 t_env	*find_env_var(t_env *env_list, char *name)

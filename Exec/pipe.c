@@ -23,7 +23,7 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 	else if (prev_fd != -1)
 	{
 		dup2(prev_fd, STDIN_FILENO);
-		close(prev_fd);
+		//close(prev_fd);
 	}
 	// STDOUT ← redirection > result OU pipe
 	if (cmd->fd_out != STDOUT_FILENO)
@@ -34,33 +34,27 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 	else if (cmd->next)
 	{
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[1]);
+		//close(pipe_fd[1]);
 	} 
 	// 🔒 Ferme les extrémités inutiles
-	if (cmd->next && pipe_fd[0] != -1)
-		close(pipe_fd[0]);
- /*  	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
-		close(pipe_fd[1]);  */
+	 if (cmd->next && pipe_fd[0] != -1)
+		close(pipe_fd[0]); 
+   	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
+		close(pipe_fd[1]);  
 	if (prev_fd != -1)
 		close(prev_fd); 
-} 
+      if (cmd->next)
+    {
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
+    }  
+     
+}  
 
 bool	is_empty_cmd(t_cmd *cmd)
 {
 	return (!cmd || !cmd->args || !cmd->args[0]);
 }
-/* 
-int isbuiltin_pipe(t_cmd *cmd)
-{
-    if (!cmd || !cmd->name)
-        return (0);
-    char *cmds = cmd->name;    
-    return (ft_strcmp(cmds, "echo") == 0 || ft_strcmp(cmds, "pwd") == 0
-		|| ft_strcmp(cmds, "env") == 0 || ft_strcmp(cmds, "exit") == 0
-		|| ft_strcmp(cmds, "cd") == 0 || ft_strcmp(cmds, "export") == 0
-		|| ft_strcmp(cmds, "unset") == 0);
-} */
-
 
 void	exec_command(t_cmd *cmd, t_data *data)
 {
@@ -88,13 +82,6 @@ void	exec_command(t_cmd *cmd, t_data *data)
        // free(path);
 	}
 	reset_signals_to_default();
-/* 	if (cmd->fd_out == STDOUT_FILENO && !cmd->next)
-	{
-		int devnull = open("/dev/null", O_WRONLY);
-		if (devnull != -1)
-			dup2(devnull, STDOUT_FILENO);
-	} */
-	
     envi = convert_env(data->env); 
 	if (execve(path, cmd->args, envi) == -1)
 	{
@@ -104,9 +91,6 @@ void	exec_command(t_cmd *cmd, t_data *data)
         free_all(data, g_exit_status, true);
         exit(127);
 	}
-    // après toutes les exécutions
-
-
 	//dprintf(2, "EXECUTING CMD: %s\n", cmd->args[0]);
 	//exit(127);
 }
@@ -257,22 +241,6 @@ void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
 
 } */
 
-/* bool	is_invalid_command(char *path, char *cmd_name)
-{
-	if (!cmd_name || cmd_name[0] == '\0')
-		return (true); // vide
-
-	if (access(path, F_OK) != 0)
-		return (true); // n'existe pas
-
-	if (is_a_directory(path, NULL))
-		return (true); // dossier
-
-	if (access(path, X_OK) != 0)
-		return (true); // pas exécutable
-
-	return (false); // tout est ok
-} */
 
 
 bool	has_real_command(t_cmd *cmd)
@@ -287,225 +255,160 @@ bool	has_real_command(t_cmd *cmd)
 }
 
 
-void	exec_pipe(t_cmd *cmd, t_data *data)
+void exec_pipe(t_cmd *cmd, t_data *data)
 {
-    int		pipe_fd[2];
-    pid_t	pid;
-    pid_t	last_pid;
-    int		prev_fd;
-    int		status;
-    //t_cmd *head;
+    int   pipe_fd[2];
+    pid_t pid;
+    pid_t last_pid = -1;
+    int   prev_fd = -1;
+    int   status = 0;
+    t_cmd *current_cmd = cmd;
 
-    //head = cmd;
-
-    prev_fd = -1;
-    while (cmd)
+    while (current_cmd)
     {
-        if (cmd->next)
-            pipe(pipe_fd);
-		
+        // On crée un pipe si la commande actuelle n'est pas la dernière
+        if (current_cmd->next)
+        {
+            if (pipe(pipe_fd) == -1)
+            {
+                perror("pipe");
+                // Nettoyage avant de quitter
+                if (prev_fd != -1) close(prev_fd);
+                return;
+            }
+        }
+
         pid = fork();
         if (pid == -1)
         {
             perror("fork");
-            exit(1);
+            // Nettoyage avant de quitter
+            if (prev_fd != -1) close(prev_fd);
+            if (current_cmd->next) { close(pipe_fd[0]); close(pipe_fd[1]); }
+            return;
         }
 
-        if (pid == 0)
-            children(cmd, data, prev_fd, pipe_fd);
+        if (pid == 0) // --- Processus Enfant ---
+        {
+            // setup_outandin se charge de dup2 et de fermer les FDs dans l'enfant.
+            // Votre logique dans setup_outandin semble déjà correcte.
+            setup_outandin(current_cmd, prev_fd, pipe_fd);
+            
+            // exec_command va exécuter la commande et appeler exit().
+            exec_command(current_cmd, data);
+        }
         
-        if (cmd->next == NULL)
+        // --- Processus Parent (dans la boucle) ---
+        
+        // 1. Fermer le FD d'entrée qui vient du pipe précédent.
+        // L'enfant en a hérité, le parent n'en a plus besoin.
+        if (prev_fd != -1)
+            close(prev_fd);
+
+        // 2. Préparer le `prev_fd` pour la prochaine itération de la boucle.
+        if (current_cmd->next)
+        {
+            close(pipe_fd[1]); // Le parent n'écrit JAMAIS dans le pipe.
+            prev_fd = pipe_fd[0]; // On garde l'extrémité de lecture pour le prochain enfant.
+        }
+
+        // 3. *** LA CORRECTION LA PLUS IMPORTANTE EST ICI ***
+        // Le parent DOIT fermer SA copie des descripteurs de fichiers de redirection
+        // pour la commande qu'il vient de lancer. C'est ça qui corrige la fuite.
+        if (current_cmd->fd_in != STDIN_FILENO)
+            close(current_cmd->fd_in);
+        if (current_cmd->fd_out != STDOUT_FILENO)
+            close(current_cmd->fd_out);
+        // Note : si vous utilisez `heredoc_file`, le fd correspondant est dans `fd_in`.
+        // Cette correction gère donc aussi les heredocs.
+
+        // On garde le PID de la dernière commande pour récupérer son statut
+        if (current_cmd->next == NULL)
             last_pid = pid;
 
-        parent(cmd, pipe_fd, &prev_fd);
-        //cmd = cmd->next;
-        cmd = cmd->next;
+        current_cmd = current_cmd->next;
     }
 
+    // --- Processus Parent (après la boucle) ---
+    // Attendre la fin de TOUS les processus enfants.
     ignore_sigint();
-    bool sigint_printed = false;
-    while ((pid = wait(&status)) > 0)
+    int pid_wait;
+	int last_status;
+
+    while ((pid_wait = wait(&status)) > 0)
     {
-        if (WIFSIGNALED(status))
-        {
-            int sig = WTERMSIG(status);
-            if (sig == SIGINT && !sigint_printed && pid != last_pid)
-            {
-                write(STDOUT_FILENO, "\n", 1);
-                sigint_printed = true;
-            }
-        }
-        if (pid == last_pid && !sigint_printed)
-            handle_status_and_print(status);
-        else if (pid == last_pid && sigint_printed)
-            g_exit_status = 130;
+        if (pid_wait == last_pid)
+		{
+			// On stocke le statut de la dernière commande mais on ne l'évalue pas encore
+			last_status = status;
+		}
     }
-    close_all_fd();
-} 
+    
+	// Une fois que tous les enfants sont terminés, on traite le statut de la dernière commande
+	if (last_pid != -1)
+		handle_status_and_print(last_status);
 
-
-/* void	exec_pipe(t_cmd *cmd, t_data *data)
-{
-    int		pipe_fd[2];
-    pid_t	pid;
-    pid_t	last_pid;
-    int		prev_fd;
-    int		status;
-
-    if (!cmd || !data)
-        return ;
-
-    prev_fd = -1;
-    while (cmd)
-    {
-        if (is_empty_cmd(cmd))
-        {
-            if (cmd->fd_in != STDIN_FILENO)
-                close(cmd->fd_in);
-            if (cmd->fd_out != STDOUT_FILENO)
-                close(cmd->fd_out);
-            cmd = cmd->next;
-            continue;
-        }
-
-        if (cmd->next)
-            pipe(pipe_fd);
-
-        pid = fork();
-        if (pid == -1)
-        {
-            perror("fork");
-            exit(1);
-        }
-
-        if (pid == 0)
-            children(cmd, data, prev_fd, pipe_fd);
-        if (cmd->next == NULL)
-            last_pid = pid;
-        parent(cmd, pipe_fd, &prev_fd);
-        cmd = cmd->next;
-    }
-
-    ignore_sigint();
-    bool sigint_printed = false;
-    while ((pid = wait(&status)) > 0)
-    {
-        if (WIFSIGNALED(status))
-        {
-            int sig = WTERMSIG(status);
-            if (sig == SIGINT && !sigint_printed && pid != last_pid)
-            {
-                write(STDOUT_FILENO, "\n", 1);
-                sigint_printed = true;
-            }
-        }
-        if (pid == last_pid && !sigint_printed)
-            handle_status_and_print(status);
-        else if (pid == last_pid && sigint_printed)
-            g_exit_status = 130;
-    }
-    close_all_fd();
-} */
+    // close_all_fd() est une sécurité, mais la gestion ci-dessus est plus propre.
+    // Vous pouvez la garder si vous le souhaitez.
+}
 
 
 // void	exec_pipe(t_cmd *cmd, t_data *data)
 // {
-// 	int		pipe_fd[2];
-// 	pid_t	pid;
-// 	pid_t	last_pid;
-// 	int		prev_fd;
-// 	int		status;
-// 	//char *path;
+//     int		pipe_fd[2];
+//     pid_t	pid;
+//     pid_t	last_pid;
+//     int		prev_fd;
+//     int		status;
+//     //t_cmd *head;
 
-// 	prev_fd = -1;
-// 	while (cmd)
-//  	 {
+//     //head = cmd;
 
-// 		//bool next_cmd_valid = cmd->next && !is_empty_cmd(cmd->next);
-
-// 	/* 	if (is_empty_cmd(cmd))
-// 		{
-// 			if (cmd->fd_out != STDOUT_FILENO)
-// 			{
-// 				close(cmd->fd_out);
-//         		cmd->fd_out = STDOUT_FILENO;
-// 			}
-// 			if (cmd->fd_in != STDIN_FILENO)
-// 			{
-// 				close(cmd->fd_in);
-// 				cmd->fd_in = STDIN_FILENO;
-// 			}
-// 			if (prev_fd != -1)
-// 			{
-// 				close(prev_fd);
-// 				prev_fd = -1;
-// 			}
-// 			cmd = cmd->next;
-// 			continue;
-// 		} 
-
-// 		if (cmd->next && !is_empty_cmd(cmd->next))
-// 		{
-// 			if (pipe(pipe_fd) == -1)
-// 			{
-// 				perror("pipe");
-// 				exit(1);
-// 			}
-// 		}
-// 		else
-// 		{
-// 			pipe_fd[0] = -1;
-//    			pipe_fd[1] = -1;
-// 		}*/
-// 		if (!cmd->args || !cmd->args[0])
-// 		{
-// 			// Ferme les fds si nécessaire
-// 			if (cmd->fd_in != STDIN_FILENO)
-// 				close(cmd->fd_in);
-// 			if (cmd->fd_out != STDOUT_FILENO)
-// 				close(cmd->fd_out);
-// 			exit(0); // Juste redirection, pas de commande
-// 		}
-// 		 if (cmd->next)
+//     prev_fd = -1;
+//     while (cmd)
+//     {
+//         if (cmd->next)
 //             pipe(pipe_fd);
-// 		pid = fork();
-// 		if (pid == -1)
-// 		{
-// 			perror("fork");
-// 			exit(1);
-// 		} 
-// 		if (pid == 0)
-// 			children(cmd, data, prev_fd, pipe_fd);
-// 		if (cmd->next == NULL)
-// 			last_pid = pid;
-// 		parent(cmd, pipe_fd, &prev_fd);
-// 		cmd = cmd->next;
-// 	} 
+		
+//         pid = fork();
+//         if (pid == -1)
+//         {
+//             perror("fork");
+//             exit(1);
+//         }
 
-// 	ignore_sigint();
-// 	bool sigint_printed = false;
-// 	while ((pid = wait(&status)) > 0)
-// 	{
-//     	if (WIFSIGNALED(status))
-//     	{
-//         	int sig = WTERMSIG(status);
-//         	if (sig == SIGINT && !sigint_printed && pid != last_pid)
-//         	{
-//             	write(STDOUT_FILENO, "\n", 1);
-//             	sigint_printed = true;
-//         	}
-//     	}
-//     if (pid == last_pid && !sigint_printed)
-//         handle_status_and_print(status);
-// 	else if (pid == last_pid && sigint_printed)
-// 		g_exit_status = 130;
-// 	}
-// 	close_all_fd();
-// /* 	while ((pid = wait(&status)) > 0)
-// 		g_exit_status = WEXITSTATUS(status);
-// 	close_all_fd();  */
-// 	/*   while (wait(NULL) > 0)
-// 		;
-// 	if (prev_fd != -1)
-// 		close(prev_fd);  */
-// }
+//         if (pid == 0)
+//             children(cmd, data, prev_fd, pipe_fd);
+        
+//         if (cmd->next == NULL)
+//             last_pid = pid;
+
+//         parent(cmd, pipe_fd, &prev_fd);
+//         //cmd = cmd->next;
+//         cmd = cmd->next;
+//     }
+
+//     ignore_sigint();
+//     bool sigint_printed = false;
+//     while ((pid = wait(&status)) > 0)
+//     {
+//         if (WIFSIGNALED(status))
+//         {
+//             int sig = WTERMSIG(status);
+//             if (sig == SIGINT && !sigint_printed && pid != last_pid)
+//             {
+//                 write(STDOUT_FILENO, "\n", 1);
+//                 sigint_printed = true;
+//             }
+//         }
+//         if (pid == last_pid && !sigint_printed)
+//             handle_status_and_print(status);
+//         else if (pid == last_pid && sigint_printed)
+//             g_exit_status = 130;
+//     }
+
+//     close_all_fd();
+// } 
+
+
+

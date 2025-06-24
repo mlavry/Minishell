@@ -57,7 +57,10 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	//char	*heredoc_file;
+	char			*infile;
+	char			*outfile;
+	char			*outfile_append;
+	char			*heredoc_file;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -180,6 +183,7 @@ bool	is_a_directory(char *path, char **args);
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 t_cmd	*create_new_cmd(void);
 bool is_redirection(int type);
+int write_heredoc(char *delimiter, int tmp_fd);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

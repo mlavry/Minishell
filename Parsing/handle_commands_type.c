@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
+/* 
 bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 {
 	if (!t->next || t->next->type != ARG)
@@ -32,7 +32,35 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 		return (false);
 	*tok = (*tok)->next->next;
 	return (true);
-}  
+}   */
+
+// Dans ./Parsing/handle_commands_type.c
+bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
+{
+	if (!t->next || t->next->type != ARG)
+	{
+		// ... erreur
+		return (false);
+	}
+
+    // Si `*cur` est NULL, cela signifie qu'aucune commande n'a encore été créée.
+    // C'est le cas pour `<< E | ls`. On doit créer la première commande.
+	if (*cur == NULL)
+    {
+        *cur = create_new_cmd(); // On modifie le pointeur `cur` de la fonction appelante
+        if (!*cur)
+            return (false);
+        
+        // Il faut aussi mettre à jour la tête de liste si elle est vide
+        // La logique pour ça doit être dans `tokens_to_commands`
+    }
+
+	if (!handle_heredoc(tok, *cur)) // On passe *cur (la commande) à handle_heredoc
+		return (false);
+	
+	*tok = (*tok)->next->next; // On avance de 2 tokens (<< et le délimiteur)
+	return (true);
+}
 
 /* bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 {

@@ -104,6 +104,7 @@ bool	parse_line(t_data *data)
 	if (!(data->cmd))
 	{
 		free(data->line);
+		free_token(&data->token);
 		return (false);
 	}
 	//print_cmds(data->cmd);

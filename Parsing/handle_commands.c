@@ -158,7 +158,7 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 		}
 		*tokens = (*tokens)->next;
 	}
-	close_all_fd();
+
 	return (1);
 }
 
@@ -186,6 +186,5 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 
 		*tokens = (*tokens)->next;
 	}
-	close_all_fd();
 	return (1);
 }

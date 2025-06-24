@@ -63,7 +63,8 @@ void	exec_command(t_cmd *cmd, t_data *data)
      t_cmd   *original_cmd_head = data->cmd;
 
 	if (!cmd || !cmd->args || !cmd->args[0])
-		exit(0);
+        free_all(data, 0, true);
+		//exit(0);
     data->cmd = cmd;   
 	if (isbuiltin(data))
 	{

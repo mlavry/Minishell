@@ -84,6 +84,7 @@ static int	validate_exit_code(t_data *data, int *exit_code)
 		free_all(data, 2, true);
 		return (0);
 	}
+	//free_all(data, g_exit_status, true);
 	return (1);
 }
 

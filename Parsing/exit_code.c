@@ -14,17 +14,15 @@
 
 void	free_all(t_data *data, int exit_code, bool exit_or_not)
 {
-	//free_env(&data->env);
 	if (data->env)
-		free_env(&data->env); 
-	free_token(&data->token);
-	//free_cmd(&data->cmd);
+		free_env(&data->env);
+	if (data->token) 
+		free_token(&data->token);
 	if (data->cmd)
 	{
    	 	free_cmd(&data->cmd);
    	 	data->cmd = NULL;
 	}
-
 	if (data->line)
 	{
 		free(data->line);

@@ -184,6 +184,7 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 t_cmd	*create_new_cmd(void);
 bool is_redirection(int type);
 int write_heredoc(char *delimiter, int tmp_fd);
+void	print_error(char *cmd, char *msg);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

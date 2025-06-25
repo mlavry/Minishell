@@ -59,7 +59,8 @@ void	updatepwd(t_env **env_list, char *oldpath)
 	newpwd = getcwd(NULL, 0);
 	if (!newpwd)
 	{
-		perror("cd: error retrieving current directory");
+		ft_putstr_fd("cd: error retrieving current directory: No such file or directory\n", 2);
+		//perror("cd: error retrieving current directory");
 		g_exit_status = 1;
 		update_env_paths(env_list, oldpath, NULL);
 		return ;

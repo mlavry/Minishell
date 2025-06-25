@@ -16,12 +16,12 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 {
 	if (data->env)
 		free_env(&data->env);
-	if (data->token) 
+	if (data->token)
 		free_token(&data->token);
 	if (data->cmd)
 	{
-   	 	free_cmd(&data->cmd);
-   	 	data->cmd = NULL;
+		free_cmd(&data->cmd);
+		data->cmd = NULL;
 	}
 	if (data->line)
 	{

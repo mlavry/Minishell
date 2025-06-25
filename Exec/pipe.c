@@ -20,20 +20,14 @@ void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
 		close(cmd->fd_in);
 	}
 	else if (prev_fd != -1)
-	{
 		dup2(prev_fd, STDIN_FILENO);
-		//close(prev_fd);
-	}
 	if (cmd->fd_out != STDOUT_FILENO)
 	{
 		dup2(cmd->fd_out, STDOUT_FILENO);
 		close(cmd->fd_out);
 	}
 	else if (cmd->next)
-	{
 		dup2(pipe_fd[1], STDOUT_FILENO);
-		//close(pipe_fd[1]);
-	} 
 	if (cmd->next && pipe_fd[0] != -1)
 		close(pipe_fd[0]); 
    	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
@@ -55,153 +49,56 @@ bool	is_empty_cmd(t_cmd *cmd)
 void	exec_command(t_cmd *cmd, t_data *data)
 {
 	char	*path;
-    char    **envi;
-     t_cmd   *original_cmd_head = data->cmd;
+	char	**envi;
+	t_cmd	*original_cmd_head;
 
+	original_cmd_head = data->cmd;
 	if (!cmd || !cmd->args || !cmd->args[0])
-        free_all(data, 0, true);
-    data->cmd = cmd;   
+		free_all(data, 0, true);
+	data->cmd = cmd;
 	if (isbuiltin(data))
 	{
 		exec_builtin(data);
-        data->cmd = original_cmd_head; 
-        free_all(data,g_exit_status, true);
-		//close_all_fd();
+		data->cmd = original_cmd_head;
+		free_all(data, g_exit_status, true);
 		exit(0);
 	}
-    data->cmd = original_cmd_head;
+	data->cmd = original_cmd_head;
 	path = getpath(cmd->args[0], data);
 	if (!path)
-	{
-		//close_all_fd();
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
-       // free(path);
-	}
 	reset_signals_to_default();
-    envi = convert_env(data->env); 
+	envi = convert_env(data->env);
 	if (execve(path, cmd->args, envi) == -1)
 	{
 		close_all_fd();
 		perror("execve");
-        free(path);
-        free_all(data, g_exit_status, true);
-        exit(127);
+		free(path);
+		free_all(data, g_exit_status, true);
+		exit(127);
 	}
 }
 
-void children(t_cmd *cmd, t_data *data, int prev_fd, int *pipe_fd)
+void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd)
 {
-	if (is_empty_cmd(cmd))
+	if (*prev_fd != -1)
+		close(*prev_fd);
+	if (current_cmd->next)
 	{
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (pipe_fd)
-		{
-			if (pipe_fd[0] != -1)
-				close(pipe_fd[0]);
-			if (pipe_fd[1] != -1)
-				close(pipe_fd[1]);
-		}
-		if (cmd && cmd->fd_in > 2)
-			close(cmd->fd_in);
-		if (cmd && cmd->fd_out > 2)
-			close(cmd->fd_out);
-		exit(0);
+		close(pipe_fd[1]); // Le parent n'écrit JAMAIS dans le pipe.
+		*prev_fd = pipe_fd[0]; // On garde l'extrémité de lecture pour le prochain enfant.
 	}
-	if (cmd->fd_in == -1 || cmd->fd_out == -1)
-	{
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (pipe_fd)
-		{
-			if (pipe_fd[0] != -1)
-				close(pipe_fd[0]);
-			if (pipe_fd[1] != -1)
-				close(pipe_fd[1]);
-		}
-		free_all(data, 0, true);
-        //exit(1);
-	}
-   // data->cmd = cmd;
-	setup_outandin(cmd, prev_fd, pipe_fd);
-	exec_command(cmd, data);
-	free_all(data, g_exit_status, true);
+	if (current_cmd->fd_in > 2)
+		close(current_cmd->fd_in);
+	if (current_cmd->fd_out > 2)
+		close(current_cmd->fd_out);
 }
 
-
-/* void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
-{
-	if (*prev_fd != -1)
-		close(*prev_fd);
-	if (cmd->next && pipe_fd[1] != -1)
-	{
-		close(pipe_fd[1]);
-		*prev_fd = pipe_fd[0];
-	}
-	else
-	{
-		if (pipe_fd[0] != -1)
-			close(pipe_fd[0]); 
-		if (pipe_fd[1] != -1)
-			close(pipe_fd[1]);
-		*prev_fd = -1;
-	}
-	close_all_fd();
-} */
-
-/* void parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
-{
-    fprintf(stderr, "PARENT: closing prev_fd %d\n", *prev_fd);
-    if (*prev_fd != -1)
-        close(*prev_fd);
-    if (cmd->next)
-    {
-        fprintf(stderr, "PARENT: closing pipe_fd[1] %d\n", pipe_fd[1]);
-        close(pipe_fd[1]);
-        *prev_fd = pipe_fd[0];
-    }
-} */
-
-/* 
-void	parent(t_cmd *cmd, int *pipe_fd, int *prev_fd)
-{
-	if (*prev_fd != -1)
-		close(*prev_fd);
-	if (cmd->next)
-	{
-		close(pipe_fd[1]);
-		*prev_fd = pipe_fd[0];
-	}
- 	else
-	{
-		// Pas de commande suivante ou elle est vide
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		*prev_fd = -1;
-	}
-	dprintf(2, "PARENT: closing pipe_fd: %d %d\n", pipe_fd[0], pipe_fd[1]);
-
-} */
-
-
-
-/* bool	has_real_command(t_cmd *cmd)
-{
-	while (cmd)
-	{
-		if (cmd->args && cmd->args[0])
-			return true;
-		cmd = cmd->next;
-	}
-	return false;
-} */
-
-
-void	parent_process(pid_t last_pid)
+void	wait_process(pid_t last_pid)
 {
 	int		status;
 	pid_t	pid_wait;
-	int 	sig;
+	int		sig;
 	bool	sigint_printed;
 
 	sigint_printed = false;
@@ -227,121 +124,58 @@ void	parent_process(pid_t last_pid)
 	}
 }
 
-void exec_pipe(t_cmd *cmd, t_data *data)
+int	handle_one_pipe(t_cmd *current_cmd, int *prev_fd, int *pipe_fd, pid_t *pid)
 {
-	int  	pipe_fd[2];
-	pid_t	pid;
-	pid_t	last_pid = -1;
-	int  	prev_fd = -1;
-	//int 	status = 0;
-	t_cmd	*current_cmd = cmd;
-
-	while (current_cmd)
+	if (current_cmd->next)
 	{
+		if (pipe(pipe_fd) == -1)
+		{
+			perror("pipe");
+			if (*prev_fd != -1)
+				close(*prev_fd);
+			return (0);
+		}
+	}
+	*pid = fork();
+	if (*pid == -1)
+	{
+		perror("fork");
+		if (*prev_fd != -1)
+			close(*prev_fd);
 		if (current_cmd->next)
 		{
-			if (pipe(pipe_fd) == -1)
-			{
-				perror("pipe");
-				if (prev_fd != -1)
-					close(prev_fd);
-				return ;
-			}
+			close(pipe_fd[0]);
+			close(pipe_fd[1]);
 		}
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			if (prev_fd != -1)
-				close(prev_fd);
-			if (current_cmd->next)
-			{
-				close(pipe_fd[0]);
-				close(pipe_fd[1]);
-			}
-			return ;
-		}
+		return (0);
+	}
+	return (1);
+}
 
+void	exec_pipe(t_cmd *cmd, t_data *data)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+	pid_t	last_pid;
+	int		prev_fd;
+	t_cmd	*current_cmd;
+
+	last_pid = -1;
+	prev_fd = -1;
+	current_cmd = cmd;
+	while (current_cmd)
+	{
+		if (!handle_one_pipe(current_cmd, &prev_fd, pipe_fd, &pid))
+			return ;
 		if (pid == 0)
 		{
 			setup_outandin(current_cmd, prev_fd, pipe_fd);
 			exec_command(current_cmd, data);
 		}
-		if (prev_fd != -1)
-			close(prev_fd);
-		if (current_cmd->next)
-		{
-			close(pipe_fd[1]); // Le parent n'écrit JAMAIS dans le pipe.
-			prev_fd = pipe_fd[0]; // On garde l'extrémité de lecture pour le prochain enfant.
-		}
-		if (current_cmd->fd_in > 2)
-			close(current_cmd->fd_in);
-		if (current_cmd->fd_out > 2)
-			close(current_cmd->fd_out);
+		parent(current_cmd, &prev_fd, pipe_fd);
 		if (current_cmd->next == NULL)
 			last_pid = pid;
 		current_cmd = current_cmd->next;
 	}
-	parent_process(last_pid);
+	wait_process(last_pid);
 }
-
-
-// void	exec_pipe(t_cmd *cmd, t_data *data)
-// {
-//     int		pipe_fd[2];
-//     pid_t	pid;
-//     pid_t	last_pid;
-//     int		prev_fd;
-//     int		status;
-//     //t_cmd *head;
-
-//     //head = cmd;
-
-//     prev_fd = -1;
-//     while (cmd)
-//     {
-//         if (cmd->next)
-//             pipe(pipe_fd);
-		
-//         pid = fork();
-//         if (pid == -1)
-//         {
-//             perror("fork");
-//             exit(1);
-//         }
-
-//         if (pid == 0)
-//             children(cmd, data, prev_fd, pipe_fd);
-        
-//         if (cmd->next == NULL)
-//             last_pid = pid;
-
-//         parent(cmd, pipe_fd, &prev_fd);
-//         //cmd = cmd->next;
-//         cmd = cmd->next;
-//     }
-
-//     ignore_sigint();
-//     bool sigint_printed = false;
-//     while ((pid = wait(&status)) > 0)
-//     {
-//         if (WIFSIGNALED(status))
-//         {
-//             int sig = WTERMSIG(status);
-//             if (sig == SIGINT && !sigint_printed && pid != last_pid)
-//             {
-//                 write(STDOUT_FILENO, "\n", 1);
-//                 sigint_printed = true;
-//             }
-//         }
-//         if (pid == last_pid && !sigint_printed)
-//             handle_status_and_print(status);
-//         else if (pid == last_pid && sigint_printed)
-//             g_exit_status = 130;
-//     }
-
-//     close_all_fd();
-// } 
-
-
-

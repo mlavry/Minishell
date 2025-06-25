@@ -70,3 +70,14 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 		free_all(data, g_exit_status, true);
 	exit(exit_code);
 }
+
+
+void	print_error(char *cmd, char *msg)
+{
+	if (cmd)
+	{
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": ", 2);
+	}
+	ft_putstr_fd(msg, 2);
+}

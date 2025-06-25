@@ -48,10 +48,8 @@ void	print_antislash(const char *str)
 		i = antislash(str, i);
 }
 
-void	echo(t_env *env_list, int i, t_cmd *cmd, t_data *data)
+void	echo(int i, t_cmd *cmd)
 {
-	(void)data;
-	(void)env_list;
 	if (cmd->args[i][0] == '\\')
 	{
 		if (cmd->args[i][1] >= 'a' && cmd->args[i][1] <= 'z')
@@ -100,7 +98,7 @@ void	builtin_echo(t_data *data)
 	newline = check_newline(args, &i);
 	while (args[i])
 	{
-		echo(env_list, i, cmd, data);
+		echo(i, cmd);
 		if (cmd->args[i + 1])
 			printf(" ");
 		i++;

@@ -19,22 +19,41 @@ void	built_path(char *newpath, t_data *data)
 
 	if (access(newpath, F_OK) != 0)
 	{
-		printf("cd: %s: No such file or directory\n", newpath);
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "No such file or directory\n");
 		g_exit_status = 1;
 		return ;
 	}
 	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
 	{
-		printf("bash: cd: %s: Not a directory\n", newpath);
+
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "Not a directory\n");
 		g_exit_status = 1;
 		return ;
 	}
 	if (access(newpath, X_OK) != 0)
 	{
-		printf("bash: cd: %s: Permission denied\n", newpath);
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "Permission denied\n");
 		g_exit_status = 126;
 		return ;
 	}
+ 	if (!getcwd(cwd, sizeof(cwd)))
+	{
+		ft_putstr_fd("cd: error retrieving current directory\n", 2);
+		if (chdir("/.") == 0) // on revient au root
+			updatepwd(&data->env, "/");
+		else
+			g_exit_status = 1;
+		return ;
+	}
+	if (chdir(newpath) != 0)
+	{
+		perror("cd");
+		g_exit_status = 1;
+		return ;
+	} 
 	getcwd(cwd, sizeof(cwd));
 	chdir(newpath);
 	updatepwd(&data->env, cwd);
@@ -47,7 +66,7 @@ static char	*handle_cd_null(void)
 	home = getenv("HOME");
 	if (!home)
 	{
-		printf("cd: HOME not set\n");
+		ft_putstr_fd("cd: HOME not set\n", 2);
 		g_exit_status = 1;
 		return (NULL);
 	}
@@ -61,7 +80,7 @@ static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 	old = find_env_var(data->env, "OLDPWD");
 	if (!old || !old->value)
 	{
-		printf("cd: OLDPWD not set\n");
+		ft_putstr_fd("cd: OLDPWD not set\n", 2);
 		g_exit_status = 1;
 		return (NULL);
 	}
@@ -81,7 +100,7 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 	home = getenv("HOME");
 	if (!home)
 	{
-		printf("cd: HOME not set\n");
+		ft_putstr_fd("cd: HOME not set\n", 2);
 		g_exit_status = 1;
 		return (NULL);
 	}
@@ -106,7 +125,8 @@ void	builtin_cd(char *newpath, t_data *data)
 		count++;
 	if (count > 2)
 	{
-		printf("%s: too many arguments\n", *data->cmd->args);
+		ft_putstr_fd(*data->cmd->args, 2);
+		ft_putstr_fd(": too many arguments\n", 2);
 		g_exit_status = 1;
 		return ;
 	}

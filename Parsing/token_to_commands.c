@@ -30,7 +30,7 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 		}
 		*tokens = (*tokens)->next->next;
 	}
-	close_all_fd();
+	//close_all_fd();
 	return (1);
 }
 

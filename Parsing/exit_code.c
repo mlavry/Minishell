@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 16:33:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 20:57:33 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,18 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 		free_token(&data->token);
 	if (data->cmd)
 	{
-		free_cmd(&data->cmd);
-		data->cmd = NULL;
+   	 	free_cmd(&data->cmd);
+   	 	data->cmd = NULL;
 	}
 	if (data->line)
 	{
 		free(data->line);
 		data->line = NULL;
+	}
+	if (data->expand_hd)
+	{
+		free(data->expand_hd);
+		data->expand_hd = NULL;
 	}
 	if (exit_or_not)
 	{

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:34:37 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/16 23:58:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:39:02 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
 }   */
 
 // Dans ./Parsing/handle_commands_type.c
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
+bool	handle_heredoc_type(t_data *data, t_token *t, t_token **tok, t_cmd **cur)
 {
 	if (!t->next || t->next->type != ARG)
 	{
@@ -55,7 +55,7 @@ bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur)
         // La logique pour ça doit être dans `tokens_to_commands`
     }
 
-	if (!handle_heredoc(tok, *cur)) // On passe *cur (la commande) à handle_heredoc
+	if (!handle_heredoc(data, tok, *cur)) // On passe *cur (la commande) à handle_heredoc
 		return (false);
 	
 	*tok = (*tok)->next->next; // On avance de 2 tokens (<< et le délimiteur)

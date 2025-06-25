@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 22:49:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 19:31:29 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,9 @@ typedef struct s_env
 typedef struct s_data
 {
 	char		*line;
+	int			nb_hd;
+	int			hd_idx;
+	bool		*expand_hd;
 	t_env		*env;
 	t_token		*token;
 	t_cmd		*cmd;
@@ -89,15 +92,15 @@ int		count_tokens(char *line);
 char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
-t_cmd	*tokens_to_commands(t_token *tokens);
-bool	handle_heredoc_type(t_token *t, t_token **tok, t_cmd **cur);
+t_cmd	*tokens_to_commands(t_data *data, t_token *tokens);
+bool	handle_heredoc_type(t_data *data, t_token *t, t_token **tok, t_cmd **cur);
 bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
 bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
 bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
 int		handle_output(t_token **tokens, t_cmd **cur);
 int		handle_input(t_token **tokens, t_cmd **cur);
-int		handle_pipe(t_token **tokens, t_cmd **cur);
-int		handle_heredoc(t_token **tokens, t_cmd *cur);
+int		handle_pipe(t_data *data, t_token **tokens, t_cmd **cur);
+int		handle_heredoc(t_data *data, t_token **tokens, t_cmd *cur);
 int		handle_append(t_token **tokens, t_cmd **cur);
 int		handle_arg(t_cmd *cur, t_token *token);
 int		handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens);
@@ -105,6 +108,10 @@ void	init_data(t_data *data, int argc, char **argv, char **envp);
 void	replace_dollars(t_data *data);
 char	*check_next(char *line, char *actual_chain, int *pos);
 bool	check_arg_op_syntax(t_token *tok);
+void	mark_heredoc_quotes(t_data *data);
+int		count_heredocs(char *line);
+void	check_dollars(t_data *data, char **src, char **res, int *len_buf);
+void	replace_dollars_heredocs(t_data *data, char **delim);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -183,7 +190,7 @@ bool	is_a_directory(char *path, char **args);
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 t_cmd	*create_new_cmd(void);
 bool is_redirection(int type);
-int write_heredoc(char *delimiter, int tmp_fd);
+int write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
 void	print_error(char *cmd, char *msg);
 
 //------------Debug Functions---------------------

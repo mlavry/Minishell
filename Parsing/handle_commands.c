@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:33:00 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 00:01:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 18:43:24 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ bool is_redirection(int type)
 	return (type == OUTPUT || type == APPEND || type == INPUT || type == HEREDOC);
 }
 
-int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
+int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 {
 	while (*tokens && is_redirection((*tokens)->type))
 	{
@@ -98,14 +98,14 @@ int handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
 		}
 		else if (type == HEREDOC)
 		{
-			if (!handle_heredoc_type(*tokens, tokens, cur))
+			if (!handle_heredoc_type(data, *tokens, tokens, cur))
 				return (0);
 		}
 	}
 	return (1);
 }
 
-int handle_pipe(t_token **tokens, t_cmd **cur)
+int handle_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 {
 
     if (!tokens || !*tokens)
@@ -127,7 +127,7 @@ int handle_pipe(t_token **tokens, t_cmd **cur)
         if (*cur)
             (*cur)->next = new_cmd;
         *cur = new_cmd;
-		if (!handle_redirect_after_pipe(tokens, cur))
+		if (!handle_redirect_after_pipe(data, tokens, cur))
         	return 0;
     }
     return 1;

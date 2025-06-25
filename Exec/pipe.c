@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/19 02:31:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 21:12:27 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,34 +94,34 @@ void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd)
 		close(current_cmd->fd_out);
 }
 
-void	wait_process(pid_t last_pid)
+void    wait_process(pid_t last_pid)
 {
-	int		status;
-	pid_t	pid_wait;
-	int		sig;
-	bool	sigint_printed;
+    int     status;
+    pid_t   pid_wait;
+    int     sig;
+    bool    sigint_printed;
 
-	sigint_printed = false;
-	status = 0;
-	ignore_sigint();
-	pid_wait = wait(&status);
-	while (pid_wait > 0)
-	{
-		pid_wait = wait(&status);
-		if (WIFSIGNALED(status))
-		{
-			sig = WTERMSIG(status);
-			if (sig == SIGINT && !sigint_printed && pid_wait != last_pid)
-			{
-				write(STDOUT_FILENO, "\n", 1);
-				sigint_printed = true;
-			}
-		}
-		if (pid_wait == last_pid && !sigint_printed)
-			handle_status_and_print(status);
-		else if (pid_wait == last_pid && sigint_printed)
-			g_exit_status = 130;
-	}
+    sigint_printed = false;
+    ignore_sigint();
+    while (1)
+    {
+        pid_wait = wait(&status);
+        if (pid_wait <= 0)
+            break ;
+        if (WIFSIGNALED(status))
+        {
+            sig = WTERMSIG(status);
+            if (sig == SIGINT && !sigint_printed && pid_wait != last_pid)
+            {
+                write(STDOUT_FILENO, "\n", 1);
+                sigint_printed = true;
+            }
+        }
+        if (pid_wait == last_pid && !sigint_printed)
+            handle_status_and_print(status);
+        else if (pid_wait == last_pid && sigint_printed)
+            g_exit_status = 130;
+    }
 }
 
 int	handle_one_pipe(t_cmd *current_cmd, int *prev_fd, int *pipe_fd, pid_t *pid)
@@ -172,9 +172,12 @@ void	exec_pipe(t_cmd *cmd, t_data *data)
 			setup_outandin(current_cmd, prev_fd, pipe_fd);
 			exec_command(current_cmd, data);
 		}
-		parent(current_cmd, &prev_fd, pipe_fd);
-		if (current_cmd->next == NULL)
-			last_pid = pid;
+		else
+		{
+			if (current_cmd->next == NULL)
+				last_pid = pid;
+			parent(current_cmd, &prev_fd, pipe_fd);
+		}
 		current_cmd = current_cmd->next;
 	}
 	wait_process(last_pid);

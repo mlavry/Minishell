@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/12 19:51:27 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 19:24:31 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,9 @@ void	init_data(t_data *data, int argc, char **argv, char **envp)
 	(void)envp;
 	(void)argc;
 	(void)argv;
+	data->nb_hd = 0;
+	data->hd_idx = 0;
+	data->expand_hd = NULL;
 	data->env = NULL;
 	data->cmd = NULL;
 	data->token = NULL;

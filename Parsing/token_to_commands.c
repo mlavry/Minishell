@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 20:26:23 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 23:23:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,26 +258,21 @@ t_cmd	*tokens_to_commands(t_data *data, t_token *tokens)
 
     head = NULL;
     cur = NULL;
-    g_exit_status = 0;
-
     if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
             || tokens->type == APPEND || tokens->type == HEREDOC))
     {
-        cur = create_new_cmd(); // ✅ Utilise create_new_cmd()
+        cur = create_new_cmd();
         if (!cur)
             return (free_cmd(&head),NULL);
         head = cur;
     }
-
     while (tokens && g_exit_status != 130)
     {
         if (!is_type_token(data, &tokens, &head, &cur))
             return (free_cmd(&head), NULL);
     }
-
-    return head;
+    return (head);
 }
-
 
 /* 
 t_cmd	*tokens_to_commands(t_token *tokens)

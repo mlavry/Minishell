@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 21:27:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 23:59:38 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,8 +80,18 @@ bool	validate_tokens(t_token *tokens)
 	return (true);
 }
 
+static bool	is_exit_no_arg(t_cmd *cmd)
+{
+	if (ft_strcmp(cmd->name, "exit") == 0 && !(cmd->args[1]))
+		return (true);
+	return (false);
+}
+
 bool	parse_line(t_data *data)
 {
+	int		saved_status;
+	t_cmd	*last;
+
 	if (open_quote(data->line))
 	{
 		free(data->line);
@@ -102,6 +112,8 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
+	saved_status = g_exit_status;
+	g_exit_status = 0;
 	data->cmd = tokens_to_commands(data, data->token);
 	if (!(data->cmd))
 	{
@@ -110,5 +122,10 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
+	last = data->cmd;
+	while (last && last->next)
+		last = last->next;
+	if (is_exit_no_arg(last) && g_exit_status == 0)
+		g_exit_status = saved_status;
 	return (true);
 }

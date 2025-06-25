@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:31:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 23:55:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char			*name;
-
 	char			**args;
 	int				fd_in;
 	int				fd_out;

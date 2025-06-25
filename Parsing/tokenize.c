@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 23:02:34 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 01:25:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,11 @@ int	add_token(t_token **head, char *value)
 	if (!check_arg_op_syntax(new))
 	{
 		free(new->str);
+<<<<<<< HEAD
 		free(new); 
+=======
+		free(new);
+>>>>>>> 16a13bcb5a988365818beca3964086a64a4a3ad1
 		return (0);
 	}
 	check_value(new);

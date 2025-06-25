@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:16:31 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/23 18:39:52 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/13 13:25:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,9 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 		if (*lvl >= 999)
 		{
 			(*lvl)++;
-			printf("warning: shell level (%d)", *lvl);
-			printf(" too high, resetting to 1\n");
+			ft_putstr_fd("warning: shell level ", 2);
+			ft_putnbr_fd(*lvl, 2);
+			ft_putstr_fd(" too high, resetting to 1\n", 2);
 			*lvl = 1;
 		}
 		else if (*lvl < 0)
@@ -58,18 +59,26 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 	}
 }
 
+void	add_pwd(t_env **env_list, t_data *data, char *cwd)
+{
+	t_env	*pwd;
+
+	pwd = find_env_var(*env_list, "PWD");
+	if (!pwd)
+		add_env_var(data, env_list, "PWD", cwd);
+	free(cwd);
+
+}
+
 void	execshell(t_data *data, t_env **env_list)
 {
 	t_env	*shlvl;
 	int		lvl;
-	//char	*new_val;
-	t_env	*pwd;
-	char *cwd;
+	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		malloc_failed(data);
-
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
 	{
@@ -80,17 +89,12 @@ void	execshell(t_data *data, t_env **env_list)
 	{
 		lvl = 1;
 		shlvl_verification(shlvl, &lvl);
-	//	new_val = ft_itoa(lvl);
-		//if (!new_val)
-		//	malloc_failed(data);
+
 		free(shlvl->value);
 		shlvl->value = ft_itoa(lvl);
 		if (!shlvl->value)
-    		malloc_failed(data);
+			malloc_failed(data);
 	}
-	pwd = find_env_var(*env_list, "PWD");
-	if (!pwd)
-		add_env_var(data, env_list, "PWD", cwd);
-	free(cwd);
+	add_pwd(env_list, data, cwd);
 
 }

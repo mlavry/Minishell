@@ -74,14 +74,16 @@ static int	validate_exit_code(t_data *data, int *exit_code)
 {
 	if (!is_numeric(data->cmd->args[1]))
 	{
-		printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
-		free_all(data, 2, true);
+		ft_putstr_fd("exit: ", 2);
+		handle_command_error(data->cmd->args[1],
+			"numeric argument required\n", 2, data);
 		return (0);
 	}
 	else if (!ft_atoi_safe(data->cmd->args[1], exit_code))
 	{
-		printf("exit: %s: numeric argument required\n", data->cmd->args[1]);
-		free_all(data, 2, true);
+		ft_putstr_fd("exit: ", 2);
+		handle_command_error(data->cmd->args[1],
+			"numeric argument required\n", 2, data);
 		return (0);
 	}
 	return (1);
@@ -91,14 +93,14 @@ void	builtin_exit(t_data *data)
 {
 	int	exit_code;
 
-	printf("exit\n");
+	ft_putstr_fd("exit\n", 2);
 	if (data->cmd->args[1])
 	{
 		if (!validate_exit_code(data, &exit_code))
 			return ;
 		else if (data->cmd->args[2])
 		{
-			printf("bash: exit: too many arguments\n");
+			ft_putstr_fd("exit: too many arguments\n", 2);
 			g_exit_status = 1;
 		}
 		else

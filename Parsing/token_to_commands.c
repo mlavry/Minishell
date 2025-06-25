@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 02:40:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 20:26:23 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,6 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
- 	if ((*tokens)->type == APPEND && (!(*tokens)->prev
-			|| !(*tokens)->next || (*tokens)->next->type != ARG))
-	{
-		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
-		g_exit_status = 2;
-		return (0);
-	}
 	if ((*tokens) && (*tokens)->type == APPEND
 		&& (*tokens)->next && (*tokens)->next->type == ARG)
 	{
@@ -52,34 +45,7 @@ char	*heredoc_tmp(void)
 	return (filename);
 }
 
-/* int	write_heredoc(char *delimiter, int tmp_fd)
-{
-	char	*line;
-	char	*newline;
-
-	while (1)
-	{
-		reset_signals_to_default();
-		write(1, "> ", 2);
-		line = get_next_line(0);
-		if (!line)
-			break ;
-		newline = ft_strchr(line, '\n');
-		if (newline)
-			*newline = '\0';
-		if (ft_strcmp(line, delimiter) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write(tmp_fd, line, ft_strlen(line));
-		write(tmp_fd, "\n", 1);
-		free(line);
-	}
-	return (1);
-} */
-
-int write_heredoc(char *delimiter, int tmp_fd)
+int write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd)
 {
     char               *line;
     char               *newline;
@@ -93,7 +59,7 @@ int write_heredoc(char *delimiter, int tmp_fd)
     while (1)
     {
         write(STDOUT_FILENO, "> ", 2);
-        line = get_next_line(STDIN_FILENO);
+        line = get_next_line(STDIN_FILENO, 0);
         if (!line)
 		{
 			eof = true;
@@ -112,6 +78,8 @@ int write_heredoc(char *delimiter, int tmp_fd)
             free(line);
             break;
         }
+		if (data->expand_hd[hd_idx])
+			replace_dollars_heredocs(data, &line);
         write(tmp_fd, line, ft_strlen(line));
         write(tmp_fd, "\n", 1);
         free(line);
@@ -129,25 +97,22 @@ int write_heredoc(char *delimiter, int tmp_fd)
     return (g_exit_status == 130 ? -1 : 0);
 }
 
-int	handle_heredoc(t_token **tokens, t_cmd *cur)
+int	handle_heredoc(t_data *data, t_token **tokens, t_cmd *cur)
 {
-    char	*delimiter;
-    char	*tmp_filename;
-    int		tmp_fd;
+    char		*delimiter;
+    char		*tmp_filename;
+    int			tmp_fd;
+	int			hd_idx;
 
+	hd_idx = data->hd_idx;
     delimiter = (*tokens)->next->str;
     tmp_filename = heredoc_tmp();
     if (!tmp_filename)
         return (0);
-
-    tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC | __O_CLOEXEC, 0600);
     if (tmp_fd == -1)
         return (perror("open tmp"), free(tmp_filename), 0);
-
-    if (!tokens || !*tokens || !(*tokens)->next)
-        return (close(tmp_fd), free(tmp_filename), 0);
-
-    if (write_heredoc(delimiter, tmp_fd) == -1)
+    if (write_heredoc(data, hd_idx, delimiter, tmp_fd) == -1)
     {
         close(tmp_fd);
         unlink(tmp_filename);
@@ -155,10 +120,9 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         g_exit_status = 130;
         return (0);
     }
-
-    close(tmp_fd); // ⚠️ Ferme tmp_fd ici après écriture
-
-    //cur->heredoc_file = tmp_filename; // Sauvegarde pour suppression plus tard
+	if (cur->fd_in != STDIN_FILENO)
+		close(cur->fd_in);
+    close(tmp_fd);
     cur->fd_in = open(tmp_filename, O_RDONLY);
     if (cur->fd_in == -1)
     {
@@ -167,7 +131,14 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         free(tmp_filename);
         return (0);
     }
-	close(cur->fd_in); 
+	 if (cur->heredoc_file)
+    {
+        unlink(cur->heredoc_file); 
+        free(cur->heredoc_file);
+    }
+    cur->heredoc_file = tmp_filename;
+	data->hd_idx++;
+	get_next_line(STDIN_FILENO, 1);
     return (1);
 }
 
@@ -253,33 +224,15 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
 } */
 
 
-static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
+static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **cur)
 {
 	t_token	*tok;
 
 	tok = *tokens;
 	if (!tok)
 		return (false);
-	/* if (tok->type == HEREDOC)
-		return (handle_heredoc_type(tok, tokens, *cur));
-	if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
-		return (true);
-	if (tok->type == CMD)
-		return (handle_cmd_type(tok, head, cur, tokens));
-	if (tok->type == ARG)
-		return (handle_arg_type(tok, *cur, tokens));
-	if (tok->type == OUTPUT)
-		return (handle_output(tokens, cur));
-	if (tok->type == INPUT)
-		return (handle_input(tokens, cur));
-	if (tok->type == PIPE)
-		return (handle_pipe(tokens, cur));
-	if (tok->type == APPEND)
-		return (handle_append(tokens, cur));
- */
-
 	if (tok->type == HEREDOC)
-    	return (handle_heredoc_type(tok, tokens, cur));
+    	return (handle_heredoc_type(data, tok, tokens, cur));
 	else if (tok->type == OUTPUT)
    	 	return (handle_output(tokens, cur));
 	else if (tok->type == APPEND)
@@ -287,7 +240,7 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 	else if (tok->type == INPUT)
    	 	return (handle_input(tokens, cur));
 	else if (tok->type == PIPE)
-    	return (handle_pipe(tokens, cur));
+    	return (handle_pipe(data, tokens, cur));
 	else if (tok->type == CMD)
     	return (handle_cmd_type(tok, head, cur, tokens));
 	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
@@ -298,8 +251,7 @@ static bool	is_type_token(t_token **tokens, t_cmd **head, t_cmd **cur)
 	return (true);
 }
 
-
-t_cmd	*tokens_to_commands(t_token *tokens)
+t_cmd	*tokens_to_commands(t_data *data, t_token *tokens)
 {
     t_cmd	*head;
     t_cmd	*cur;
@@ -313,13 +265,13 @@ t_cmd	*tokens_to_commands(t_token *tokens)
     {
         cur = create_new_cmd(); // ✅ Utilise create_new_cmd()
         if (!cur)
-            return (NULL);
+            return (free_cmd(&head),NULL);
         head = cur;
     }
 
     while (tokens && g_exit_status != 130)
     {
-        if (!is_type_token(&tokens, &head, &cur)) // ✅ Déjà bien utilisé ici
+        if (!is_type_token(data, &tokens, &head, &cur))
             return (free_cmd(&head), NULL);
     }
 

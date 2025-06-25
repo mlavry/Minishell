@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/23 19:37:51 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,20 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 	waitpid(pid, &status, 0);
 	if (data->cmd->fd_in != STDIN_FILENO)
 	{
-   	 	close(data->cmd->fd_in);
-   		data->cmd->fd_in = STDIN_FILENO;
-	}
-	handle_status_and_print(status);
-	free(path);
-	if (data->cmd->fd_in != STDIN_FILENO)
 		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
 	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
 		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	free(path);
 	if (WIFEXITED(status))
 		g_exit_status = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 		g_exit_status = 128 + WTERMSIG(status);
+	handle_status_and_print(status);
 }
 
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
@@ -46,26 +47,23 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		close(data->cmd->fd_out);
 	}
 	reset_signals_to_default();
-	if (execve(path, args, convert_env(env)) == -1)
-	{
-		perror(data->cmd->args[0]);
-		free_all(data, 127, true);
-	}
-	// execve(path, args, convert_env(env));
-	free_all(data, g_exit_status, true);
+	execve(path, args, convert_env(env));
+	free(path);
+	//free_all(data, g_exit_status, true);
+	exit(127);
 }
 
 bool	have_no_permission(char *cmd_path)
 {
 	if (access(cmd_path, F_OK) != 0)
 	{
-		printf("minishell: %s: No such file or directory\n", cmd_path);
+		print_error(cmd_path, "No such file or directory\n");
 		g_exit_status = 127;
 		return (true);
 	}
 	if (access(cmd_path, X_OK) != 0)
 	{
-		printf("minishell: %s: Permission denied\n", cmd_path);
+		print_error(cmd_path, "Permission denied\n");
 		g_exit_status = 126;
 		return (true);
 	}
@@ -85,7 +83,8 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 		path = getpath(args[0], data);
 	if (!path)
 	{
-		printf("%s: command not found\n", args[0]);
+		print_error(args[0], "command not found\n");
+		//printf("%s: command not found\n", args[0]);
 		g_exit_status = 127;
 
 		if (data->cmd->fd_out != STDOUT_FILENO)
@@ -98,10 +97,6 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 			close(data->cmd->fd_in);
 			data->cmd->fd_in = STDIN_FILENO;
 		}
-		/* if (data->cmd->fd_out != STDOUT_FILENO)
-			close(data->cmd->fd_out);
-		if (data->cmd->fd_in != STDIN_FILENO)
-			close(data->cmd->fd_in); */
 		return ;
 	}
 	if (is_a_directory(path, args) || have_no_permission(path))
@@ -119,13 +114,13 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 {
 	if (!args || !args[0] || args[0][0] == '\0')
 	{
-		printf("'' command not found\n");
+		ft_putstr_fd("'' command not found\n", 2);
 		g_exit_status = 127;
 		return ;
 	}
 	if (ft_strcmp(args[0], "\\n") == 0)
 	{
-		printf("n : command not found\n");
+		ft_putstr_fd("n : command not found\n", 2);
 		g_exit_status = 127;
 		return ;
 	}

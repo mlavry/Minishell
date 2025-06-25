@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 23:44:24 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/23 19:29:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/16 23:39:21 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,17 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 	}
 	ft_putstr_fd(msg, 2);
 	if (data)
-		free_all(data, exit_code, true);
-	else
-		exit(exit_code);
+		free_all(data, g_exit_status, true);
+	exit(exit_code);
+}
+
+
+void	print_error(char *cmd, char *msg)
+{
+	if (cmd)
+	{
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": ", 2);
+	}
+	ft_putstr_fd(msg, 2);
 }

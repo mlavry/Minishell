@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 17:17:15 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 19:27:11 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,13 +64,18 @@ void	minishell_loop(t_data *data)
 		free_token(&data->token);
 		free_cmd(&data->cmd);
 		free(data->line);
+		if (data->expand_hd)
+		{
+			free(data->expand_hd);
+			data->expand_hd = NULL;
+		}
 	}
 }
 
 int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
-	
+
 	if (!isatty(1))
 		return (ft_putstr_fd("Error output is not a terminal\n", 2), 1);
 	if (!isatty(0))

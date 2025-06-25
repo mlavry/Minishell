@@ -46,6 +46,8 @@ char *	handle_dq_joined(char *line, char *old_chain, bool *dq, int *pos)
 	if (temp)
 	{
 		res = ft_strjoin(old_chain, temp);
+		free(old_chain);
+		free(temp);
 		if (!is_space(line[pos[1]])
 			&& !is_operator(line[pos[1]]))
 			res = check_next(line, res, pos);
@@ -81,6 +83,8 @@ char *	handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 	if (temp)
 	{
 		res = ft_strjoin(old_chain, temp);
+		free(old_chain);
+		free(temp);
 		if (!is_space(line[pos[1]])
 			&& !is_operator(line[pos[1]]))
 			res = check_next(line, res, pos);
@@ -115,6 +119,8 @@ char	*handle_chain_joined(char *line, char *old_chain, int *pos)
 	if (temp)
 	{
 		res = ft_strjoin(old_chain, temp);
+		free(old_chain);
+		free(temp);
 		if (!is_space(line[pos[1]])
 			&& !is_operator(line[pos[1]]))
 			res = check_next(line, res, pos);

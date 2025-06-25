@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 22:47:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 19:24:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		return (false);
 	}
+	mark_heredoc_quotes(data);
+	data->hd_idx = 0;
 	replace_dollars(data);
 	if (!tokenize(data))
 	{
@@ -100,12 +102,12 @@ bool	parse_line(t_data *data)
 		free_token(&data->token);
 		return (false);
 	}
-	data->cmd = tokens_to_commands(data->token);
+	data->cmd = tokens_to_commands(data, data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);
+		free_token(&data->token);
 		return (false);
 	}
-	//print_cmds(data->cmd);
 	return (true);
 }

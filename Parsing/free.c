@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 22:31:47 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/23 18:38:39 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/05/14 18:33:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	close_all_fd(void)
 		close(fd);
 		fd++;
 	}
-}
+} 
 /* #include <fcntl.h>
 
 void close_all_fd(void)
@@ -172,6 +172,8 @@ void	free_cmd(t_cmd **cmd)
 	}
 	*cmd = NULL;
 } */
+
+
 void	free_cmd(t_cmd **cmd)
 {
     t_cmd	*tmp;
@@ -187,6 +189,10 @@ void	free_cmd(t_cmd **cmd)
 		tmp = current->next; 
 		if ( current->name)
 			free(current->name);
+		if (current->fd_in != STDIN_FILENO && current->fd_in > 2)
+			close(current->fd_in);
+		if (current->fd_out != STDOUT_FILENO && current->fd_out > 2)
+			close(current->fd_out);	
       //  printf("Current cmd: %p\n", (void*)current);
       //  if (current->name)
            // printf("Freeing name: %s\n", current->name), free(current->name);
@@ -194,6 +200,28 @@ void	free_cmd(t_cmd **cmd)
         {
            // printf("Freeing args...\n");
             free_tab(current->args);
+        }
+		 // ...
+        if (current->heredoc_file)
+        {
+            // Le fichier devrait déjà être unlink, mais au cas où...
+            unlink(current->heredoc_file);
+            free(current->heredoc_file);
+        }
+		if (current->infile)
+        {
+           // printf("Freeing args...\n");
+            free(current->infile);
+        }
+		if (current->outfile)
+        {
+           // printf("Freeing args...\n");
+            free(current->outfile);
+        }
+		if (current->outfile_append)
+        {
+           // printf("Freeing args...\n");
+            free(current->outfile_append);
         }
        // if (current->fd_in)
           //  printf("Freeing infile: %d\n", current->fd_in);

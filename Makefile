@@ -9,7 +9,7 @@ Exec/builtin3.c Exec/builtin4.c Exec/exec2.c Exec/exec3.c Exec/envp.c Gnl/get_ne
 SRC_PARSING = Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c Parsing/line_to_token.c Parsing/stock_tokens.c\
 Parsing/free.c Utils/utils.c Utils/utils_2.c Parsing/make_commands.c Parsing/token_to_commands.c Parsing/init_struct.c Parsing/exit_code.c\
 Parsing/expand.c Utils/utils_3.c Parsing/handle_commands_type.c Parsing/handle_commands.c Utils/signal.c \
-Utils/signal_hd.c Parsing/check_op_syntax.c
+Utils/signal_hd.c Parsing/check_op_syntax.c Parsing/expand_heredoc.c
 
 SRC = $(SRC_EXEC) $(SRC_PARSING)
 
@@ -47,4 +47,3 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re
-

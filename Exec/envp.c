@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/23 18:40:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/03 20:37:30 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ t_env	*create_env_var(t_data *data, char *name, char *value)
 	new_var->value = ft_strdup(value);
 	if (!new_var->name || (value != NULL && !new_var->value))
 	{
-		//free(name);
 		free_env(&new_var);
 		malloc_failed(data);
 	}

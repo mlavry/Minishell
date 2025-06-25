@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/30 17:28:02 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 23:23:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 20:26:23 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,6 +273,7 @@ t_cmd	*tokens_to_commands(t_data *data, t_token *tokens)
     }
     return (head);
 }
+
 
 /* 
 t_cmd	*tokens_to_commands(t_token *tokens)

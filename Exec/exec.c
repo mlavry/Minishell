@@ -49,7 +49,6 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 	reset_signals_to_default();
 	execve(path, args, convert_env(env));
 	free(path);
-	//free_all(data, g_exit_status, true);
 	exit(127);
 }
 
@@ -70,6 +69,23 @@ bool	have_no_permission(char *cmd_path)
 	return (false);
 }
 
+void	no_path(t_data *data, char **args)
+{
+	print_error(args[0], "command not found\n");
+	g_exit_status = 127;
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
+	return ;
+}
+
 void	launch_extern_command(char **args, t_env *env, t_data *data)
 {
 	pid_t	pid;
@@ -83,20 +99,7 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 		path = getpath(args[0], data);
 	if (!path)
 	{
-		print_error(args[0], "command not found\n");
-		//printf("%s: command not found\n", args[0]);
-		g_exit_status = 127;
-
-		if (data->cmd->fd_out != STDOUT_FILENO)
-		{
-			close(data->cmd->fd_out);
-			data->cmd->fd_out = STDOUT_FILENO;
-		}
-		if (data->cmd->fd_in != STDIN_FILENO)
-		{
-			close(data->cmd->fd_in);
-			data->cmd->fd_in = STDIN_FILENO;
-		}
+		no_path(data, args);
 		return ;
 	}
 	if (is_a_directory(path, args) || have_no_permission(path))
@@ -126,4 +129,3 @@ void	exec_extern_command(char **args, t_env *env, t_data *data)
 	}
 	launch_extern_command(args, env, data);
 }
-

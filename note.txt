@@ -16,6 +16,14 @@ lo: command not found
 minishell$ echo $?
 0
 
+expand heredoc
+
+pas expand delimiteur entre double quote
+
 Exit sans arguments -> garde le dernier code erreur
 
 exit -> limite long long pas int
+
+signaux test 
+
+test pwd

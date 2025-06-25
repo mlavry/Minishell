@@ -59,7 +59,6 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 {
 	if (data)
 		g_exit_status = exit_code;
-	//ft_putstr_fd("minishell: ", 2);
 	if (cmd)
 	{
 		ft_putstr_fd(cmd, 2);
@@ -70,7 +69,6 @@ void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data)
 		free_all(data, g_exit_status, true);
 	exit(exit_code);
 }
-
 
 void	print_error(char *cmd, char *msg)
 {

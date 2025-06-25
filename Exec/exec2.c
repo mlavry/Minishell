@@ -26,7 +26,6 @@ bool	is_a_directory(char *path, char **args)
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
 		print_error(args[0], "Is a directory\n");
-		//printf("bash: %s: Is a directory\n", args[0]);
 		free(path);
 		g_exit_status = 126;
 		return (true);
@@ -58,37 +57,43 @@ void	exec_builtin_redirection(t_data *data)
 	close(saved_out);
 }
 
+void	redirect_file(t_data *data)
+{
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
+}
+
 void	executecommand(t_data *data)
 {
-	if (!data || !data->line || !data->env || !data->cmd) // Ajout d'une garde pour data->cmd
+	if (!data || !data->line || !data->env || !data->cmd)
 		return ;
 	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
 	{
 		g_exit_status = 1;
 		return ;
 	}
-
-	// CAS 1: C'est une pipeline
 	if (data->cmd->next)
-	{
 		exec_pipe(data->cmd, data);
-	}
-	// CAS 2: C'est une commande unique et c'est un builtin
 	else if (isbuiltin(data))
 	{
-	 	if (!ft_strcmp(data->cmd->args[0], "exit"))
-			builtin_exit(data); // `exit` est spécial car il termine le shell
+		if (!ft_strcmp(data->cmd->args[0], "exit"))
+			builtin_exit(data);
 		else
-			exec_builtin_redirection(data); // Pour les autres builtins (cd, export, etc.)
+			exec_builtin_redirection(data);
 	}
-	// CAS 3: C'est une commande unique qui est externe
 	else if (data->cmd->args && data->cmd->args[0])
-	{
 		exec_extern_command(data->cmd->args, data->env, data);
-	}
-	// CAS 4: Commande vide mais avec des redirections (ex: `> out` ou `< in`)
 	else if (!data->cmd->args || !data->cmd->args[0])
-	{
+		redirect_file(data);
+/* 	{
 		if (data->cmd->fd_out != STDOUT_FILENO)
 		{
 			close(data->cmd->fd_out);
@@ -99,12 +104,9 @@ void	executecommand(t_data *data)
 			close(data->cmd->fd_in);
 			data->cmd->fd_in = STDIN_FILENO;
 		}
-	}
-
-	// Le nettoyage se fait à la fin, une fois que la bonne branche a été exécutée
-  	free_cmd(&data->cmd);
+	} */
+	free_cmd(&data->cmd);
 	data->cmd = NULL;
-	// close_all_fd(); // Soyez prudent avec cette fonction, elle peut fermer des FDs utiles.
 }
 
 // void	executecommand(t_data *data)

@@ -33,22 +33,24 @@ void	init_signals_prompt(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
-void    handle_status_and_print(int status)
+void	handle_status_and_print(int status)
 {
-    if (WIFSIGNALED(status))
-    {
-        	int sig = WTERMSIG(status);
-			if (sig == SIGINT || sig == SIGQUIT)
-			{
-    			if (sig == SIGINT)
-            		write(STDOUT_FILENO, "\n", 1);
-        		else if (sig == SIGQUIT)
-            		write(STDOUT_FILENO, "Quit\n", 5);
-        		g_exit_status = 128 + sig;
-			}
-    }
-    else
-        g_exit_status = WEXITSTATUS(status);
+	int	sig;
+
+	if (WIFSIGNALED(status))
+	{
+		sig = WTERMSIG(status);
+		if (sig == SIGINT || sig == SIGQUIT)
+		{
+			if (sig == SIGINT)
+				write(STDOUT_FILENO, "\n", 1);
+			else if (sig == SIGQUIT)
+				write(STDOUT_FILENO, "Quit\n", 5);
+			g_exit_status = 128 + sig;
+		}
+	}
+	else
+		g_exit_status = WEXITSTATUS(status);
 }
 
 void	reset_signals_to_default(void)

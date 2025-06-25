@@ -6,42 +6,59 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 21:47:49 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:33:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 00:27:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+static void	skip_spaces(char *line, size_t *i)
+{
+	while (line[*i] && is_space(line[*i]))
+		(*i)++;
+}
+
+static void	skip_operator(char *line, size_t *i)
+{
+	char	op;
+
+	op = line[*i];
+	while (line[*i] && line[*i] == op)
+		(*i)++;
+}
+
+static void	consume_word(char *line, size_t *i, bool *sq, bool *dq)
+{
+	while (line[*i])
+	{
+		quote_choice(sq, dq, line[*i]);
+		if (!*sq && !*dq && (is_space(line[*i]) || is_operator(line[*i])))
+			break ;
+		(*i)++;
+	}
+}
+
 int	count_tokens(char *line)
 {
-	size_t	i = 0;
-	int		tokens = 0;
-	bool	sq = false;
-	bool	dq = false;
+	size_t	i;
+	int		tokens;
+	bool	sq;
+	bool	dq;
 
+	i = 0;
+	tokens = 0;
+	sq = false;
+	dq = false;
 	while (line && line[i])
 	{
-		while (is_space(line[i]))
-			i++;
+		skip_spaces(line, &i);
 		if (!line[i])
 			break ;
 		tokens++;
 		if (!sq && !dq && is_operator(line[i]))
-		{
-			char op = line[i];
-			while (line[i] == op)
-				i++;
-		}
+			skip_operator(line, &i);
 		else
-		{
-			while (line[i])
-			{
-				quote_choice(&sq, &dq, line[i]);
-				if (!sq && !dq && (is_space(line[i]) || is_operator(line[i])))
-					break ;
-				i++;
-			}
-		}
+			consume_word(line, &i, &sq, &dq);
 	}
 	return (tokens);
 }

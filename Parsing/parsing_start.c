@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:24:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 21:27:15 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,7 @@ bool	parse_line(t_data *data)
 	if (!(data->cmd))
 	{
 		free(data->line);
+		free(data->expand_hd);
 		free_token(&data->token);
 		return (false);
 	}

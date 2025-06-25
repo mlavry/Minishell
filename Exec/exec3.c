@@ -47,8 +47,9 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 		if (*lvl >= 999)
 		{
 			(*lvl)++;
-			printf("warning: shell level (%d)", *lvl);
-			printf(" too high, resetting to 1\n");
+			ft_putstr_fd("warning: shell level ", 2);
+			ft_putnbr_fd(*lvl, 2);
+			ft_putstr_fd(" too high, resetting to 1\n", 2);
 			*lvl = 1;
 		}
 		else if (*lvl < 0)

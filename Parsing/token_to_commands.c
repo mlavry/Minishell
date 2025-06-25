@@ -123,8 +123,8 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         g_exit_status = 130;
         return (0);
     }
-	 /* if (cur->fd_in != STDIN_FILENO) // Si un autre heredoc ou < était avant
-        close(cur->fd_in); */
+	 if (cur->fd_in != STDIN_FILENO) // Si un autre heredoc ou < était avant
+        close(cur->fd_in); 
     close(tmp_fd); // ⚠️ Ferme tmp_fd ici après écriture
     //cur->heredoc_file = tmp_filename; // Sauvegarde pour suppression plus tard
     cur->fd_in = open(tmp_filename, O_RDONLY);
@@ -140,7 +140,6 @@ int	handle_heredoc(t_token **tokens, t_cmd *cur)
         unlink(cur->heredoc_file); 
         free(cur->heredoc_file);
     }
-    
     cur->heredoc_file = tmp_filename;
 	get_next_line(STDIN_FILENO, 1);
     return (1);

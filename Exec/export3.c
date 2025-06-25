@@ -72,6 +72,14 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 	free(new_value);
 }
 
+void	export_error(char *name, char *value, char **args, int *i)
+{
+	ft_putstr_fd("export: ", 2);
+	print_error(args[*i], "not a valid identifier\n");
+	g_exit_status = 1;
+	increment_and_free(i, value, name);
+}
+
 void	built_export2(t_data *data, t_env **env_list, char **args)
 {
 	int		i;
@@ -91,9 +99,7 @@ void	built_export2(t_data *data, t_env **env_list, char **args)
 		value = extract_value(args[i]);
 		if (!name || !validate_export_name(name))
 		{
-			printf("export: `%s': not a valid identifier\n", args[i]);
-			g_exit_status = 1;
-			increment_and_free(&i, value, name);
+			export_error(name, value, args, &i);
 			continue ;
 		}
 		existing_value(data, env_list, name, value);

@@ -48,14 +48,15 @@ void	built_path(char *newpath, t_data *data)
 			g_exit_status = 1;
 		return ;
 	}
-	if (chdir(newpath) != 0)
-	{
-		perror("cd");
-		g_exit_status = 1;
-		return ;
-	} 
-	getcwd(cwd, sizeof(cwd));
-	chdir(newpath);
+		if (chdir(newpath) != 0)
+    {
+        ft_putstr_fd("cd: ", 2);
+        perror(newpath);
+        g_exit_status = 1;
+        return ;
+    }
+	//getcwd(cwd, sizeof(cwd));
+	//chdir(newpath);
 	updatepwd(&data->env, cwd);
 }
 
@@ -81,6 +82,13 @@ static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 	if (!old || !old->value)
 	{
 		ft_putstr_fd("cd: OLDPWD not set\n", 2);
+		g_exit_status = 1;
+		return (NULL);
+	}
+	if (access(old->value, F_OK) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		print_error(old->value, "No such file or directory\n");
 		g_exit_status = 1;
 		return (NULL);
 	}

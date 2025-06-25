@@ -31,6 +31,37 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	}
 }
 
+/* void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
+{
+	t_env	*old;
+	t_env	*pwd;
+
+	if (oldpath)
+	{
+		old = find_env_var(*env_list, "OLDPWD");
+		if (old)
+		{
+			free(old->value);
+			old->value = ft_strdup(oldpath);
+		}
+		else
+			add_env_var(NULL, env_list, "OLDPWD", oldpath);
+	}
+	// On ne met à jour PWD que si newpwd est valide
+	if (newpwd)
+	{
+		pwd = find_env_var(*env_list, "PWD");
+		if (pwd)
+		{
+			free(pwd->value);
+			pwd->value = ft_strdup(newpwd);
+		}
+		else
+			add_env_var(NULL, env_list, "PWD", newpwd);
+	}
+} */
+
+
 void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 {
 	t_env	*old;
@@ -60,7 +91,6 @@ void	updatepwd(t_env **env_list, char *oldpath)
 	if (!newpwd)
 	{
 		ft_putstr_fd("cd: error retrieving current directory: No such file or directory\n", 2);
-		//perror("cd: error retrieving current directory");
 		g_exit_status = 1;
 		update_env_paths(env_list, oldpath, NULL);
 		return ;

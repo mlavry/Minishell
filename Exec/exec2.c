@@ -18,14 +18,15 @@ bool	is_a_directory(char *path, char **args)
 
 	if (!args || !args[0] || args[0][0] == '\0')
 	{
-		printf("minishell: command not found\n");
+		ft_putstr_fd("minishell: command not found\n", 2);
 		g_exit_status = 127;
 		free(path);
 		return (true);
 	}
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
-		printf("bash: %s: Is a directory\n", args[0]);
+		print_error(args[0], "Is a directory\n");
+		//printf("bash: %s: Is a directory\n", args[0]);
 		free(path);
 		g_exit_status = 126;
 		return (true);

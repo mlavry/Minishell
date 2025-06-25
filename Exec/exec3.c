@@ -58,19 +58,26 @@ void	shlvl_verification(t_env *shlvl, int *lvl)
 	}
 }
 
+void	add_pwd(t_env **env_list, t_data *data, char *cwd)
+{
+	t_env	*pwd;
+
+	pwd = find_env_var(*env_list, "PWD");
+	if (!pwd)
+		add_env_var(data, env_list, "PWD", cwd);
+	free(cwd);
+
+}
+
 void	execshell(t_data *data, t_env **env_list)
 {
-
 	t_env	*shlvl;
 	int		lvl;
-	//char	*new_val;
-	t_env	*pwd;
-	char *cwd;
+	char	*cwd;
 
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		malloc_failed(data);
-
 	shlvl = find_env_var(*env_list, "SHLVL");
 	if (!shlvl)
 	{
@@ -81,17 +88,12 @@ void	execshell(t_data *data, t_env **env_list)
 	{
 		lvl = 1;
 		shlvl_verification(shlvl, &lvl);
-	//	new_val = ft_itoa(lvl);
-		//if (!new_val)
-		//	malloc_failed(data);
+
 		free(shlvl->value);
 		shlvl->value = ft_itoa(lvl);
 		if (!shlvl->value)
-    		malloc_failed(data);
+			malloc_failed(data);
 	}
-	pwd = find_env_var(*env_list, "PWD");
-	if (!pwd)
-		add_env_var(data, env_list, "PWD", cwd);
-	free(cwd);
+	add_pwd(env_list, data, cwd);
 
 }

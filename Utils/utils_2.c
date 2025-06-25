@@ -26,7 +26,7 @@ int	is_space(char c)
 	return (0);
 }
 
-int	big_heredoc(char *str, int i)
+/* int	big_heredoc(char *str, int i)
 {
 	if (ft_strcmp(&str[i], "<<<<") == 0)
 	{
@@ -94,4 +94,4 @@ int	is_multiple_append(char *str)
 		str++;
 	}
 	return (0);
-}
+} */

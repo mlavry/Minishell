@@ -71,6 +71,7 @@ int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
+	//signal(SIGPIPE, SIG_IGN);
 	if (!isatty(1))
 		return (ft_putstr_fd("Error output is not a terminal\n", 2), 1);
 	if (!isatty(0))

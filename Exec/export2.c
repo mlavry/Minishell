@@ -68,36 +68,6 @@ void	updatepwd(t_env **env_list, char *oldpath)
 	free(newpwd);
 }
 
-/* void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
-{
-	t_env	*existing;
-	char	*copied_value;
-
-	existing = find_env_var(*env_list, name);
-	if (existing)
-	{
-		if (value)
-		{
-			free(existing->value);
-			existing->value = ft_strdup(value);
-			if (!existing->value)
-				malloc_failed(data);
-		}
-	}
-	else
-	{
-		copied_value = NULL;
-		if (value)
-		{
-			copied_value = ft_strdup(value);
-			if (!copied_value)
-				malloc_failed(data);
-		}
-		add_env_var(data, env_list, ft_strdup(name), copied_value);
-
-	}
-}  */
-
 void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
 {
 	char	*copied_name;

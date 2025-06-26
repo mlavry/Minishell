@@ -94,5 +94,5 @@ void	built_export(t_data *data, t_env *env_list)
 		}
 		current = current->next;
 	}
-	free_env_list(sortedlist);
+	free_env(&sortedlist);
 }

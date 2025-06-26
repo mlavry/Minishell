@@ -25,7 +25,8 @@ int	handle_append(t_token **tokens, t_cmd **cur)
 				O_WRONLY | O_CREAT | O_APPEND, 0644);
 		if ((*cur)->fd_out < 0)
 		{
-			perror("open");
+			//print_error((*tokens)->next->str, "Permission denied\n");
+			perror((*tokens)->next->str);
 			return (0);
 		}
 		*tokens = (*tokens)->next->next;
@@ -142,189 +143,51 @@ int	handle_heredoc(t_data *data, t_token **tokens, t_cmd *cur)
     return (1);
 }
 
-
-/* int	handle_heredoc(t_token **tokens, t_cmd *cur)
-{
-	char	*delimiter;
-	char	*tmp_filename;
-	int		tmp_fd;
-
-	delimiter = (*tokens)->next->str;
-	tmp_filename = heredoc_tmp();
-	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (tmp_fd == -1)
-		return (perror("open tmp"),free(tmp_filename), 0);
-	if (!tokens || !*tokens || !(*tokens)->next)
-		return (close(tmp_fd), free(tmp_filename),0);
-	if (write_heredoc(delimiter, tmp_fd) == -1)
-	{
-		close(tmp_fd);
-		unlink(tmp_filename);
-		free(tmp_filename);
-		g_exit_status = 130;
-		return (0);
-	}
-	close(tmp_fd);
-	if (cur->fd_in != STDIN_FILENO)
-		close(cur->fd_in);
-	cur->fd_in = open(tmp_filename, O_RDONLY);
-	if (cur->fd_in == -1)
-		return (perror("open heredoc read"), 0);
-	free(tmp_filename);
-	return (1);
-} */
-
-/* int	handle_heredoc(t_token **tokens, t_cmd *cur)
-{
-	char	*delimiter;
-	char	*tmp_filename;
-	int		tmp_fd;
-
-	delimiter = (*tokens)->next->str;
-	tmp_filename = heredoc_tmp();
-	tmp_fd = open(tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-	if (tmp_fd == -1)
-		return (perror("open tmp"), 0);
-	if (!tokens || !*tokens || !(*tokens)->next)
-		return (0);
-	write_heredoc(delimiter, tmp_fd);
-	close(tmp_fd);
-	if (cur->fd_in != STDIN_FILENO)
-		close(cur->fd_in);
-	cur->fd_in = open(tmp_filename, O_RDONLY);
-	unlink(tmp_filename);
-	if (cur->fd_in == -1)
-		return (perror("open heredoc read"), 0);
-	free(tmp_filename);
-	return (1);
-} */
-
-
-/* bool	handle_redirect_after_pipe(t_token **tokens, t_cmd **cur)
-{
-	t_token *tok = *tokens;
-
-	// Vérifie si on est bien sur un token de redirection
-	if (!tok || !(tok->type == OUTPUT || tok->type == APPEND || tok->type == INPUT || tok->type == HEREDOC))
-		return (false);
-
-	t_cmd *cmd = *cur;
-
-	// On gère chaque type de redirection
-	if (tok->type == OUTPUT)
-		return handle_output(tokens, &cmd);
-	else if (tok->type == APPEND)
-		return handle_append(tokens, &cmd);
-	else if (tok->type == INPUT)
-		return handle_input(tokens, &cmd);
-	else if (tok->type == HEREDOC)
-		return handle_heredoc_type(tok, tokens, cmd);
-
-	return false;
-} */
-
-
-static bool	is_type_token(t_data *data, t_token **tokens, t_cmd **head, t_cmd **cur)
+static bool	is_type_token(t_data *data, t_token **toke, t_cmd **hd, t_cmd **cur)
 {
 	t_token	*tok;
 
-	tok = *tokens;
+	tok = *toke;
 	if (!tok)
 		return (false);
 	if (tok->type == HEREDOC)
-    	return (handle_heredoc_type(data, tok, tokens, cur));
+		return (handle_heredoc_type(data, tok, toke, cur));
 	else if (tok->type == OUTPUT)
-   	 	return (handle_output(tokens, cur));
+		return (handle_output(toke, cur));
 	else if (tok->type == APPEND)
-    	return (handle_append(tokens, cur));
+		return (handle_append(toke, cur));
 	else if (tok->type == INPUT)
-   	 	return (handle_input(tokens, cur));
+		return (handle_input(toke, cur));
 	else if (tok->type == PIPE)
-    	return (handle_pipe(data, tokens, cur));
+		return (handle_pipe(data, toke, cur));
 	else if (tok->type == CMD)
-    	return (handle_cmd_type(tok, head, cur, tokens));
-	else if (tok->type == ARG && handle_redirectarg_type(tok, tokens))
-    	return (true); 		
+		return (handle_cmd_type(tok, hd, cur, toke));
+	else if (tok->type == ARG && handle_redirectarg_type(tok, toke))
+		return (true);
 	else if (tok->type == ARG)
-   	 	return (handle_arg_type(tok, *cur, tokens));
-
+		return (handle_arg_type(tok, *cur, toke));
 	return (true);
 }
 
 t_cmd	*tokens_to_commands(t_data *data, t_token *tokens)
-{
-    t_cmd	*head;
-    t_cmd	*cur;
-
-    head = NULL;
-    cur = NULL;
-    if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
-            || tokens->type == APPEND || tokens->type == HEREDOC))
-    {
-        cur = create_new_cmd();
-        if (!cur)
-            return (free_cmd(&head),NULL);
-        head = cur;
-    }
-    while (tokens && g_exit_status != 130)
-    {
-        if (!is_type_token(data, &tokens, &head, &cur))
-            return (free_cmd(&head), NULL);
-    }
-    return (head);
-}
-
-
-/* 
-t_cmd	*tokens_to_commands(t_token *tokens)
 {
 	t_cmd	*head;
 	t_cmd	*cur;
 
 	head = NULL;
 	cur = NULL;
-
- 	if ((tokens->type == PIPE && (!tokens->next || tokens->next->type == PIPE
-				|| tokens->next->type == OUTPUT)) || (tokens->type == OUTPUT
-			&& (!tokens->next || tokens->next->type != CMD)))
-	{
-		printf("shell: syntax error near unexpected token\n");
-		return (free_cmd(&head), NULL);
-	} 
-	 if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
+	if (tokens && (tokens->type == OUTPUT || tokens->type == INPUT
 			|| tokens->type == APPEND || tokens->type == HEREDOC))
 	{
-		cur = ft_calloc(1, sizeof(t_cmd));
+		cur = create_new_cmd();
 		if (!cur)
-			return (NULL);
-		cur->fd_in = STDIN_FILENO;
-		cur->fd_out = STDOUT_FILENO;
-		cur->name = ft_strdup("");
+			return (free_cmd(&head), NULL);
 		head = cur;
-	} 
-	g_exit_status = 0;
-	while (tokens)
+	}
+	while (tokens && g_exit_status != 130)
 	{
-		if (g_exit_status == 130)
-			break ;
-		if (!is_type_token (&tokens, &head, &cur))
-		{
-			free_cmd(&head);
-			return (NULL);
-		}
+		if (!is_type_token(data, &tokens, &head, &cur))
+			return (free_cmd(&head), NULL);
 	}
 	return (head);
-} */
-
-/*  void print_cmds(t_cmd *c)
-{
-    int idx;
-    while (c)
-    {
-        printf("=== Command: %s ===\n", c->name);
-        for (idx = 0; c->args && c->args[idx]; idx++)
-            printf("  arg[%d]: %s\n", idx, c->args[idx]);
-        printf("  fd_in = %d, fd_out = %d\n", c->fd_in, c->fd_out);
-        c = c->next;
-    }
-}  */
+}

@@ -26,7 +26,6 @@ void	built_path(char *newpath, t_data *data)
 	}
 	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
 	{
-
 		ft_putstr_fd("cd: ", 2);
 		print_error(newpath, "Not a directory\n");
 		g_exit_status = 1;
@@ -48,7 +47,7 @@ void	built_path(char *newpath, t_data *data)
 			g_exit_status = 1;
 		return ;
 	}
-		if (chdir(newpath) != 0)
+	if (chdir(newpath) != 0)
     {
         ft_putstr_fd("cd: ", 2);
         perror(newpath);
@@ -112,7 +111,7 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 		g_exit_status = 1;
 		return (NULL);
 	}
-	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath)) ;
 	if (!expanded_path)
 		malloc_failed(data);
 	ft_strcpy(expanded_path, home);

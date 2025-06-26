@@ -19,8 +19,6 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 	current = *env_list;
 	while (current)
 	{
-		/* if (current->value == NULL)
-			return ; */
 		if (ft_strcmp(current->name, name) == 0)
 		{
 			free(current->value);
@@ -30,36 +28,6 @@ void	update_env_var(t_env **env_list, char *name, char *value)
 		current = current->next;
 	}
 }
-
-/* void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
-{
-	t_env	*old;
-	t_env	*pwd;
-
-	if (oldpath)
-	{
-		old = find_env_var(*env_list, "OLDPWD");
-		if (old)
-		{
-			free(old->value);
-			old->value = ft_strdup(oldpath);
-		}
-		else
-			add_env_var(NULL, env_list, "OLDPWD", oldpath);
-	}
-	// On ne met à jour PWD que si newpwd est valide
-	if (newpwd)
-	{
-		pwd = find_env_var(*env_list, "PWD");
-		if (pwd)
-		{
-			free(pwd->value);
-			pwd->value = ft_strdup(newpwd);
-		}
-		else
-			add_env_var(NULL, env_list, "PWD", newpwd);
-	}
-} */
 
 void	update_env_paths(t_env **env_list, char *oldpath, char *newpwd)
 {

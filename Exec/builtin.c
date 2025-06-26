@@ -97,7 +97,7 @@ void	builtin_exit(t_data *data)
 	if (data->cmd->args[1])
 	{
 		if (!validate_exit_code(data, &exit_code))
-			return (free_all(data,g_exit_status, true));
+			return (free_all(data, g_exit_status, true));
 		else if (data->cmd->args[2])
 		{
 			ft_putstr_fd("exit: too many arguments\n", 2);

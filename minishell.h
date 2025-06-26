@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 17:31:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 18:06:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <fcntl.h>
+# include <errno.h>
 # include <sys/wait.h>
 # include <signal.h>
 # include <sys/stat.h>
@@ -53,7 +54,6 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char			*name;
-
 	char			**args;
 	int				fd_in;
 	int				fd_out;
@@ -133,7 +133,7 @@ void	update_env_var(t_env **env_list, char *name, char *value);
 void	swap_env(t_env *a, t_env *b);
 void	sort_env(t_env **env_list);
 void	emptyenv(t_data *data, t_env **env_list);
-char	**convert_env(t_env *env_list);
+char	**convert_env(t_data *data, t_env *env_list);
 t_env	*find_env_var(t_env *env_list, char *name);
 
 //------------------------Utils---------------------
@@ -191,6 +191,7 @@ char	*extract_value(char *arg);
 t_env	*copyenvlist(t_data *data, t_env *env_list);
 void	built_export(t_data *data, t_env *env_list);
 void	built_export2(t_data *data, t_env **env_list, char **args);
+int		loop(t_env *current, char *new_value, char *var_name);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
 void	updatepwd(t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);

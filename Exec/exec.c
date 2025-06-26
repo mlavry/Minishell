@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 18:09:43 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
 
 void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 {
+	char	**envi;
+
 	if (data->cmd->fd_in != STDIN_FILENO)
 	{
 		dup2(data->cmd->fd_in, STDIN_FILENO);
@@ -47,9 +49,14 @@ void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
 		close(data->cmd->fd_out);
 	}
 	reset_signals_to_default();
-	execve(path, args, convert_env(env));
-	free(path);
-	exit(127);
+	envi = convert_env(data, env);
+	if (execve(path, args, convert_env(data, env)) == -1)
+	{
+		perror("execve");
+		free_tab(envi);
+		free(path);
+		exit(127);
+	}
 }
 
 bool	have_no_permission(char *cmd_path)
@@ -94,7 +101,14 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 
 	status = 0;
 	if (ft_strchr(args[0], '/'))
+	{
 		path = ft_strdup(args[0]);
+		if (!path)
+		{
+			free(path);
+			malloc_failed(data);
+		}
+	}
 	else
 		path = getpath(args[0], data);
 	if (!path)

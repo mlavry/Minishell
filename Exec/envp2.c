@@ -59,20 +59,6 @@ void	sort_env(t_env **env_list)
 	}
 }
 
-void	free_env_list(t_env *env_list)
-{
-	t_env	*tmp;
-
-	while (env_list)
-	{
-		tmp = env_list;
-		free(tmp->name);
-		free(tmp->value);
-		env_list = env_list->next;
-		free(tmp);
-	}
-}
-
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd)
 {
 	if (!cmd->args[1])

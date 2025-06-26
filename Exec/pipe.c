@@ -48,20 +48,18 @@ bool	is_empty_cmd(t_cmd *cmd)
 
 void	builtin_in_pipe(t_data *data, t_cmd *original_cmd_head)
 {
-	if(data->cmd && data->cmd->args && data->cmd->args[0]
+	if (data->cmd && data->cmd->args && data->cmd->args[0]
 		&& ft_strcmp(data->cmd->args[0], "exit") == 0)
 	{
-		// On est dans un pipe, donc on n'exécute pas "exit"
 		data->cmd = original_cmd_head;
 		free_all(data, g_exit_status, true);
-		exit(0); // quitter proprement le processus fils sans quitter le shell
+		exit(0);
 	}
 	exec_builtin(data);
 	data->cmd = original_cmd_head;
 	free_all(data, g_exit_status, true);
 	exit(0);
 }
-
 
 void	exec_command(t_cmd *cmd, t_data *data)
 {
@@ -74,19 +72,13 @@ void	exec_command(t_cmd *cmd, t_data *data)
 		free_all(data, 0, true);
 	data->cmd = cmd;
 	if (isbuiltin(data))
-	{
 		builtin_in_pipe(data, original_cmd_head);
-		/* exec_builtin(data);
-		data->cmd = original_cmd_head;
-		free_all(data, g_exit_status, true);
-		exit(0); */
-	}
 	data->cmd = original_cmd_head;
 	path = getpath(cmd->args[0], data);
 	if (!path)
 		handle_command_error(cmd->args[0], "command not found\n", 127, data);
 	reset_signals_to_default();
-	envi = convert_env(data->env);
+	envi = convert_env(data, data->env);
 	if (execve(path, cmd->args, envi) == -1)
 	{
 		close_all_fd();

@@ -93,87 +93,9 @@ void	executecommand(t_data *data)
 		exec_extern_command(data->cmd->args, data->env, data);
 	else if (!data->cmd->args || !data->cmd->args[0])
 		redirect_file(data);
-/* 	{
-		if (data->cmd->fd_out != STDOUT_FILENO)
-		{
-			close(data->cmd->fd_out);
-			data->cmd->fd_out = STDOUT_FILENO;
-		}
-		if (data->cmd->fd_in != STDIN_FILENO)
-		{
-			close(data->cmd->fd_in);
-			data->cmd->fd_in = STDIN_FILENO;
-		}
-	} */
 	free_cmd(&data->cmd);
 	data->cmd = NULL;
 }
-
-// void	executecommand(t_data *data)
-// {
-// 	if (!data || !data->line || !data->env)
-// 		return ;
-// 	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
-// 	{
-// 		g_exit_status = 1;
-// 		return ;
-// 	}
-// 	if (data->cmd->next)
-// 		exec_pipe(data->cmd, data);
-// 	else if (isbuiltin(data))
-// 	{
-// 	 	if (!ft_strcmp(data->cmd->args[0], "exit"))
-// 			builtin_exit(data);
-// 		else 
-// 			exec_builtin_redirection(data);
-// 	}
-// 	else if (!data->cmd->args || !data->cmd->args[0])
-// 	{
-// 	// Ne pas exécuter, mais si redirection seule, tu crées le fichier vide
-// 		if (data->cmd->fd_out != STDOUT_FILENO)
-// 		{
-// 			write(data->cmd->fd_out, "", 0);
-// 			close(data->cmd->fd_out);
-// 			data->cmd->fd_out = STDOUT_FILENO;
-// 		}
-// 		if (data->cmd->fd_in != STDIN_FILENO)
-// 		{
-// 			close(data->cmd->fd_in);
-// 			data->cmd->fd_in = STDIN_FILENO;
-// 		}
-// 		return ;
-// 	}
-// 	else if (data->cmd->args && data->cmd->args[0])
-// 		exec_extern_command(data->cmd->args, data->env, data);
-// 	else
-// 	{
-// 	 	if (data->cmd->fd_in != STDIN_FILENO)
-// 		{
-// 			close(data->cmd->fd_in);
-// 			data->cmd->fd_in =STDIN_FILENO;
-// 		}
-// 		if (data->cmd->fd_out != STDOUT_FILENO)
-// 		{
-// 			close(data->cmd->fd_out);
-// 			data->cmd->fd_out = STDOUT_FILENO;
-// 		}
-// 		while(wait(NULL) > 0)
-// 			;
-// 		if (data->cmd->fd_in != STDIN_FILENO)
-// 		{
-//     		close(data->cmd->fd_in);
-//    	 		data->cmd->fd_in = STDIN_FILENO;
-// 		}
-// 		if (data->cmd->fd_out != STDOUT_FILENO)
-// 		{
-// 			close(data->cmd->fd_out);
-// 			data->cmd->fd_out = STDOUT_FILENO;
-// 		}
-// 	}
-//   	free_cmd(&data->cmd);
-// 	data->cmd = NULL;  
-// 	close_all_fd();
-// }
 
 t_env	*find_env_var(t_env *env_list, char *name)
 {

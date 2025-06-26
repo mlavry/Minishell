@@ -6,12 +6,11 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 00:50:35 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/25 19:24:59 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
 
 void	set_token_prev_links(t_token *tokens)
 {
@@ -95,6 +94,7 @@ bool	parse_line(t_data *data)
 	if (open_quote(data->line))
 	{
 		free(data->line);
+		data->line = NULL;
 		return (false);
 	}
 	mark_heredoc_quotes(data);
@@ -104,14 +104,18 @@ bool	parse_line(t_data *data)
 	{
 		free(data->expand_hd);
 		free(data->line);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
 	set_token_prev_links(data->token);
 	if (!validate_tokens(data->token))
 	{
-		free(data->line);
 		free(data->expand_hd);
+		free(data->line);
 		free_token(&data->token);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
 	saved_status = g_exit_status;
@@ -122,6 +126,8 @@ bool	parse_line(t_data *data)
 		free(data->line);
 		free(data->expand_hd);
 		free_token(&data->token);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
 	last = data->cmd;

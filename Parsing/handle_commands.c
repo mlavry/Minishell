@@ -54,7 +54,7 @@ t_cmd	*create_new_cmd(void)
 {
 	t_cmd	*cmd;
 
-	cmd = ft_calloc(1,sizeof(t_cmd));
+	cmd = ft_calloc(1, sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);
 	cmd->args = NULL;
@@ -69,34 +69,32 @@ t_cmd	*create_new_cmd(void)
 	return (cmd);
 }
 
-
-bool is_redirection(int type)
+bool	is_redirection(int type)
 {
-	return (type == OUTPUT || type == APPEND || type == INPUT || type == HEREDOC);
+	return (type == OUTPUT || type == APPEND
+		|| type == INPUT || type == HEREDOC);
 }
 
-int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
+int	handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 {
 	while (*tokens && is_redirection((*tokens)->type))
 	{
-		int type = (*tokens)->type;
-
-		if (type == OUTPUT)
+		if ((*tokens)->type == OUTPUT)
 		{
 			if (!handle_output(tokens, cur))
-				return (free_cmd(cur),0);
+				return (free_cmd(cur), 0);
 		}
-		else if (type == APPEND)
+		else if ((*tokens)->type == APPEND)
 		{
 			if (!handle_append(tokens, cur))
 				return (0);
 		}
-		else if (type == INPUT)
+		else if ((*tokens)->type == INPUT)
 		{
 			if (!handle_input(tokens, cur))
 				return (0);
 		}
-		else if (type == HEREDOC)
+		else if ((*tokens)->type == HEREDOC)
 		{
 			if (!handle_heredoc_type(data, *tokens, tokens, cur))
 				return (0);
@@ -107,41 +105,36 @@ int handle_redirect_after_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 
 int handle_pipe(t_data *data, t_token **tokens, t_cmd **cur)
 {
+	t_cmd	*new_cmd;
 
-    if (!tokens || !*tokens)
-        return 0;
+	if (!tokens || !*tokens)
+    	return 0;
     if ((*tokens)->type == PIPE && (!(*tokens)->next))
     {
-        printf("minishell: syntax error near unexpected token `|'\n");
-        return 0;
-    }
-    *tokens = (*tokens)->next;
-
-    if (*tokens && is_redirection((*tokens)->type))
-    {
-
-		 t_cmd *new_cmd = create_new_cmd();
-        if (!new_cmd)
-            return 0;
-
-        if (*cur)
-            (*cur)->next = new_cmd;
-        *cur = new_cmd;
+       // printf("minishell: syntax error near unexpected token `|'\n");
+       // return 0;
+	} 
+	*tokens = (*tokens)->next;
+	if (*tokens && is_redirection((*tokens)->type))
+	{
+		new_cmd = create_new_cmd();
+		if (!new_cmd)
+			return (0);
+		if (*cur)
+			(*cur)->next = new_cmd;
+		*cur = new_cmd;
 		if (!handle_redirect_after_pipe(data, tokens, cur))
-        	return 0;
-    }
-    return 1;
-} 
+			return (0);
+	}
+	return (1);
+}
 
 int	handle_output(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
 	if ((*cur)->args == NULL && (*cur)->name == NULL)
-	{/* 
-		(*cur)->name = ft_strdup(""); 
-		if ( !(*cur)->name)
-			return (0); */
+	{
 		(*cur)->fd_in = STDIN_FILENO;
 		(*cur)->fd_out = STDOUT_FILENO;
 	}
@@ -153,12 +146,13 @@ int	handle_output(t_token **tokens, t_cmd **cur)
 				O_CREAT | O_WRONLY | O_TRUNC | __O_CLOEXEC, 0644);
 		if ((*cur)->fd_out < 0)
 		{
-			printf("%s: No such file or directory\n", (*tokens)->next->str);
+			perror((*tokens)->next->str);
+			//print_error((*tokens)->next->str, peror(errno));
+			//print_error((*tokens)->next->str, "No such file or directory\n");
 			return (0);
 		}
 		*tokens = (*tokens)->next;
 	}
-
 	return (1);
 }
 
@@ -166,13 +160,13 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)
 		return (0);
-	if (tokens && ((*tokens)->type == INPUT)
+/* 	if (tokens && ((*tokens)->type == INPUT)
 		&& (!(*tokens)->next || (*tokens)->next->type != ARG))
 	{
 		ft_putstr_fd("shel: syntax error near unexpected token `newline'\n", 2);
 		g_exit_status = 2;
 		return (0);
-	}
+	} */
 	if ((*tokens)->next && (*tokens)->next->type == ARG)
 	{
 		if ((*cur)->fd_in != STDIN_FILENO)
@@ -180,10 +174,10 @@ int	handle_input(t_token **tokens, t_cmd **cur)
 		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY | __O_CLOEXEC);
 		if ((*cur)->fd_in < 0)
 		{
-			printf("%s: No such file or directory\n", (*tokens)->next->str);
+			perror((*tokens)->next->str);
+			//print_error((*tokens)->next->str, "No such file or directory\n");
 			return (0);
 		}
-
 		*tokens = (*tokens)->next;
 	}
 	return (1);

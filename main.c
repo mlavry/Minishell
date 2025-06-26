@@ -24,9 +24,9 @@ bool	empty_line(char *line)
 		i++;
 		g_exit_status = 0;
 	}
-	if (line[0] == '|')
+	if (line[0] == '|' && line[1] == '|')
 	{
-		printf("bash: syntax error near unexpected token `|'\n");
+		printf("bash: syntax error near unexpected token `||'\n");
 		g_exit_status = 2;
 		return (true);
 	}

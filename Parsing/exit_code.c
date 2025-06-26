@@ -42,6 +42,7 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 
 void	malloc_failed(t_data *data)
 {
+	close_all_fd();
 	ft_putstr_fd("Cannot allocate memory\n", 2);
 	free_all(data, 1, true);
 }

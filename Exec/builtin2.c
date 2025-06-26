@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/16 23:49:33 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 01:04:52 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,10 @@ static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
 	printf("%s\n", old->value);
 	newpath = ft_strdup(old->value);
 	if (!newpath)
+	{
+		free(newpath);
 		malloc_failed(data);
+	}
 	*must_free = true;
 	return (newpath);
 }

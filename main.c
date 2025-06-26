@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 17:55:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:27:11 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:37:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,6 @@ int	main(int argc, char *argv[], char **envp)
 	execshell(&data, &data.env);
 	minishell_loop(&data);
 	free_all(&data, 0, true);
-	clear_history();
+	rl_clear_history();
 	return (0);
 }

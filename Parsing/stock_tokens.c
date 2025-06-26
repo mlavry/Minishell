@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 20:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 17:22:40 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:46:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ char	**line_to_token(t_data *data)
 	init_var(pos, &sq, &dq);
 	tokens = malloc(sizeof(char *) * (count_tokens(data->line) + 1));
 	if (!tokens)
-		return (NULL);
+		malloc_failed(data);
 	while (data->line[pos[1]])
 	{
 		quote_choice(&sq, &dq, data->line[pos[1]]);

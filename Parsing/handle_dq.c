@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:40:17 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 23:43:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:29:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ static char	*dq_extract(char *line, bool *dq, int *pos)
 		token = ft_substr(line, pos[0], pos[1] - pos[0]);
 	else
 		token = ft_strdup("");
+	if (!token)
+		return (NULL);
 	return (token);
 }
 

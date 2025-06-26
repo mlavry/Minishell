@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 20:26:29 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 20:27:08 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:35:28 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@ char	*heredoc_tmp(void)
 
 	num = ft_itoa(i++);
 	filename = ft_strjoin("/tmp/heredoc_%d.tmp", num);
+	if (!filename)
+	{
+		free(num);
+		return (NULL);
+	}
 	free(num);
 	return (filename);
 }

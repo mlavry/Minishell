@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 22:08:30 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/06 15:15:58 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:42:37 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ int	add_args(char ***args, char *str)
 			return (0);
 		(*args)[0] = ft_strdup(str);
 		if (!(*args)[0])
-			return (0);
+			return (free(*args), 0);
 		(*args)[1] = NULL;
 		return (1);
 	}
@@ -86,7 +86,7 @@ int	add_args(char ***args, char *str)
 		return (0);
 	tmp[nb] = ft_strdup(str);
 	if (!tmp[nb])
-		return (0);
+		return (free(tmp), 0);
 	tmp[nb + 1] = NULL;
 	*args = tmp;
 	return (1);

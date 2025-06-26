@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/13 19:48:09 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 20:57:33 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 00:36:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	free_all(t_data *data, int exit_code, bool exit_or_not)
 	}
 	if (exit_or_not)
 	{
-		clear_history();
+		rl_clear_history();
 		exit(exit_code);
 	}
 }

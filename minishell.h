@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 23:34:19 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/27 01:06:45 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,8 +152,6 @@ int		is_space(char c);
 bool	is_redir(int type);
 int		str_append(char **res, int *len_buf, const char *add);
 int		char_append(char **res, int *len_buf, char c);
-int		is_multiple_append(char *str);
-int		is_multiple_heredoc(char *str);
 int		ft_isnumeric(const char *str);
 int		check_operators(char *line, char **tokens, int *pos);
 int		ft_atoi_safe(const char *str, int *out);
@@ -168,12 +166,9 @@ void	hd_set_signals(struct sigaction *old_int);
 void	hd_restore_signals(const struct sigaction *old_int);
 void	disable_echoctl(void);
 void	enable_echoctl(void);
-void	handle_signal_print(int status);
 
 //------------------------Free functions---------------------
 void	free_tab(char **tokens);
-void	free_env_list(t_env *env_list);
-void	safe_close(int fd);
 void	free_env(t_env **env);
 void	free_token(t_token **token);
 void	free_cmd(t_cmd **cmd);
@@ -183,7 +178,6 @@ void	close_all_fd(void);
 
 //------------------------Exec---------------------
 int		isbuiltin(t_data *data);
-//int		is_fork_builtin(char *cmd);
 void	exec_builtin(t_data *data);
 void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);
@@ -218,8 +212,5 @@ void	launch_extern_command(char **args, t_env *env, t_data *data);
 void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd);
 void	exec_command(t_cmd *cmd, t_data *data);
 void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd);
-
-//------------Debug Functions---------------------
-void	print_cmds(t_cmd *c);
 
 #endif

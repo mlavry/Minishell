@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:41:00 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 19:26:50 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 21:44:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,26 +28,25 @@ int	get_token_type(char *str)
 		return (ARG);
 }
 
-static void	check_value(t_token *token)
+static t_token	*token_new(char *value)
 {
-	int		i;
-	char	type_quote;
-	char	*res;
+	t_token	*new;
 
-	i = 1;
-	if (is_quoted(token->str[0]) && is_operator(token->str[1]))
+	new = malloc(sizeof(t_token));
+	if (!new)
+		return (NULL);
+	new->str = ft_strdup(value);
+	if (!new->str)
+		return (free(new), NULL);
+	new->type = get_token_type(new->str);
+	if (!check_arg_op_syntax(new))
 	{
-		type_quote = token->str[0];
-		while (is_operator(token->str[i]))
-			i++;
-		if (token->str[i] == type_quote && !(token->str[i + 1]))
-		{
-			res = ft_substr(token->str, 1, i - 1);
-			free(token->str);
-			token->str = res;
-			token->type = ARG;
-		}
+		free(new->str);
+		return (free(new), NULL);
 	}
+	check_value(new);
+	new->next = NULL;
+	return (new);
 }
 
 int	add_token(t_token **head, char *value)
@@ -55,21 +54,9 @@ int	add_token(t_token **head, char *value)
 	t_token	*new;
 	t_token	*tmp;
 
-	new = malloc(sizeof(t_token));
+	new = token_new(value);
 	if (!new)
 		return (0);
-	new->str = ft_strdup(value);
-	if (!new->str)
-		return (free(new), 0);
-	new->type = get_token_type(new->str);
-	if (!check_arg_op_syntax(new))
-	{
-		free(new->str);
-		free(new); 
-		return (0);
-	}
-	check_value(new);
-	new->next = NULL;
 	if (!*head)
 		*head = new;
 	else

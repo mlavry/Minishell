@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 18:10:46 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/19 19:00:44 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 21:09:41 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,27 @@ static void	ft_putnchar_fd(char c, size_t n, int fd)
 		ft_putchar_fd(c, fd);
 }
 
+static bool	print_op_error(char op, size_t extra, size_t limit)
+{
+	size_t	print;
+
+	print = extra;
+	if (print > limit)
+		print = limit;
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	ft_putnchar_fd(op, print, 2);
+	ft_putstr_fd("'\n", 2);
+	g_exit_status = 2;
+	return (false);
+}
+
 bool	check_arg_op_syntax(t_token *tok)
 {
 	size_t	len;
 	char	op;
 	size_t	limit;
-	size_t	print;
 
+	limit = 0;
 	if (tok->type != ARG && tok->type != CMD)
 		return (true);
 	if (!is_same_op_sequence(tok->str))
@@ -53,16 +67,7 @@ bool	check_arg_op_syntax(t_token *tok)
 		limit = 1;
 	if (op == '>' || op == '<')
 		limit = 2;
-	if (len > limit)
-	{
-		print = len - limit;
-		if (print > limit)
-			print = limit;
-		ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-		ft_putnchar_fd(op, print, 2);
-		ft_putstr_fd("'\n", 2);
-		g_exit_status = 2;
-		return (false);
-	}
+	if (limit && len > limit)
+		return (print_op_error(op, len - limit, limit));
 	return (true);
 }

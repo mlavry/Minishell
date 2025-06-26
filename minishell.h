@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 20:36:26 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 21:41:36 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,11 @@ int		handle_unquoted(char *line, char **tokens, int *pos);
 int		handle_heredoc(t_data *data, t_token **tokens, t_cmd *cur);
 char	*heredoc_tmp(void);
 int		write_heredoc(t_data *d, int idx, char *delim, int fd);
+int		check_quote_dollars(char **res, int *len_buf, char **src, t_data *data);
+void	check_dollars(t_data *data, char **src, char **res, int *len_buf);
+void	set_token_prev_links(t_token *tokens);
+bool	validate_tokens(t_token *tokens);
+void	check_value(t_token *token);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);

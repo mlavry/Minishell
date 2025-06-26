@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_start.c                                    :+:      :+:    :+:   */
+/*   error_syntax.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/08 18:55:39 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:24:59 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 21:41:12 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ bool	check_pipe_syntax(t_token *tok)
 		g_exit_status = 2;
 		return (false);
 	}
-   // Optionnel : vérifier que tokens->prev et tokens->next ne sont pas PIPE ou opérateurs
 	if (tok->prev->type == PIPE || tok->next->type == PIPE)
 	{
 		ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", 2);
@@ -79,61 +78,24 @@ bool	validate_tokens(t_token *tokens)
 	return (true);
 }
 
-static bool	is_exit_no_arg(t_cmd *cmd)
+void	check_value(t_token *token)
 {
-	if (ft_strcmp(cmd->name, "exit") == 0 && !(cmd->args[1]))
-		return (true);
-	return (false);
-}
+	int		i;
+	char	type_quote;
+	char	*res;
 
-bool	parse_line(t_data *data)
-{
-	int		saved_status;
-	t_cmd	*last;
-
-	if (open_quote(data->line))
+	i = 1;
+	if (is_quoted(token->str[0]) && is_operator(token->str[1]))
 	{
-		free(data->line);
-		data->line = NULL;
-		return (false);
+		type_quote = token->str[0];
+		while (is_operator(token->str[i]))
+			i++;
+		if (token->str[i] == type_quote && !(token->str[i + 1]))
+		{
+			res = ft_substr(token->str, 1, i - 1);
+			free(token->str);
+			token->str = res;
+			token->type = ARG;
+		}
 	}
-	mark_heredoc_quotes(data);
-	data->hd_idx = 0;
-	replace_dollars(data);
-	if (!tokenize(data))
-	{
-		free(data->expand_hd);
-		free(data->line);
-		data->line = NULL;
-		data->expand_hd = NULL;
-		return (false);
-	}
-	set_token_prev_links(data->token);
-	if (!validate_tokens(data->token))
-	{
-		free(data->expand_hd);
-		free(data->line);
-		free_token(&data->token);
-		data->line = NULL;
-		data->expand_hd = NULL;
-		return (false);
-	}
-	saved_status = g_exit_status;
-	g_exit_status = 0;
-	data->cmd = tokens_to_commands(data, data->token);
-	if (!(data->cmd))
-	{
-		free(data->line);
-		free(data->expand_hd);
-		free_token(&data->token);
-		data->line = NULL;
-		data->expand_hd = NULL;
-		return (false);
-	}
-	last = data->cmd;
-	while (last && last->next)
-		last = last->next;
-	if (is_exit_no_arg(last) && g_exit_status == 0)
-		g_exit_status = saved_status;
-	return (true);
 }

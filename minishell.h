@@ -33,13 +33,13 @@
 # include <limits.h>
 # include "Gnl/get_next_line.h"
 
-# define INPUT 1 //"<"
-# define HEREDOC 2 //"<<"
-# define OUTPUT 3 //">"
-# define APPEND 4 //">>"
-# define PIPE 5 //"|"
-# define CMD 6 //"cmd"
-# define ARG 7 //"arg"
+# define INPUT 1
+# define HEREDOC 2
+# define OUTPUT 3
+# define APPEND 4
+# define PIPE 5
+# define CMD 6
+# define ARG 7
 
 extern int	g_exit_status;
 
@@ -168,7 +168,7 @@ int		isbuiltin(t_data *data);
 void	exec_builtin(t_data *data);
 void	builtin_env(t_env *env_list, t_data *data);
 void	builtin_cd( char *newpath, t_data *data);
-void	builtin_pwd(void);
+void	builtin_pwd(t_cmd *pwd);
 void	builtin_echo(t_data *data);
 void	builtin_exit(t_data *data);
 void	builtin_unset(t_env **env_list, t_cmd *cmd);
@@ -181,19 +181,22 @@ void	built_export(t_data *data, t_env *env_list);
 void	built_export2(t_data *data, t_env **env_list, char **args);
 int		loop(t_env *current, char *new_value, char *var_name);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
-void	updatepwd(t_env **env_list, char *oldpath);
+void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);
 bool	is_a_directory(char *path, char **args);
+void	built_path(char *newpath, t_data *data);
 
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 t_cmd	*create_new_cmd(void);
-bool is_redirection(int type);
-int write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
+bool	is_redirection(int type);
+int		write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
 void	print_error(char *cmd, char *msg);
+int		check_cd_errors(char *newpath);
+void	launch_extern_command(char **args, t_env *env, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

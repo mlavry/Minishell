@@ -75,25 +75,6 @@ void	builtin_env( t_env *env_list, t_data *data)
 	}
 }
 
-void	emptyenv(t_data *data, t_env **env_list)
-{
-	char	*cwd;
-	t_env	*pwd;
-
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		malloc_failed(data);
-	if (*env_list == NULL)
-	{
-		add_env_var(data, env_list, "PWD", cwd);
-		add_env_var(data, env_list, "PATH", "/usr/bin:/bin");
-	}
-	pwd = find_env_var(*env_list, "PWD");
-	if (pwd && pwd->value)
-		chdir(pwd->value);
-	free(cwd);
-}
-
 void	builtin_pwd(void)
 {
 	char	*cwd;

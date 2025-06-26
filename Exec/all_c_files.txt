@@ -1,0 +1,1665 @@
+/* ======= fichier: ./builtin2.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin2.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/21 21:42:28 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:49:33 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+int	check_cd_errors(char *newpath)
+{
+	struct stat	sb;
+
+	if (access(newpath, F_OK) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "No such file or directory\n");
+		g_exit_status = 1;
+		return (0);
+	}
+	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
+	{
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "Not a directory\n");
+		g_exit_status = 1;
+		return (0);
+	}
+	if (access(newpath, X_OK) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		print_error(newpath, "Permission denied\n");
+		g_exit_status = 126;
+		return (0);
+	}
+	return (1);
+}
+
+static char	*handle_cd_null(void)
+{
+	const char	*home;
+
+	home = getenv("HOME");
+	if (!home)
+	{
+		ft_putstr_fd("cd: HOME not set\n", 2);
+		g_exit_status = 1;
+		return (NULL);
+	}
+	return ((char *)home);
+}
+
+static char	*handle_cd_oldpwd(t_data *data, bool *must_free, char *newpath)
+{
+	t_env	*old;
+
+	old = find_env_var(data->env, "OLDPWD");
+	if (!old || !old->value)
+	{
+		ft_putstr_fd("cd: OLDPWD not set\n", 2);
+		g_exit_status = 1;
+		return (NULL);
+	}
+	if (access(old->value, F_OK) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		print_error(old->value, "No such file or directory\n");
+		g_exit_status = 1;
+		return (NULL);
+	}
+	printf("%s\n", old->value);
+	newpath = ft_strdup(old->value);
+	if (!newpath)
+		malloc_failed(data);
+	*must_free = true;
+	return (newpath);
+}
+
+static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
+{
+	const char	*home;
+	char		*expanded_path;
+
+	home = getenv("HOME");
+	if (!home)
+	{
+		ft_putstr_fd("cd: HOME not set\n", 2);
+		g_exit_status = 1;
+		return (NULL);
+	}
+	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
+	if (!expanded_path)
+		malloc_failed(data);
+	ft_strcpy(expanded_path, home);
+	ft_strcat(expanded_path, newpath + 1);
+	newpath = expanded_path;
+	*must_free = true;
+	return (expanded_path);
+}
+
+void	builtin_cd(char *newpath, t_data *data)
+{
+	bool		must_free;
+	int			count;
+
+	must_free = false;
+	count = 0;
+	while (data->cmd->args[count])
+		count++;
+	if (count > 2)
+	{
+		ft_putstr_fd(*data->cmd->args, 2);
+		ft_putstr_fd(": too many arguments\n", 2);
+		g_exit_status = 1;
+		return ;
+	}
+	if (newpath == NULL)
+		newpath = handle_cd_null();
+	else if (newpath[0] == '-')
+		newpath = handle_cd_oldpwd(data, &must_free, newpath);
+	else if (newpath[0] == '~')
+		newpath = handle_cd_home(newpath, data, &must_free);
+	if (newpath)
+		built_path(newpath, data);
+	if (must_free)
+		free(newpath);
+}
+
+
+/* ======= fichier: ./builtin.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/26 17:07:27 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:40:26 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+int	isbuiltin(t_data *data)
+{
+	char	*cmd;
+
+	if (!data || !data->cmd || !data->cmd->name)
+		return (0);
+	cmd = data->cmd->name;
+	return (ft_strcmp(cmd, "echo") == 0 || ft_strcmp(cmd, "pwd") == 0
+		|| ft_strcmp(cmd, "env") == 0 || ft_strcmp(cmd, "exit") == 0
+		|| ft_strcmp(cmd, "cd") == 0 || ft_strcmp(cmd, "export") == 0
+		|| ft_strcmp(cmd, "unset") == 0);
+}
+
+void	exec_builtin(t_data *data)
+{
+	t_cmd	*cmd;
+	t_env	*env_list;
+
+	env_list = data->env;
+	cmd = data->cmd;
+	if (!cmd || !cmd->name)
+		exit(0);
+	if (ft_strcmp(cmd->name, "echo") == 0)
+		builtin_echo(data);
+	else if (ft_strcmp(cmd->name, "pwd") == 0)
+		builtin_pwd();
+	else if (ft_strcmp(cmd->name, "env") == 0)
+		builtin_env(env_list, data);
+	else if (ft_strcmp(cmd->name, "exit") == 0)
+		builtin_exit(data);
+	else if (ft_strcmp(cmd->name, "cd") == 0)
+		builtin_cd(cmd->args[1], data);
+	else if (ft_strcmp(cmd->name, "export") == 0)
+		builtin_export(data, &env_list, cmd);
+	else if (ft_strcmp(cmd->name, "unset") == 0)
+		builtin_unset(&data->env, cmd);
+}
+
+int	is_numeric(const char *str)
+{
+	int	i;
+
+	i = 0;
+	if (!str)
+		return (0);
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+static int	validate_exit_code(t_data *data, int *exit_code)
+{
+	if (!is_numeric(data->cmd->args[1]))
+	{
+		ft_putstr_fd("exit: ", 2);
+		handle_command_error(data->cmd->args[1],
+			"numeric argument required\n", 2, data);
+		return (0);
+	}
+	else if (!ft_atoi_safe(data->cmd->args[1], exit_code))
+	{
+		ft_putstr_fd("exit: ", 2);
+		handle_command_error(data->cmd->args[1],
+			"numeric argument required\n", 2, data);
+		return (0);
+	}
+	return (1);
+}
+
+void	builtin_exit(t_data *data)
+{
+	int	exit_code;
+
+	ft_putstr_fd("exit\n", 2);
+	if (data->cmd->args[1])
+	{
+		if (!validate_exit_code(data, &exit_code))
+			return (free_all(data, g_exit_status, true));
+		else if (data->cmd->args[2])
+		{
+			ft_putstr_fd("exit: too many arguments\n", 2);
+			g_exit_status = 1;
+		}
+		else
+		{
+			exit_code = ft_atoi(data->cmd->args[1]) % 256;
+			if (exit_code < 0)
+				exit_code += 256;
+			free_all(data, exit_code, true);
+		}
+	}
+	else
+		free_all(data, g_exit_status, true);
+}
+
+
+/* ======= fichier: ./builtin4.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin4.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/12 18:02:27 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/12 18:02:30 by aboutale         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	unset(t_env **env_list, char *name )
+{
+	t_env	*current;
+	t_env	*previous;
+
+	current = *env_list;
+	previous = NULL;
+	while (current)
+	{
+		if (ft_strcmp(current->name, name) == 0)
+		{
+			if (previous)
+				previous->next = current->next;
+			else
+				*env_list = current->next;
+			free(current->name);
+			free(current->value);
+			free(current);
+			break ;
+		}
+		previous = current;
+		current = current->next;
+	}
+}
+
+void	builtin_unset(t_env **env_list, t_cmd *cmd)
+{
+	char	*name;
+	int		i;
+
+	if (!cmd->args || !cmd->args[1])
+		return ;
+	i = 1;
+	while (cmd->args[i])
+	{
+		name = cmd->args[i];
+		unset(env_list, name);
+		i++;
+	}
+}
+
+void	builtin_env( t_env *env_list, t_data *data)
+{
+	t_cmd	*cmd;
+
+	cmd = data->cmd;
+	if (cmd->args[1] && ft_strcmp(cmd->args[1], "env") != 0)
+	{
+		ft_putstr_fd("env: ", 2);
+		print_error(cmd->args[1], "No such file or directory\n");
+	}
+	else
+	{
+		while (env_list)
+		{
+			if (env_list->value != NULL)
+				printf("%s=%s\n", env_list->name, env_list->value);
+			env_list = env_list->next;
+		}
+		printf("_=/usr/bin/env\n");
+	}
+}
+
+void	built_path(char *newpath, t_data *data)
+{
+	char		cwd[1024];
+
+	if (!check_cd_errors(newpath))
+		return ;
+	if (!getcwd(cwd, sizeof(cwd)))
+	{
+		ft_putstr_fd("cd: error retrieving current directory\n", 2);
+		if (chdir("/.") == 0)
+			updatepwd(data, &data->env, "/");
+		else
+			g_exit_status = 1;
+		return ;
+	}
+	if (chdir(newpath) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		perror(newpath);
+		g_exit_status = 1;
+		return ;
+	}
+	updatepwd(data, &data->env, cwd);
+}
+
+void	builtin_pwd(void)
+{
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (cwd)
+	{
+		printf("%s\n", cwd);
+		free(cwd);
+	}
+	else
+		perror("cwd");
+}
+
+
+/* ======= fichier: ./builtin3.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   builtin3.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/19 22:18:28 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/17 02:06:18 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+int	antislash(const char *str, int i)
+{
+	int	j;
+	int	b_slash;
+
+	j = 0;
+	b_slash = 0;
+	while (str[i] == '\\')
+	{
+		b_slash++;
+		i++;
+	}
+	while (j < (b_slash / 2))
+	{
+		ft_putchar ('\\');
+		j++;
+	}
+	if (b_slash % 2 == 1)
+	{
+		if (str[i] != '\0')
+			ft_putchar(str[i++]);
+	}
+	else if (str[i] != '\0')
+		ft_putchar(str[i++]);
+	return (i);
+}
+
+void	print_antislash(const char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+		i = antislash(str, i);
+}
+
+void	echo(int i, t_cmd *cmd)
+{
+	if (cmd->args[i][0] == '\\')
+	{
+		if (cmd->args[i][1] >= 'a' && cmd->args[i][1] <= 'z')
+			printf("%s", &cmd->args[i][1]);
+		else
+			print_antislash(&cmd->args[i][1]);
+	}
+	else
+		printf("%s", cmd->args[i]);
+}
+
+int	check_newline(char **args, int *i)
+{
+	int	j;
+	int	newline ;
+
+	newline = 1;
+	while (args[*i] && args[*i][0] == '-' && args[*i][1] == 'n')
+	{
+		j = 1;
+		while (args[*i][j] == 'n')
+		{
+			j++;
+			g_exit_status = 0;
+		}
+		if (args[*i][j] != '\0')
+			break ;
+		newline = 0;
+		(*i)++;
+	}
+	return (newline);
+}
+
+void	builtin_echo(t_data *data)
+{
+	int		i;
+	int		newline;
+	char	**args;
+	t_cmd	*cmd;
+	t_env	*env_list;
+
+	cmd = data->cmd;
+	env_list = data->env;
+	i = 1;
+	args = cmd->args;
+	newline = check_newline(args, &i);
+	while (args[i])
+	{
+		echo(i, cmd);
+		if (cmd->args[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+	{
+		printf("\n");
+		g_exit_status = 0;
+	}
+}
+
+
+/* ======= fichier: ./exec.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	parent_and_wait(int status, char *path, t_data *data, pid_t pid)
+{
+	ignore_sigint();
+	waitpid(pid, &status, 0);
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	free(path);
+	if (WIFEXITED(status))
+		g_exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		g_exit_status = 128 + WTERMSIG(status);
+	handle_status_and_print(status);
+}
+
+void	extern_childprocess(t_data *data, char *path, t_env *env, char **args)
+{
+	char	**envi;
+
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		dup2(data->cmd->fd_in, STDIN_FILENO);
+		close(data->cmd->fd_in);
+	}
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(data->cmd->fd_out, STDOUT_FILENO);
+		close(data->cmd->fd_out);
+	}
+	reset_signals_to_default();
+	envi = convert_env(data, env);
+	if (execve(path, args, convert_env(data, env)) == -1)
+	{
+		perror("execve");
+		free_tab(envi);
+		free(path);
+		exit(127);
+	}
+}
+
+bool	have_no_permission(char *cmd_path)
+{
+	if (access(cmd_path, F_OK) != 0)
+	{
+		print_error(cmd_path, "No such file or directory\n");
+		g_exit_status = 127;
+		return (true);
+	}
+	if (access(cmd_path, X_OK) != 0)
+	{
+		print_error(cmd_path, "Permission denied\n");
+		g_exit_status = 126;
+		return (true);
+	}
+	return (false);
+}
+
+void	no_path(t_data *data, char **args)
+{
+	print_error(args[0], "command not found\n");
+	g_exit_status = 127;
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
+	return ;
+}
+
+void	launch_extern_command(char **args, t_env *env, t_data *data)
+{
+	pid_t	pid;
+	char	*path;
+
+	if (ft_strchr(args[0], '/'))
+	{
+		path = ft_strdup(args[0]);
+		if (!path)
+			malloc_failed(data);
+	}
+	else
+		path = getpath(args[0], data);
+	if (!path)
+	{
+		no_path(data, args);
+		return ;
+	}
+	if (is_a_directory(path, args) || have_no_permission(path))
+		return (free(path));
+	pid = fork();
+	if (pid == -1)
+		return (perror("fork"), g_exit_status = 1, free(path));
+	if (pid == 0)
+		extern_childprocess(data, path, env, args);
+	else
+		parent_and_wait(0, path, data, pid);
+}
+
+
+/* ======= fichier: ./envp.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   envp.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/25 15:43:10 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/03 20:37:30 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+t_env	*create_env_var(t_data *data, char *name, char *value)
+{
+	t_env	*new_var;
+
+	new_var = malloc(sizeof(t_env));
+	if (!new_var)
+	{
+		free(name);
+		malloc_failed(data);
+	}
+	new_var->name = ft_strdup(name);
+	new_var->value = ft_strdup(value);
+	if (!new_var->name || (value != NULL && !new_var->value))
+	{
+		free_env(&new_var);
+		malloc_failed(data);
+	}
+	new_var->next = NULL;
+	return (new_var);
+}
+
+void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*new_var;
+	t_env	*tmp;
+
+	new_var = create_env_var(data, name, value);
+	if (!*env_list)
+	{
+		*env_list = new_var;
+		return ;
+	}
+	tmp = *env_list;
+	while (tmp->next)
+		tmp = tmp->next;
+	tmp->next = new_var;
+}
+
+void	copy_env(t_data *data, t_env *tmp, char **envir)
+{
+	int		i;
+	size_t	len;
+
+	i = 0;
+	while (tmp)
+	{
+		if (tmp->value != NULL)
+		{
+			len = ft_strlen(tmp->name) + ft_strlen(tmp->value) + 2;
+			envir[i] = malloc(len);
+			if (!envir[i])
+			{
+				free_tab(envir);
+				malloc_failed(data);
+			}
+			ft_strcpy(envir[i], tmp->name);
+			ft_strcat(envir[i], "=");
+			ft_strcat(envir[i], tmp->value);
+			i++;
+		}
+		tmp = tmp->next;
+	}
+}
+
+char	**convert_env(t_data *data, t_env *env_list)
+{
+	int		count;
+	t_env	*tmp;
+	char	**envir;
+
+	tmp = env_list;
+	count = 0;
+	while (tmp)
+	{
+		if (tmp->value != NULL)
+			count++;
+		tmp = tmp->next;
+	}
+	envir = malloc((count + 1) * sizeof(char *));
+	if (!envir)
+		malloc_failed(data);
+	tmp = env_list;
+	copy_env(data, env_list, envir);
+	envir[count] = NULL;
+	return (envir);
+}
+
+void	parse_env(char **envp, t_data *data)
+{
+	int		i;
+	char	*name;
+	char	*value;
+	char	*equal_pos;
+
+	i = 0;
+	while (envp[i])
+	{
+		equal_pos = ft_strchr(envp[i], '=');
+		if (!equal_pos)
+		{
+			i++;
+			continue ;
+		}
+		name = ft_substr(envp[i], 0, equal_pos - envp[i]);
+		if (!name)
+			malloc_failed(data);
+		value = equal_pos + 1;
+		add_env_var(data, &data->env, name, value);
+		free(name);
+		i++;
+	}
+}
+
+
+/* ======= fichier: ./envp2.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   envp2.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/23 21:13:05 by aboutale          #+#    #+#             */
+/*   Updated: 2025/04/29 19:42:32 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	emptyenv(t_data *data, t_env **env_list)
+{
+	char	*cwd;
+	t_env	*pwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		malloc_failed(data);
+	if (*env_list == NULL)
+	{
+		add_env_var(data, env_list, "PWD", cwd);
+		add_env_var(data, env_list, "PATH", "/usr/bin:/bin");
+	}
+	pwd = find_env_var(*env_list, "PWD");
+	if (pwd && pwd->value)
+		chdir(pwd->value);
+	free(cwd);
+}
+
+char	*getenvp(t_env *list, char *name)
+{
+	while (list)
+	{
+		if (ft_strcmp(list->name, name) == 0)
+			return (list->value);
+		list = list->next;
+	}
+	return (NULL);
+}
+
+void	swap_env(t_env *a, t_env *b)
+{
+	char	*tmp;
+
+	tmp = a->name;
+	a->name = b->name;
+	b->name = tmp;
+	tmp = a->value;
+	a->value = b->value;
+	b->value = tmp;
+}
+
+void	sort_env(t_env **env_list)
+{
+	t_env	*current ;
+	t_env	*nextnode;
+	int		swap;
+
+	swap = 1;
+	while (swap)
+	{
+		swap = 0;
+		current = *env_list;
+		while (current->next)
+		{
+			nextnode = current->next;
+			if (ft_strcmp(current->name, nextnode->name) > 0)
+			{
+				swap_env(current, nextnode);
+				swap = 1;
+			}
+			current = current->next;
+		}
+	}
+}
+
+void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd)
+{
+	if (!cmd->args[1])
+		built_export(data, *env_list);
+	else
+		built_export2(data, env_list, cmd->args);
+}
+
+
+/* ======= fichier: ./exec3.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec3.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/12 18:16:31 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/13 13:25:56 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+t_env	*find_env_var(t_env *env_list, char *name)
+{
+	while (env_list != NULL)
+	{
+		if (ft_strcmp(env_list->name, name) == 0)
+			return (env_list);
+		env_list = env_list->next;
+	}
+	return (NULL);
+}
+
+int	ft_atoi_safe(const char *str, int *out)
+{
+	int			i;
+	int			sign;
+	int			digit;
+	long long	res;
+
+	i = 0;
+	sign = 1;
+	res = 0;
+	if (!str || !*str)
+		return (0);
+	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '+' || str[i] == '-')
+		if (str[i++] == '-')
+			sign = -1;
+	while (str[i] >= '0' && str[i] <= '9')
+	{
+		digit = str[i++] - '0';
+		res = res * 10 + digit;
+		if ((sign == 1 && res > INT_MAX) || (sign == -1 && (-res) < INT_MIN))
+			return (0);
+	}
+	*out = res * sign;
+	return (1);
+}
+
+void	shlvl_verification(t_env *shlvl, int *lvl)
+{
+	if (ft_isnumeric(shlvl->value) && ft_atoi_safe(shlvl->value, lvl))
+	{
+		if (*lvl >= 999)
+		{
+			(*lvl)++;
+			ft_putstr_fd("warning: shell level ", 2);
+			ft_putnbr_fd(*lvl, 2);
+			ft_putstr_fd(" too high, resetting to 1\n", 2);
+			*lvl = 1;
+		}
+		else if (*lvl < 0)
+			*lvl = 0;
+		else
+			(*lvl)++;
+	}
+}
+
+void	add_pwd(t_env **env_list, t_data *data, char *cwd)
+{
+	t_env	*pwd;
+
+	pwd = find_env_var(*env_list, "PWD");
+	if (!pwd)
+		add_env_var(data, env_list, "PWD", cwd);
+	free(cwd);
+}
+
+void	execshell(t_data *data, t_env **env_list)
+{
+	t_env	*shlvl;
+	int		lvl;
+	char	*cwd;
+
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		malloc_failed(data);
+	shlvl = find_env_var(*env_list, "SHLVL");
+	if (!shlvl)
+	{
+		add_env_var(data, env_list, "SHLVL", "1");
+		return ;
+	}
+	else
+	{
+		lvl = 1;
+		shlvl_verification(shlvl, &lvl);
+		free(shlvl->value);
+		shlvl->value = ft_itoa(lvl);
+		if (!shlvl->value)
+			malloc_failed(data);
+	}
+	add_pwd(env_list, data, cwd);
+}
+
+
+/* ======= fichier: ./export2.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export2.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/21 21:47:12 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:45:18 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	update_env_var(t_env **env_list, char *name, char *value)
+{
+	t_env	*current;
+
+	current = *env_list;
+	while (current)
+	{
+		if (ft_strcmp(current->name, name) == 0)
+		{
+			free(current->value);
+			current->value = ft_strdup(value);
+			return ;
+		}
+		current = current->next;
+	}
+}
+
+void	update_env_paths(t_data *data, t_env **env, char *oldpath, char *newpwd)
+{
+	t_env	*old;
+	t_env	*pwd;
+
+	old = find_env_var(*env, "OLDPWD");
+	pwd = find_env_var(*env, "PWD");
+	if (old)
+	{
+		free(old->value);
+		old->value = ft_strdup(oldpath);
+		if (!old->value)
+			malloc_failed(data);
+	}
+	else
+		add_env_var(NULL, env, "OLDPWD", oldpath);
+	if (newpwd && pwd)
+	{
+		free(pwd->value);
+		pwd->value = ft_strdup(newpwd);
+		if (!pwd->value)
+			malloc_failed(data);
+	}
+}
+
+void	updatepwd(t_data *data, t_env **env_list, char *oldpath)
+{
+	char	*newpwd;
+
+	newpwd = getcwd(NULL, 0);
+	if (!newpwd)
+	{
+		ft_putstr_fd("cd: error retrieving current directory:", 2);
+		ft_putstr_fd("No such file or directory\n", 2);
+		g_exit_status = 1;
+		update_env_paths(data, env_list, oldpath, NULL);
+		return ;
+	}
+	update_env_paths(data, env_list, oldpath, newpwd);
+	free(newpwd);
+}
+
+void	dontexist_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+	char	*copied_name;
+	char	*copied_value;
+
+	copied_name = ft_strdup(name);
+	if (!copied_name)
+		malloc_failed(data);
+	copied_value = NULL;
+	if (value)
+	{
+		copied_value = ft_strdup(value);
+		if (!copied_value)
+		{
+			free(copied_name);
+			malloc_failed(data);
+		}
+	}
+	add_env_var(data, env_list, copied_name, copied_value);
+	free(copied_name);
+	if (copied_value)
+		free(copied_value);
+}
+
+void	existing_value(t_data *data, t_env **env_list, char *name, char *value)
+{
+	t_env	*existing;
+
+	existing = find_env_var(*env_list, name);
+	if (existing)
+	{
+		if (value)
+		{
+			free(existing->value);
+			existing->value = ft_strdup(value);
+			if (!existing->value)
+				malloc_failed(data);
+		}
+	}
+	else
+		dontexist_value(data, env_list, name, value);
+}
+
+
+/* ======= fichier: ./export.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/20 20:41:49 by aboutale          #+#    #+#             */
+/*   Updated: 2025/05/07 00:30:55 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+int	validate_export_name(char *name)
+{
+	int	i;
+
+	i = 1;
+	if (!name)
+		return (0);
+	if (!ft_isalpha(name[0]) && name[0] != '_')
+		return (0);
+	while (name[i])
+	{
+		if (!ft_isalnum(name[i]) && name[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+char	*extract_name(char *arg)
+{
+	char	*sign;
+
+	if (arg[0] == '\0')
+		return (NULL);
+	if (!arg || *arg == '\0')
+		return (NULL);
+	sign = ft_strchr(arg, '=');
+	if (arg[0] == '=')
+		return (NULL);
+	if (!sign)
+		return (ft_strdup(arg));
+	return (ft_substr(arg, 0, sign - arg));
+}
+
+char	*extract_value(char *arg)
+{
+	char	*sign;
+
+	if (!arg || *arg == '\0')
+		return (NULL);
+	sign = ft_strchr(arg, '=');
+	if (!sign)
+		return (NULL);
+	if (*(sign + 1) == '\0')
+		return (ft_strdup(""));
+	return (ft_strdup(sign + 1));
+}
+
+t_env	*copyenvlist(t_data *data, t_env *env_list)
+{
+	t_env	*newlist;
+	t_env	*current;
+
+	newlist = NULL;
+	current = env_list;
+	while (current)
+	{
+		add_env_var(data, &newlist, current->name, current->value);
+		current = current->next;
+	}
+	return (newlist);
+}
+
+void	built_export(t_data *data, t_env *env_list)
+{
+	t_env	*sortedlist;
+	t_env	*current;
+
+	sortedlist = copyenvlist(data, env_list);
+	sort_env(&sortedlist);
+	current = sortedlist;
+	while (current)
+	{
+		if (ft_strcmp(current->name, "_") != 0)
+		{
+			if (current->value == NULL)
+				printf("declare -x %s\n", current->name);
+			else
+				printf("declare -x %s=\"%s\"\n", current->name, current->value);
+		}
+		current = current->next;
+	}
+	free_env(&sortedlist);
+}
+
+
+/* ======= fichier: ./export3.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   export3.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/12 18:24:58 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	increment_and_free(int *i, char *value, char *name)
+{
+	free(name);
+	free(value);
+	(*i)++;
+}
+
+int	is_concatenation(char *str)
+{
+	char	*eq;
+
+	eq = ft_strchr(str, '=');
+	if (!eq || eq == str)
+		return (0);
+	return (*(eq - 1) == '+');
+}
+
+void	ft_concatenation(char *str, t_env **env_list, t_data *data)
+{
+	char	*equal_sign;
+	char	*var_name;
+	char	*new_value;
+	t_env	*current;
+
+	var_name = NULL;
+	new_value = NULL;
+	equal_sign = ft_strchr(str, '=');
+	if (equal_sign && equal_sign > str && *(equal_sign - 1) == '+')
+	{
+		var_name = ft_substr(str, 0, equal_sign - str - 1);
+		if (!var_name)
+			malloc_failed(data);
+		new_value = ft_strdup(equal_sign + 1);
+		if (!new_value)
+		{
+			free(var_name);
+			malloc_failed(data);
+		}
+	}
+	current = *env_list;
+	if (!loop(current, new_value, var_name))
+		existing_value(data, env_list, var_name, new_value);
+	free(var_name);
+	free(new_value);
+}
+
+void	export_error(char *name, char *value, char **args, int *i)
+{
+	ft_putstr_fd("export: ", 2);
+	print_error(args[*i], "not a valid identifier\n");
+	g_exit_status = 1;
+	increment_and_free(i, value, name);
+}
+
+void	built_export2(t_data *data, t_env **env_list, char **args)
+{
+	int		i;
+	char	*name;
+	char	*value;
+
+	i = 1;
+	while (args[i])
+	{
+		if (is_concatenation(args[i]))
+		{
+			ft_concatenation(args[i], env_list, data);
+			i++;
+			continue ;
+		}
+		name = extract_name(args[i]);
+		value = extract_value(args[i]);
+		if (!name || !validate_export_name(name))
+		{
+			export_error(name, value, args, &i);
+			continue ;
+		}
+		existing_value(data, env_list, name, value);
+		increment_and_free(&i, value, name);
+	}
+}
+
+
+/* ======= fichier: ./getpath.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   getpath.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/03/26 21:43:31 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:42:22 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+int	loop(t_env *current, char *new_value, char *var_name)
+{
+	char	*joined;
+
+	while (current)
+	{
+		if (ft_strcmp(current->name, var_name) == 0)
+		{
+			if (current->value)
+				joined = ft_strjoin(current->value, new_value);
+			else
+				joined = ft_strdup(new_value);
+			free(current->value);
+			current->value = joined;
+			return (1);
+		}
+		current = current->next;
+	}
+	return (0);
+}
+
+char	*get_absolute_path(char *cmd)
+{
+	if (cmd[0] == '/' || cmd[0] == '.')
+	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+	}
+	return (NULL);
+}
+
+void	path_concatenation(char *full_path, char *token, char *cmd)
+{
+	ft_strcpy(full_path, token);
+	ft_strcat(full_path, "/");
+	ft_strcat(full_path, cmd);
+}
+
+char	*find_cmd_path(char *cmd, t_env *env_list)
+{
+	char	*path;
+	char	**token;
+	char	*full_path;
+	int		i;
+
+	i = 0;
+	path = getenvp(env_list, "PATH");
+	if (!path)
+		return (NULL);
+	token = ft_split(path, ':');
+	while (token[i])
+	{
+		full_path = malloc(ft_strlen(token[i]) + ft_strlen(cmd) + 2);
+		if (!full_path)
+			break ;
+		path_concatenation(full_path, token[i], cmd);
+		if (access(full_path, X_OK) == 0)
+			return (free_tab(token), full_path);
+		free(full_path);
+		full_path = NULL;
+		i++;
+	}
+	free_tab(token);
+	return (NULL);
+}
+
+char	*getpath(char *cmd, t_data *data)
+{
+	char	*fullpath;
+
+	fullpath = get_absolute_path(cmd);
+	if (fullpath)
+		return (fullpath);
+	fullpath = find_cmd_path(cmd, data->env);
+	if (!fullpath)
+		g_exit_status = 127;
+	return (fullpath);
+}
+
+
+/* ======= fichier: ./exec2.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec2.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/05/19 22:20:48 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/16 23:50:56 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+bool	is_a_directory(char *path, char **args)
+{
+	struct stat	sb;
+
+	if (!args || !args[0] || args[0][0] == '\0')
+	{
+		ft_putstr_fd("minishell: command not found\n", 2);
+		g_exit_status = 127;
+		return (true);
+	}
+	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+	{
+		print_error(args[0], "Is a directory\n");
+		g_exit_status = 126;
+		return (true);
+	}
+	return (false);
+}
+
+void	exec_builtin_redirection(t_data *data)
+{
+	int	saved_in;
+	int	saved_out;
+
+	saved_in = dup(STDIN_FILENO);
+	saved_out = dup(STDOUT_FILENO);
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		dup2(data->cmd->fd_in, STDIN_FILENO);
+		close(data->cmd->fd_in);
+	}
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(data->cmd->fd_out, STDOUT_FILENO);
+		close(data->cmd->fd_out);
+	}
+	exec_builtin(data);
+	dup2(saved_in, STDIN_FILENO);
+	dup2(saved_out, STDOUT_FILENO);
+	close(saved_in);
+	close(saved_out);
+}
+
+void	redirect_file(t_data *data)
+{
+	if (data->cmd->fd_out != STDOUT_FILENO)
+	{
+		close(data->cmd->fd_out);
+		data->cmd->fd_out = STDOUT_FILENO;
+	}
+	if (data->cmd->fd_in != STDIN_FILENO)
+	{
+		close(data->cmd->fd_in);
+		data->cmd->fd_in = STDIN_FILENO;
+	}
+}
+
+void	executecommand(t_data *data)
+{
+	if (!data || !data->line || !data->env || !data->cmd)
+		return ;
+	if (data->cmd->fd_in == -1 || data->cmd->fd_out == -1)
+	{
+		g_exit_status = 1;
+		return ;
+	}
+	if (data->cmd->next)
+		exec_pipe(data->cmd, data);
+	else if (isbuiltin(data))
+	{
+		if (!ft_strcmp(data->cmd->args[0], "exit"))
+			builtin_exit(data);
+		else
+			exec_builtin_redirection(data);
+	}
+	else if (data->cmd->args && data->cmd->args[0])
+		exec_extern_command(data->cmd->args, data->env, data);
+	else if (!data->cmd->args || !data->cmd->args[0])
+		redirect_file(data);
+	free_cmd(&data->cmd);
+	data->cmd = NULL;
+}
+
+void	exec_extern_command(char **args, t_env *env, t_data *data)
+{
+	if (!args || !args[0] || args[0][0] == '\0')
+	{
+		ft_putstr_fd("'' command not found\n", 2);
+		g_exit_status = 127;
+		return ;
+	}
+	if (ft_strcmp(args[0], "\\n") == 0)
+	{
+		ft_putstr_fd("n : command not found\n", 2);
+		g_exit_status = 127;
+		return ;
+	}
+	launch_extern_command(args, env, data);
+}
+
+
+/* ======= fichier: ./pipe.c ======= */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipe.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
+/*   Updated: 2025/06/25 21:12:27 by mlavry           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../minishell.h"
+
+void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd)
+{
+	if (cmd->fd_in != STDIN_FILENO)
+	{
+		dup2(cmd->fd_in, STDIN_FILENO);
+		close(cmd->fd_in);
+	}
+	else if (prev_fd != -1)
+		dup2(prev_fd, STDIN_FILENO);
+	if (cmd->fd_out != STDOUT_FILENO)
+	{
+		dup2(cmd->fd_out, STDOUT_FILENO);
+		close(cmd->fd_out);
+	}
+	else if (cmd->next)
+		dup2(pipe_fd[1], STDOUT_FILENO);
+	if (cmd->next && pipe_fd[0] != -1)
+		close(pipe_fd[0]);
+	if (cmd->next || cmd->fd_out == STDOUT_FILENO)
+		close(pipe_fd[1]);
+	if (prev_fd != -1)
+		close(prev_fd);
+	if (cmd->next)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+	}
+}
+
+bool	is_empty_cmd(t_cmd *cmd)
+{
+	return (!cmd || !cmd->args || !cmd->args[0]);
+}
+
+void	builtin_in_pipe(t_data *data, t_cmd *original_cmd_head)
+{
+	if (data->cmd && data->cmd->args && data->cmd->args[0]
+		&& ft_strcmp(data->cmd->args[0], "exit") == 0)
+	{
+		data->cmd = original_cmd_head;
+		free_all(data, g_exit_status, true);
+		exit(0);
+	}
+	exec_builtin(data);
+	data->cmd = original_cmd_head;
+	free_all(data, g_exit_status, true);
+	exit(0);
+}
+
+void	exec_command(t_cmd *cmd, t_data *data)
+{
+	char	*path;
+	char	**envi;
+	t_cmd	*original_cmd_head;
+
+	original_cmd_head = data->cmd;
+	if (!cmd || !cmd->args || !cmd->args[0])
+		free_all(data, 0, true);
+	data->cmd = cmd;
+	if (isbuiltin(data))
+		builtin_in_pipe(data, original_cmd_head);
+	data->cmd = original_cmd_head;
+	path = getpath(cmd->args[0], data);
+	if (!path)
+		handle_command_error(cmd->args[0], "command not found\n", 127, data);
+	reset_signals_to_default();
+	envi = convert_env(data, data->env);
+	if (execve(path, cmd->args, envi) == -1)
+	{
+		close_all_fd();
+		perror("execve");
+		free(path);
+		free_all(data, g_exit_status, true);
+		exit(127);
+	}
+}
+
+void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd)
+{
+	if (*prev_fd != -1)
+		close(*prev_fd);
+	if (current_cmd->next)
+	{
+		close(pipe_fd[1]);
+		*prev_fd = pipe_fd[0];
+	}
+	if (current_cmd->fd_in > 2)
+		close(current_cmd->fd_in);
+	if (current_cmd->fd_out > 2)
+		close(current_cmd->fd_out);
+}
+
+void    wait_process(pid_t last_pid)
+{
+    int     status;
+    pid_t   pid_wait;
+    int     sig;
+    bool    sigint_printed;
+
+    sigint_printed = false;
+    ignore_sigint();
+    while (1)
+    {
+        pid_wait = wait(&status);
+        if (pid_wait <= 0)
+            break ;
+        if (WIFSIGNALED(status))
+        {
+            sig = WTERMSIG(status);
+            if (sig == SIGINT && !sigint_printed && pid_wait != last_pid)
+            {
+                write(STDOUT_FILENO, "\n", 1);
+                sigint_printed = true;
+            }
+        }
+        if (pid_wait == last_pid && !sigint_printed)
+            handle_status_and_print(status);
+        else if (pid_wait == last_pid && sigint_printed)
+            g_exit_status = 130;
+    }
+}
+
+int	handle_one_pipe(t_cmd *current_cmd, int *prev_fd, int *pipe_fd, pid_t *pid)
+{
+	if (current_cmd->next)
+	{
+		if (pipe(pipe_fd) == -1)
+		{
+			perror("pipe");
+			if (*prev_fd != -1)
+				close(*prev_fd);
+			return (0);
+		}
+	}
+	*pid = fork();
+	if (*pid == -1)
+	{
+		perror("fork");
+		if (*prev_fd != -1)
+			close(*prev_fd);
+		if (current_cmd->next)
+		{
+			close(pipe_fd[0]);
+			close(pipe_fd[1]);
+		}
+		return (0);
+	}
+	return (1);
+}
+
+void	exec_pipe(t_cmd *cmd, t_data *data)
+{
+	int		pipe_fd[2];
+	pid_t	pid;
+	pid_t	last_pid;
+	int		prev_fd;
+	t_cmd	*current_cmd;
+
+	last_pid = -1;
+	prev_fd = -1;
+	current_cmd = cmd;
+	while (current_cmd)
+	{
+		if (!handle_one_pipe(current_cmd, &prev_fd, pipe_fd, &pid))
+			return ;
+		if (pid == 0)
+		{
+			setup_outandin(current_cmd, prev_fd, pipe_fd);
+			exec_command(current_cmd, data);
+		}
+		else
+		{
+			if (current_cmd->next == NULL)
+				last_pid = pid;
+			parent(current_cmd, &prev_fd, pipe_fd);
+		}
+		current_cmd = current_cmd->next;
+	}
+	wait_process(last_pid);
+}
+
+

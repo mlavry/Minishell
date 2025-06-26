@@ -94,7 +94,7 @@ char	**convert_env(t_data *data, t_env *env_list)
 	if (!envir)
 		malloc_failed(data);
 	tmp = env_list;
-	copy_env(data,env_list, envir);
+	copy_env(data, env_list, envir);
 	envir[count] = NULL;
 	return (envir);
 }

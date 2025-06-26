@@ -37,7 +37,7 @@ void	exec_builtin(t_data *data)
 	if (ft_strcmp(cmd->name, "echo") == 0)
 		builtin_echo(data);
 	else if (ft_strcmp(cmd->name, "pwd") == 0)
-		builtin_pwd();
+		builtin_pwd(data->cmd);
 	else if (ft_strcmp(cmd->name, "env") == 0)
 		builtin_env(env_list, data);
 	else if (ft_strcmp(cmd->name, "exit") == 0)

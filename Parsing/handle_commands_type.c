@@ -12,6 +12,35 @@
 
 #include "../minishell.h"
 
+int	handle_cmd(t_cmd **head, t_cmd **cur, t_token *tokens)
+{
+	t_cmd	*new;
+
+	new = ft_calloc (1, sizeof(t_cmd));
+	if (!new)
+		return (0);
+	new->name = ft_strdup(tokens->str);
+	if (!new->name)
+	{
+		free(new);
+		return (0);
+	}
+	new->fd_in = STDIN_FILENO;
+	new->fd_out = STDOUT_FILENO;
+	if (!add_args(&new->args, new->name))
+	{
+		free(new->name);
+		free(new);
+		return (0);
+	}
+	if (!(*head))
+		(*head) = new;
+	else
+		(*cur)->next = new;
+	(*cur) = new;
+	return (1);
+}
+
 bool	handle_heredoc_type(t_data *data, t_token *t, t_token **tok, t_cmd **c)
 {
 	if (!t->next || t->next->type != ARG)

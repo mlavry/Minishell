@@ -76,39 +76,3 @@ void	free_token(t_token **token)
 	}
 	*token = NULL;
 }
-
-void	free_cmd(t_cmd **cmd)
-{
-    t_cmd	*tmp;
-    t_cmd	*current;
-
-    if (!cmd || !*cmd)
-        return ;
-    current = *cmd;
-    while (current)
-    {
-		tmp = current->next; 
-		if ( current->name)
-			free(current->name);
-		if (current->fd_in != STDIN_FILENO && current->fd_in > 2)
-			close(current->fd_in);
-		if (current->fd_out != STDOUT_FILENO && current->fd_out > 2)
-			close(current->fd_out);	
-        if (current->args)
-            free_tab(current->args);
-        if (current->heredoc_file)
-        {
-            unlink(current->heredoc_file);
-            free(current->heredoc_file);
-		}
-		if (current->infile)
-            free(current->infile);
-		if (current->outfile)
-            free(current->outfile);
-		if (current->outfile_append)
-            free(current->outfile_append);
-        free(current);
-        current = tmp;
-    }
-    *cmd = NULL;
-}

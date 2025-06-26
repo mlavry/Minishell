@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 21:41:36 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:36:26 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,6 @@ typedef struct s_cmd
 	char			**args;
 	int				fd_in;
 	int				fd_out;
-	char			*infile;
-	char			*outfile;
-	char			*outfile_append;
 	char			*heredoc_file;
 	struct s_cmd	*next;
 }	t_cmd;
@@ -93,8 +90,10 @@ char	**line_to_token(t_data *data);
 void	mark_commands(t_data *data);
 int		add_args(char ***args, char *str);
 t_cmd	*tokens_to_commands(t_data *data, t_token *tokens);
-bool	handle_heredoc_type(t_data *data, t_token *t, t_token **tok, t_cmd **cur);
-bool	handle_cmd_type(t_token *tok, t_cmd **hd, t_cmd **cur, t_token **tokens);
+bool	handle_heredoc_type(t_data *data, t_token *t,
+			t_token **tok, t_cmd **cur);
+bool	handle_cmd_type(t_token *tok, t_cmd **hd,
+			t_cmd **cur, t_token **tokens);
 bool	handle_arg_type(t_token *tok, t_cmd *cur, t_token **tokens);
 bool	handle_redirectarg_type(t_token *tok, t_token **tokens);
 int		handle_output(t_token **tokens, t_cmd **cur);
@@ -165,9 +164,9 @@ void	init_signals_prompt(void);
 void	handle_status_and_print(int status);
 void	reset_signals_to_default(void);
 void	ignore_sigint(void);
-void    hd_set_signals(struct sigaction *old_int);
-void    hd_restore_signals(const struct sigaction *old_int);
-void    disable_echoctl(void);
+void	hd_set_signals(struct sigaction *old_int);
+void	hd_restore_signals(const struct sigaction *old_int);
+void	disable_echoctl(void);
 void	enable_echoctl(void);
 void	handle_signal_print(int status);
 
@@ -216,6 +215,9 @@ int		write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
 void	print_error(char *cmd, char *msg);
 int		check_cd_errors(char *newpath);
 void	launch_extern_command(char **args, t_env *env, t_data *data);
+void	setup_outandin(t_cmd *cmd, int prev_fd, int *pipe_fd);
+void	exec_command(t_cmd *cmd, t_data *data);
+void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

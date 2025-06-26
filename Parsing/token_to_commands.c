@@ -12,6 +12,50 @@
 
 #include "../minishell.h"
 
+int	handle_output(t_token **tokens, t_cmd **cur)
+{
+	if (!cur || !*cur)
+		return (0);
+	if ((*cur)->args == NULL && (*cur)->name == NULL)
+	{
+		(*cur)->fd_in = STDIN_FILENO;
+		(*cur)->fd_out = STDOUT_FILENO;
+	}
+	if ((*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		if ((*cur)->fd_out != STDOUT_FILENO && (*cur)->fd_out != -1)
+			close((*cur)->fd_out);
+		(*cur)->fd_out = open((*tokens)->next->str,
+				O_CREAT | O_WRONLY | O_TRUNC | __O_CLOEXEC, 0644);
+		if ((*cur)->fd_out < 0)
+		{
+			perror((*tokens)->next->str);
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
+}
+
+int	handle_input(t_token **tokens, t_cmd **cur)
+{
+	if (!cur || !*cur)
+		return (0);
+	if ((*tokens)->next && (*tokens)->next->type == ARG)
+	{
+		if ((*cur)->fd_in != STDIN_FILENO)
+			close((*cur)->fd_in);
+		(*cur)->fd_in = open((*tokens)->next->str, O_RDONLY | __O_CLOEXEC);
+		if ((*cur)->fd_in < 0)
+		{
+			perror((*tokens)->next->str);
+			return (0);
+		}
+		*tokens = (*tokens)->next;
+	}
+	return (1);
+}
+
 int	handle_append(t_token **tokens, t_cmd **cur)
 {
 	if (!cur || !*cur)

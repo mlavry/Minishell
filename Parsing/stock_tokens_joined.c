@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:19:33 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 03:20:10 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 22:57:00 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ char	*handle_dq_joined(char *line, char *old_chain, bool *dq, int *pos)
 
 	temp = extract_dq(line, pos, dq);
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+	while (line[pos[1]] && line[pos[1] + 1]
+		&&is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] += 2;
 	if (!temp)
@@ -40,7 +41,8 @@ char	*handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos)
 
 	temp = extract_sq(line, pos, sq);
 	pos[1]++;
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+	while (line[pos[1]] && line[pos[1] + 1]
+		&& is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] += 2;
 	if (!temp)
@@ -60,7 +62,8 @@ char	*handle_chain_joined(char *line, char *old_chain, int *pos)
 	char	*res;
 
 	temp = extract_chain(line, pos);
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+	while (line[pos[1]] && line[pos[1] + 1]
+		&& is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] += 2;
 	if (!temp)

@@ -6,27 +6,65 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:40:17 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 20:47:45 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 23:43:50 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static bool	handle_dq_operator(char *line, char **tokens, int *pos, bool *dq)
-{
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
-	{
-		pos[1]++;
-		*dq = false;
-		return (true);
-	}
-	return (false);
-}
+// int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
+// {
+// 	char	*temp;
+// 	bool	sq;
 
-static char	*capture_dq_content(char *line, int *pos, bool *dq)
+// 	sq = false;
+// 	temp = NULL;
+// 	if (!*dq)
+// 		return (0);
+// 	pos[1]++;
+// 	pos[0] = pos[1];
+// 	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+// 	{
+// 		pos[1]++;
+// 		(*dq) = false;
+// 		return (1);
+// 	}
+// 	quote_choice(&sq, dq, line[pos[1]]);
+// 	while (line[pos[1]] && *dq)
+// 	{
+// 		pos[1]++;
+// 		quote_choice(&sq, dq, line[pos[1]]);
+// 	}
+// 	if (pos[1] > pos[0])
+// 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+// 	else
+// 		temp = ft_strdup("");
+// 	pos[1]++;
+// 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+// 		&& line[pos[1]] == line[pos[1] + 1])
+// 		pos[1] = pos[1] + 2;
+// 	pos[1]++;
+// 	if (line[pos[1] - 1] && line[pos[1]]
+// 		&& is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+// 			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
+// 	{
+// 		pos[1]++;
+// 		(*dq) = false;
+// 		return (1);
+// 	}
+// 	pos[1]--;
+// 	if (!is_space(line[pos[1]])
+// 		&& !is_operator(line[pos[1]]))
+// 		temp = check_next(line, temp, pos);
+// 	tokens[pos[2]++] = temp;
+// 	pos[0] = pos[1];
+// 	return (1);
+// }
+
+static char	*dq_extract(char *line, bool *dq, int *pos)
 {
-	char	*temp;
 	bool	sq;
+	char	*token;
 
 	sq = false;
 	quote_choice(&sq, dq, line[pos[1]]);
@@ -36,33 +74,51 @@ static char	*capture_dq_content(char *line, int *pos, bool *dq)
 		quote_choice(&sq, dq, line[pos[1]]);
 	}
 	if (pos[1] > pos[0])
-		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+		token = ft_substr(line, pos[0], pos[1] - pos[0]);
 	else
-		temp = ft_strdup("");
-	return (temp);
+		token = ft_strdup("");
+	return (token);
 }
 
-int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
+static int	handle_dq_body(char *line, char **tokens, bool *dq, int *pos)
 {
 	char	*temp;
 
-	temp = NULL;
-	if (!*dq)
-		return (0);
+	temp = dq_extract(line, dq, pos);
 	pos[1]++;
-	pos[0] = pos[1];
-	if (handle_dq_operator(line, tokens, pos, dq))
-		return (free_ret(temp));
-	temp = capture_dq_content(line, pos, dq);
+	while (is_quoted(line[pos[1]])
+		&& is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
+		pos[1] += 2;
 	pos[1]++;
-	skip_dup_quotes(line, pos);
-	pos[1]++;
-	if (handle_dq_operator(line, tokens, pos, dq))
-		return (free_ret(temp));
+	if (line[pos[1] - 1] && line[pos[1]]
+		&& is_operator(line[pos[1]])
+		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1])
+		&& check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*dq) = false;
+		return (1);
+	}
 	pos[1]--;
 	if (!is_space(line[pos[1]]) && !is_operator(line[pos[1]]))
 		temp = check_next(line, temp, pos);
 	tokens[pos[2]++] = temp;
 	pos[0] = pos[1];
 	return (1);
+}
+
+int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
+{
+	if (!*dq)
+		return (0);
+	pos[1]++;
+	pos[0] = pos[1];
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*dq) = false;
+		return (1);
+	}
+	return (handle_dq_body(line, tokens, dq, pos));
 }

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:36:37 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 20:47:09 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 23:41:42 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,26 +14,65 @@
 
 void	skip_dup_quotes(char *line, int *pos)
 {
-	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+	while (line[pos[1]] && line[pos[1] + 1]
+		&& is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])
 		pos[1] += 2;
 }
 
-static bool	handle_sq_operator(char *line, char **tokens, int *pos, bool *sq)
-{
-	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
-	{
-		pos[1]++;
-		*sq = false;
-		return (true);
-	}
-	return (false);
-}
+// int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
+// {
+// 	char	*temp;
+// 	bool	dq;
 
-static char	*capture_sq_content(char *line, int *pos, bool *sq)
+// 	dq = false;
+// 	temp = NULL;
+// 	if (!*sq)
+// 		return (0);
+// 	pos[1]++;
+// 	pos[0] = pos[1];
+// 	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+// 	{
+// 		pos[1]++;
+// 		(*sq) = false;
+// 		return (1);
+// 	}
+// 	quote_choice(sq, &dq, line[pos[1]]);
+// 	while (line[pos[1]] && *sq)
+// 	{
+// 		pos[1]++;
+// 		quote_choice(sq, &dq, line[pos[1]]);
+// 	}
+// 	if (pos[1] > pos[0])
+// 		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+// 	else
+// 		temp = ft_strdup("");
+// 	pos[1]++;
+// 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
+// 		&& line[pos[1]] == line[pos[1] + 1])
+// 		pos[1] = pos[1] + 2;
+// 	pos[1]++;
+// 	if (line[pos[1] - 1] && line[pos[1]]
+// 		&& is_operator(line[pos[1]]) && (is_space(line[pos[1] - 1])
+// 			|| !line[pos[1] - 1]) && check_operators(line, tokens, pos))
+// 	{
+// 		pos[1]++;
+// 		(*sq) = false;
+// 		return (1);
+// 	}
+// 	pos[1]--;
+// 	if (!is_space(line[pos[1]])
+// 		&& !is_operator(line[pos[1]]))
+// 		temp = check_next(line, temp, pos);
+// 	tokens[pos[2]++] = temp;
+// 	pos[0] = pos[1];
+// 	return (1);
+// }
+
+static char	*sq_extract(char *line, bool *sq, int *pos)
 {
-	char	*temp;
 	bool	dq;
+	char	*token;
 
 	dq = false;
 	quote_choice(sq, &dq, line[pos[1]]);
@@ -43,33 +82,51 @@ static char	*capture_sq_content(char *line, int *pos, bool *sq)
 		quote_choice(sq, &dq, line[pos[1]]);
 	}
 	if (pos[1] > pos[0])
-		temp = ft_substr(line, pos[0], pos[1] - pos[0]);
+		token = ft_substr(line, pos[0], pos[1] - pos[0]);
 	else
-		temp = ft_strdup("");
-	return (temp);
+		token = ft_strdup("");
+	return (token);
 }
 
-int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
+static int	handle_sq_body(char *line, char **tokens, bool *sq, int *pos)
 {
 	char	*temp;
 
-	temp = NULL;
-	if (!*sq)
-		return (0);
+	temp = sq_extract(line, sq, pos);
 	pos[1]++;
-	pos[0] = pos[1];
-	if (handle_sq_operator(line, tokens, pos, sq))
-		return (free_ret(temp));
-	temp = capture_sq_content(line, pos, sq);
+	while (is_quoted(line[pos[1]])
+		&& is_quoted(line[pos[1] + 1])
+		&& line[pos[1]] == line[pos[1] + 1])
+		pos[1] += 2;
 	pos[1]++;
-	skip_dup_quotes(line, pos);
-	pos[1]++;
-	if (handle_sq_operator(line, tokens, pos, sq))
-		return (free_ret(temp));
+	if (line[pos[1] - 1] && line[pos[1]]
+		&& is_operator(line[pos[1]])
+		&& (is_space(line[pos[1] - 1]) || !line[pos[1] - 1])
+		&& check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*sq) = false;
+		return (1);
+	}
 	pos[1]--;
 	if (!is_space(line[pos[1]]) && !is_operator(line[pos[1]]))
 		temp = check_next(line, temp, pos);
 	tokens[pos[2]++] = temp;
 	pos[0] = pos[1];
 	return (1);
+}
+
+int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
+{
+	if (!*sq)
+		return (0);
+	pos[1]++;
+	pos[0] = pos[1];
+	if (is_operator(line[pos[1]]) && check_operators(line, tokens, pos))
+	{
+		pos[1]++;
+		(*sq) = false;
+		return (1);
+	}
+	return (handle_sq_body(line, tokens, sq, pos));
 }

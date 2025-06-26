@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   error_syntax.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 21:48:29 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/26 21:48:32 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/26 22:13:42 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ bool	validate_tokens(t_token *tokens)
 	return (true);
 }
 
-void	check_value(t_token *token)
+void	check_value(t_data *data, t_token *token)
 {
 	int		i;
 	char	type_quote;
@@ -93,6 +93,8 @@ void	check_value(t_token *token)
 		if (token->str[i] == type_quote && !(token->str[i + 1]))
 		{
 			res = ft_substr(token->str, 1, i - 1);
+			if (!res)
+				malloc_failed(data);
 			free(token->str);
 			token->str = res;
 			token->type = ARG;

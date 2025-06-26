@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 22:31:47 by mlavry            #+#    #+#             */
-/*   Updated: 2025/05/14 18:33:17 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 01:38:32 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	close_all_fd(void)
 		close(fd);
 		fd++;
 	}
-} 
+}
 /* #include <fcntl.h>
 
 void close_all_fd(void)

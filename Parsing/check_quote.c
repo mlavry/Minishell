@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 21:21:34 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/16 23:54:47 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 00:59:01 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,31 +61,3 @@ int	is_quoted(char c)
 		return (2);
 	return (0);
 }
-
-/* void	stock_and_delete_quote(t_token *token)
-{
-	int		len;
-	char	*tmp;
-
-	len = (int)ft_strlen(token->str);
-	if (!token || !token->str || len < 2)
-		return ;
-	if (token->str[0] == '\'' && token->str[len - 1] == '\'')
-	{
-		token->sq = true;
-		tmp = ft_substr(token->str, 1, len - 2);
-		if (!tmp)
-			return ;
-		free(token->str);
-		token->str = tmp;
-	}
-	else if (token->str[0] == '"' && token->str[len - 1] == '"')
-	{
-		token->dq = true;
-		tmp = ft_substr(token->str, 1, len - 2);
-		if (!tmp)
-			return ;
-		free(token->str);
-		token->str = tmp;
-	}
-} */

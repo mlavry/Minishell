@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/25 19:31:29 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 03:37:55 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,13 @@ void	mark_heredoc_quotes(t_data *data);
 int		count_heredocs(char *line);
 void	check_dollars(t_data *data, char **src, char **res, int *len_buf);
 void	replace_dollars_heredocs(t_data *data, char **delim);
+char	*handle_dq_joined(char *line, char *old_chain, bool *dq, int *pos);
+char	*handle_sq_joined(char *line, char *old_chain, bool *sq, int *pos);
+char	*handle_chain_joined(char *line, char *old_chain, int *pos);
+char	*extract_chain(char *line, int *pos);
+char	*extract_sq(char *line, int *pos, bool *sq);
+char	*extract_dq(char *line, int *pos, bool *dq);
+int		handle_sq(char *line, char **tokens, bool *sq, int *pos);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);

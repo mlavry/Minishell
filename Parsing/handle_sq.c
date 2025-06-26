@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:36:37 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 16:42:56 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:47:09 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,18 +53,19 @@ int	handle_sq(char *line, char **tokens, bool *sq, int *pos)
 {
 	char	*temp;
 
+	temp = NULL;
 	if (!*sq)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
 	if (handle_sq_operator(line, tokens, pos, sq))
-		return (1);
+		return (free_ret(temp));
 	temp = capture_sq_content(line, pos, sq);
 	pos[1]++;
 	skip_dup_quotes(line, pos);
 	pos[1]++;
 	if (handle_sq_operator(line, tokens, pos, sq))
-		return (1);
+		return (free_ret(temp));
 	pos[1]--;
 	if (!is_space(line[pos[1]]) && !is_operator(line[pos[1]]))
 		temp = check_next(line, temp, pos);

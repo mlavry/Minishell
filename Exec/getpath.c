@@ -43,6 +43,13 @@ char	*get_absolute_path(char *cmd)
 	return (NULL);
 }
 
+void	path_concatenation(char *full_path, char *token, char *cmd)
+{
+	ft_strcpy(full_path, token);
+	ft_strcat(full_path, "/");
+	ft_strcat(full_path, cmd);
+}
+
 char	*find_cmd_path(char *cmd, t_env *env_list)
 {
 	char	*path;
@@ -53,19 +60,18 @@ char	*find_cmd_path(char *cmd, t_env *env_list)
 	i = 0;
 	path = getenvp(env_list, "PATH");
 	if (!path)
-		return (free(path), NULL);
+		return (NULL);
 	token = ft_split(path, ':');
 	while (token[i])
 	{
 		full_path = malloc(ft_strlen(token[i]) + ft_strlen(cmd) + 2);
 		if (!full_path)
 			break ;
-		ft_strcpy(full_path, token[i]);
-		ft_strcat(full_path, "/");
-		ft_strcat(full_path, cmd);
+		path_concatenation(full_path, token[i], cmd);
 		if (access(full_path, X_OK) == 0)
 			return (free_tab(token), full_path);
 		free(full_path);
+		full_path = NULL;
 		i++;
 	}
 	free_tab(token);

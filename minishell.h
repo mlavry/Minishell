@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 18:06:28 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:36:26 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,13 @@
 # include <limits.h>
 # include "Gnl/get_next_line.h"
 
-# define INPUT 1 //"<"
-# define HEREDOC 2 //"<<"
-# define OUTPUT 3 //">"
-# define APPEND 4 //">>"
-# define PIPE 5 //"|"
-# define CMD 6 //"cmd"
-# define ARG 7 //"arg"
+# define INPUT 1
+# define HEREDOC 2
+# define OUTPUT 3
+# define APPEND 4
+# define PIPE 5
+# define CMD 6
+# define ARG 7
 
 extern int	g_exit_status;
 
@@ -124,6 +124,9 @@ void	handle_operator(char *line, char **temp, int *pos);
 int		handle_dq(char *line, char **tokens, bool *dq, int *pos);
 void	skip_leading_spaces(char *line, int *pos);
 int		handle_unquoted(char *line, char **tokens, int *pos);
+int		handle_heredoc(t_data *data, t_token **tokens, t_cmd *cur);
+char	*heredoc_tmp(void);
+int		write_heredoc(t_data *d, int idx, char *delim, int fd);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -193,19 +196,21 @@ void	built_export(t_data *data, t_env *env_list);
 void	built_export2(t_data *data, t_env **env_list, char **args);
 int		loop(t_env *current, char *new_value, char *var_name);
 void	builtin_export(t_data *data, t_env **env_list, t_cmd *cmd);
-void	updatepwd(t_env **env_list, char *oldpath);
+void	updatepwd(t_data *data, t_env **env_list, char *oldpath);
 char	*getpath(char *cmd, t_data *data);
 void	execshell(t_data *data, t_env **env_list);
 void	executecommand(t_data *data);
 void	exec_extern_command(char **args, t_env *env_list, t_data *data);
 void	exec_pipe(t_cmd *cmd, t_data *data);
 bool	is_a_directory(char *path, char **args);
-
+void	built_path(char *newpath, t_data *data);
 void	handle_command_error(char *cmd, char *msg, int exit_code, t_data *data);
 t_cmd	*create_new_cmd(void);
-bool is_redirection(int type);
-int write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
+bool	is_redirection(int type);
+int		write_heredoc(t_data *data, int hd_idx, char *delimiter, int tmp_fd);
 void	print_error(char *cmd, char *msg);
+int		check_cd_errors(char *newpath);
+void	launch_extern_command(char **args, t_env *env, t_data *data);
 
 //------------Debug Functions---------------------
 void	print_cmds(t_cmd *c);

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 16:55:58 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 17:32:16 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:57:33 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ static bool	mid_quoted_operator(char *line, char **tokens, int *pos)
 		{
 			sq = false;
 			dq = false;
-
 			quote_choice(&sq, &dq, line[pos[1]]);
 			pos[1]++;
 			return (true);
@@ -59,7 +58,6 @@ static bool	trailing_operator(char *line, char **tokens, int *pos)
 	{
 		sq = false;
 		dq = false;
-
 		quote_choice(&sq, &dq, line[pos[1]]);
 		pos[1]++;
 		return (true);

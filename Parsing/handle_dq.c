@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:40:17 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 16:48:30 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:47:45 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,18 +46,19 @@ int	handle_dq(char *line, char **tokens, bool *dq, int *pos)
 {
 	char	*temp;
 
+	temp = NULL;
 	if (!*dq)
 		return (0);
 	pos[1]++;
 	pos[0] = pos[1];
 	if (handle_dq_operator(line, tokens, pos, dq))
-		return (1);
+		return (free_ret(temp));
 	temp = capture_dq_content(line, pos, dq);
 	pos[1]++;
 	skip_dup_quotes(line, pos);
 	pos[1]++;
 	if (handle_dq_operator(line, tokens, pos, dq))
-		return (1);
+		return (free_ret(temp));
 	pos[1]--;
 	if (!is_space(line[pos[1]]) && !is_operator(line[pos[1]]))
 		temp = check_next(line, temp, pos);

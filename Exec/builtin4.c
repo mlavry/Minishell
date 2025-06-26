@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin4.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aboutale <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/12 18:02:27 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/12 18:02:30 by aboutale         ###   ########.fr       */
+/*   Updated: 2025/06/26 20:45:17 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,25 +75,6 @@ void	builtin_env( t_env *env_list, t_data *data)
 	}
 }
 
-void	emptyenv(t_data *data, t_env **env_list)
-{
-	char	*cwd;
-	t_env	*pwd;
-
-	cwd = getcwd(NULL, 0);
-	if (!cwd)
-		malloc_failed(data);
-	if (*env_list == NULL)
-	{
-		add_env_var(data, env_list, "PWD", cwd);
-		add_env_var(data, env_list, "PATH", "/usr/bin:/bin");
-	}
-	pwd = find_env_var(*env_list, "PWD");
-	if (pwd && pwd->value)
-		chdir(pwd->value);
-	free(cwd);
-}
-
 void	builtin_pwd(void)
 {
 	char	*cwd;
@@ -106,4 +87,29 @@ void	builtin_pwd(void)
 	}
 	else
 		perror("cwd");
+}
+
+void	built_path(char *newpath, t_data *data)
+{
+	char	cwd[1024];
+
+	if (!check_cd_errors(newpath))
+		return ;
+	if (!getcwd(cwd, sizeof(cwd)))
+	{
+		ft_putstr_fd("cd: error retrieving current directory\n", 2);
+		if (chdir("/.") == 0)
+			updatepwd(data, &data->env, "/");
+		else
+			g_exit_status = 1;
+		return ;
+	}
+	if (chdir(newpath) != 0)
+	{
+		ft_putstr_fd("cd: ", 2);
+		perror(newpath);
+		g_exit_status = 1;
+		return ;
+	}
+	updatepwd(data, &data->env, cwd);
 }

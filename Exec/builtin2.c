@@ -12,9 +12,8 @@
 
 #include "../minishell.h"
 
-void	built_path(char *newpath, t_data *data)
+int	check_cd_errors(char *newpath)
 {
-	char		cwd[1024];
 	struct stat	sb;
 
 	if (access(newpath, F_OK) != 0)
@@ -22,41 +21,23 @@ void	built_path(char *newpath, t_data *data)
 		ft_putstr_fd("cd: ", 2);
 		print_error(newpath, "No such file or directory\n");
 		g_exit_status = 1;
-		return ;
+		return (0);
 	}
 	if (stat(newpath, &sb) != 0 || !S_ISDIR(sb.st_mode))
 	{
 		ft_putstr_fd("cd: ", 2);
 		print_error(newpath, "Not a directory\n");
 		g_exit_status = 1;
-		return ;
+		return (0);
 	}
 	if (access(newpath, X_OK) != 0)
 	{
 		ft_putstr_fd("cd: ", 2);
 		print_error(newpath, "Permission denied\n");
 		g_exit_status = 126;
-		return ;
+		return (0);
 	}
- 	if (!getcwd(cwd, sizeof(cwd)))
-	{
-		ft_putstr_fd("cd: error retrieving current directory\n", 2);
-		if (chdir("/.") == 0) // on revient au root
-			updatepwd(&data->env, "/");
-		else
-			g_exit_status = 1;
-		return ;
-	}
-	if (chdir(newpath) != 0)
-    {
-        ft_putstr_fd("cd: ", 2);
-        perror(newpath);
-        g_exit_status = 1;
-        return ;
-    }
-	//getcwd(cwd, sizeof(cwd));
-	//chdir(newpath);
-	updatepwd(&data->env, cwd);
+	return (1);
 }
 
 static char	*handle_cd_null(void)
@@ -111,7 +92,7 @@ static char	*handle_cd_home(char *newpath, t_data *data, bool *must_free)
 		g_exit_status = 1;
 		return (NULL);
 	}
-	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath)) ;
+	expanded_path = malloc(ft_strlen(home) + ft_strlen(newpath));
 	if (!expanded_path)
 		malloc_failed(data);
 	ft_strcpy(expanded_path, home);

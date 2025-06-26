@@ -12,6 +12,17 @@
 
 #include "../minishell.h"
 
+t_env	*find_env_var(t_env *env_list, char *name)
+{
+	while (env_list != NULL)
+	{
+		if (ft_strcmp(env_list->name, name) == 0)
+			return (env_list);
+		env_list = env_list->next;
+	}
+	return (NULL);
+}
+
 int	ft_atoi_safe(const char *str, int *out)
 {
 	int			i;

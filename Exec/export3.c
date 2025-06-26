@@ -42,7 +42,14 @@ void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 	if (equal_sign && equal_sign > str && *(equal_sign - 1) == '+')
 	{
 		var_name = ft_substr(str, 0, equal_sign - str - 1);
+		if (!var_name)
+			malloc_failed(data);
 		new_value = ft_strdup(equal_sign + 1);
+		if (!new_value)
+		{
+			free(var_name);
+			malloc_failed(data);
+		}
 	}
 	current = *env_list;
 	if (!loop(current, new_value, var_name))

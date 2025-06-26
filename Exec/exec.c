@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/20 20:57:16 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/26 18:09:43 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/17 21:04:07 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,18 +96,13 @@ void	no_path(t_data *data, char **args)
 void	launch_extern_command(char **args, t_env *env, t_data *data)
 {
 	pid_t	pid;
-	int		status;
 	char	*path;
 
-	status = 0;
 	if (ft_strchr(args[0], '/'))
 	{
 		path = ft_strdup(args[0]);
 		if (!path)
-		{
-			free(path);
 			malloc_failed(data);
-		}
 	}
 	else
 		path = getpath(args[0], data);
@@ -124,22 +119,5 @@ void	launch_extern_command(char **args, t_env *env, t_data *data)
 	if (pid == 0)
 		extern_childprocess(data, path, env, args);
 	else
-		parent_and_wait(status, path, data, pid);
-}
-
-void	exec_extern_command(char **args, t_env *env, t_data *data)
-{
-	if (!args || !args[0] || args[0][0] == '\0')
-	{
-		ft_putstr_fd("'' command not found\n", 2);
-		g_exit_status = 127;
-		return ;
-	}
-	if (ft_strcmp(args[0], "\\n") == 0)
-	{
-		ft_putstr_fd("n : command not found\n", 2);
-		g_exit_status = 127;
-		return ;
-	}
-	launch_extern_command(args, env, data);
+		parent_and_wait(0, path, data, pid);
 }

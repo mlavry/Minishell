@@ -20,13 +20,11 @@ bool	is_a_directory(char *path, char **args)
 	{
 		ft_putstr_fd("minishell: command not found\n", 2);
 		g_exit_status = 127;
-		free(path);
 		return (true);
 	}
 	if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
 	{
 		print_error(args[0], "Is a directory\n");
-		free(path);
 		g_exit_status = 126;
 		return (true);
 	}
@@ -97,13 +95,19 @@ void	executecommand(t_data *data)
 	data->cmd = NULL;
 }
 
-t_env	*find_env_var(t_env *env_list, char *name)
+void	exec_extern_command(char **args, t_env *env, t_data *data)
 {
-	while (env_list != NULL)
+	if (!args || !args[0] || args[0][0] == '\0')
 	{
-		if (ft_strcmp(env_list->name, name) == 0)
-			return (env_list);
-		env_list = env_list->next;
+		ft_putstr_fd("'' command not found\n", 2);
+		g_exit_status = 127;
+		return ;
 	}
-	return (NULL);
+	if (ft_strcmp(args[0], "\\n") == 0)
+	{
+		ft_putstr_fd("n : command not found\n", 2);
+		g_exit_status = 127;
+		return ;
+	}
+	launch_extern_command(args, env, data);
 }

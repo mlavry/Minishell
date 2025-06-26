@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/22 16:20:22 by aboutale          #+#    #+#             */
-/*   Updated: 2025/06/25 21:12:27 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 20:56:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,34 +104,38 @@ void	parent(t_cmd *current_cmd, int *prev_fd, int *pipe_fd)
 		close(current_cmd->fd_out);
 }
 
-void    wait_process(pid_t last_pid)
+static void	handle_child_status(int status, pid_t pid, pid_t last, bool *print)
 {
-    int     status;
-    pid_t   pid_wait;
-    int     sig;
-    bool    sigint_printed;
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT
+		&& !*print && pid != last)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+		*print = true;
+	}
+	if (pid == last)
+	{
+		if (!*print)
+			handle_status_and_print(status);
+		else
+			g_exit_status = 130;
+	}
+}
 
-    sigint_printed = false;
-    ignore_sigint();
-    while (1)
-    {
-        pid_wait = wait(&status);
-        if (pid_wait <= 0)
-            break ;
-        if (WIFSIGNALED(status))
-        {
-            sig = WTERMSIG(status);
-            if (sig == SIGINT && !sigint_printed && pid_wait != last_pid)
-            {
-                write(STDOUT_FILENO, "\n", 1);
-                sigint_printed = true;
-            }
-        }
-        if (pid_wait == last_pid && !sigint_printed)
-            handle_status_and_print(status);
-        else if (pid_wait == last_pid && sigint_printed)
-            g_exit_status = 130;
-    }
+void	wait_process(pid_t last_pid)
+{
+	int		status;
+	pid_t	pid_wait;
+	bool	printed;
+
+	printed = false;
+	ignore_sigint();
+	while (1)
+	{
+		pid_wait = wait(&status);
+		if (pid_wait <= 0)
+			break ;
+		handle_child_status(status, pid_wait, last_pid, &printed);
+	}
 }
 
 int	handle_one_pipe(t_cmd *current_cmd, int *prev_fd, int *pipe_fd, pid_t *pid)

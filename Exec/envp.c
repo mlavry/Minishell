@@ -50,7 +50,7 @@ void	add_env_var(t_data *data, t_env **env_list, char *name, char *value)
 	tmp->next = new_var;
 }
 
-void	copy_env(t_env *tmp, char **envir)
+void	copy_env(t_data *data, t_env *tmp, char **envir)
 {
 	int		i;
 	size_t	len;
@@ -64,8 +64,8 @@ void	copy_env(t_env *tmp, char **envir)
 			envir[i] = malloc(len);
 			if (!envir[i])
 			{
-				perror("malloc");
-				exit(EXIT_FAILURE);
+				free_tab(envir);
+				malloc_failed(data);
 			}
 			ft_strcpy(envir[i], tmp->name);
 			ft_strcat(envir[i], "=");
@@ -76,7 +76,7 @@ void	copy_env(t_env *tmp, char **envir)
 	}
 }
 
-char	**convert_env(t_env *env_list)
+char	**convert_env(t_data *data, t_env *env_list)
 {
 	int		count;
 	t_env	*tmp;
@@ -92,12 +92,9 @@ char	**convert_env(t_env *env_list)
 	}
 	envir = malloc((count + 1) * sizeof(char *));
 	if (!envir)
-	{
-		perror("malloc");
-		exit(EXIT_FAILURE);
-	}
+		malloc_failed(data);
 	tmp = env_list;
-	copy_env(env_list, envir);
+	copy_env(data,env_list, envir);
 	envir[count] = NULL;
 	return (envir);
 }

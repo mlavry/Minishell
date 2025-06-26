@@ -12,6 +12,27 @@
 
 #include "../minishell.h"
 
+int	loop(t_env *current, char *new_value, char *var_name)
+{
+	char	*joined;
+
+	while (current)
+	{
+		if (ft_strcmp(current->name, var_name) == 0)
+		{
+			if (current->value)
+				joined = ft_strjoin(current->value, new_value);
+			else
+				joined = ft_strdup(new_value);
+			free(current->value);
+			current->value = joined;
+			return (1);
+		}
+		current = current->next;
+	}
+	return (0);
+}
+
 char	*get_absolute_path(char *cmd)
 {
 	if (cmd[0] == '/' || cmd[0] == '.')

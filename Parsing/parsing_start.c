@@ -12,7 +12,6 @@
 
 #include "../minishell.h"
 
-
 void	set_token_prev_links(t_token *tokens)
 {
 	t_token	*prev;
@@ -80,11 +79,22 @@ bool	validate_tokens(t_token *tokens)
 	return (true);
 }
 
+static bool	is_exit_no_arg(t_cmd *cmd)
+{
+	if (ft_strcmp(cmd->name, "exit") == 0 && !(cmd->args[1]))
+		return (true);
+	return (false);
+}
+
 bool	parse_line(t_data *data)
 {
+	int		saved_status;
+	t_cmd	*last;
+
 	if (open_quote(data->line))
 	{
 		free(data->line);
+		data->line = NULL;
 		return (false);
 	}
 	mark_heredoc_quotes(data);
@@ -92,22 +102,38 @@ bool	parse_line(t_data *data)
 	replace_dollars(data);
 	if (!tokenize(data))
 	{
+		free(data->expand_hd);
 		free(data->line);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
 	set_token_prev_links(data->token);
 	if (!validate_tokens(data->token))
 	{
+		free(data->expand_hd);
 		free(data->line);
 		free_token(&data->token);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
+	saved_status = g_exit_status;
+	g_exit_status = 0;
 	data->cmd = tokens_to_commands(data, data->token);
 	if (!(data->cmd))
 	{
 		free(data->line);
+		free(data->expand_hd);
 		free_token(&data->token);
+		data->line = NULL;
+		data->expand_hd = NULL;
 		return (false);
 	}
+	last = data->cmd;
+	while (last && last->next)
+		last = last->next;
+	if (is_exit_no_arg(last) && g_exit_status == 0)
+		g_exit_status = saved_status;
 	return (true);
 }

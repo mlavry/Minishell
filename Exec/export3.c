@@ -29,27 +29,6 @@ int	is_concatenation(char *str)
 	return (*(eq - 1) == '+');
 }
 
-int	loop(t_env *current, char *new_value, char *var_name)
-{
-	char	*joined;
-
-	while (current)
-	{
-		if (ft_strcmp(current->name, var_name) == 0)
-		{
-			if (current->value)
-				joined = ft_strjoin(current->value, new_value);
-			else
-				joined = ft_strdup(new_value);
-			free(current->value);
-			current->value = joined;
-			return (1);
-		}
-		current = current->next;
-	}
-	return (0);
-}
-
 void	ft_concatenation(char *str, t_env **env_list, t_data *data)
 {
 	char	*equal_sign;

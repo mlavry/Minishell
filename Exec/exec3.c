@@ -67,7 +67,6 @@ void	add_pwd(t_env **env_list, t_data *data, char *cwd)
 	if (!pwd)
 		add_env_var(data, env_list, "PWD", cwd);
 	free(cwd);
-
 }
 
 void	execshell(t_data *data, t_env **env_list)
@@ -89,12 +88,10 @@ void	execshell(t_data *data, t_env **env_list)
 	{
 		lvl = 1;
 		shlvl_verification(shlvl, &lvl);
-
 		free(shlvl->value);
 		shlvl->value = ft_itoa(lvl);
 		if (!shlvl->value)
 			malloc_failed(data);
 	}
 	add_pwd(env_list, data, cwd);
-
 }

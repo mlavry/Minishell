@@ -35,7 +35,6 @@ void	free_tab(char **tokens)
 		close(data->cmd->fd_out);
 } */
 
-
 void	close_all_fd(void)
 {
 	int	fd;
@@ -48,7 +47,7 @@ void	close_all_fd(void)
 		close(fd);
 		fd++;
 	}
-} 
+}
 /* #include <fcntl.h>
 
 void close_all_fd(void)
@@ -61,8 +60,6 @@ void close_all_fd(void)
         fd++;
     }
 } */
-
-
 
 void	free_env(t_env **env)
 {

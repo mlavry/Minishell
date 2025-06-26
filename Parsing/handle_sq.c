@@ -6,13 +6,13 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 03:36:37 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 03:37:31 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 16:42:56 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static void	skip_dup_quotes(char *line, int *pos)
+void	skip_dup_quotes(char *line, int *pos)
 {
 	while (is_quoted(line[pos[1]]) && is_quoted(line[pos[1] + 1])
 		&& line[pos[1]] == line[pos[1] + 1])

@@ -6,7 +6,7 @@
 /*   By: mlavry <mlavry@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/07 19:37:28 by mlavry            #+#    #+#             */
-/*   Updated: 2025/06/26 03:37:55 by mlavry           ###   ########.fr       */
+/*   Updated: 2025/06/26 17:31:10 by mlavry           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,11 @@ char	*extract_chain(char *line, int *pos);
 char	*extract_sq(char *line, int *pos, bool *sq);
 char	*extract_dq(char *line, int *pos, bool *dq);
 int		handle_sq(char *line, char **tokens, bool *sq, int *pos);
+void	skip_dup_quotes(char *line, int *pos);
+void	handle_operator(char *line, char **temp, int *pos);
+int		handle_dq(char *line, char **tokens, bool *dq, int *pos);
+void	skip_leading_spaces(char *line, int *pos);
+int		handle_unquoted(char *line, char **tokens, int *pos);
 
 //------------------------Env---------------------
 void	parse_env(char **envp, t_data *env_list);
@@ -145,6 +150,7 @@ int		is_multiple_heredoc(char *str);
 int		ft_isnumeric(const char *str);
 int		check_operators(char *line, char **tokens, int *pos);
 int		ft_atoi_safe(const char *str, int *out);
+int		free_ret(char *ptr);
 
 //------------------------Signals---------------------
 void	init_signals_prompt(void);

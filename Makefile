@@ -10,7 +10,7 @@ SRC_PARSING = Parsing/parsing_start.c Parsing/check_quote.c Parsing/tokenize.c P
 Parsing/free.c Utils/utils.c Utils/utils_2.c Parsing/make_commands.c Parsing/token_to_commands.c Parsing/init_struct.c Parsing/exit_code.c\
 Parsing/expand.c Utils/utils_3.c Parsing/handle_commands_type.c Parsing/handle_commands.c Utils/signal.c \
 Utils/signal_hd.c Parsing/check_op_syntax.c Parsing/expand_heredoc.c Parsing/stock_tokens_joined.c \
-Parsing/extract_chain.c Parsing/handle_sq.c
+Parsing/extract_chain.c Parsing/handle_sq.c Parsing/handle_dq.c Parsing/handle_uq.c
 
 SRC = $(SRC_EXEC) $(SRC_PARSING)
 
